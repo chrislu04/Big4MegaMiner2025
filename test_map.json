@@ -1,0 +1,33 @@
+{
+    "floor_tiles": [
+        "bbbbbb     rrrrrr",
+        "bbOOOOOOOOOOOOOrr",
+        "bbObbb     rrrOrr",
+        "bbbOOOOOOOOOOOrrr",
+        "bbObbb     rrrOrr",
+        "bbOOOOOOOOOOOOOrr",
+        "bbbbbb     rrrrrr"
+    ],
+    "blue_base": {
+        "x": 2,
+        "y": 3
+    },
+    "red_base": {
+        "x": 14,
+        "y": 3
+    },
+    "spawners": [
+        {
+            "x": 8,
+            "y": 1,
+            "initial_target": "Red",
+            "switch_target": true
+        },
+        {
+            "x": 8,
+            "y": 5,
+            "initial_target": "Blue",
+            "switch_target": true
+        }
+    ]
+}
