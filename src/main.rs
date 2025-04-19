@@ -412,7 +412,11 @@ struct GameState {
 }
 
 impl GameState {
+
+    // Create a new game state object from a map file
     fn new(map_file_path_str: &String) -> GameState {
+
+        // Create the struct, and fill in all properties which don't need to come from the file
         let mut new_game_state = GameState {
             turns_progressed: 0,
             victory: None,
@@ -423,20 +427,36 @@ impl GameState {
             enemies: HashMap::new(),
             enemy_spawners: HashMap::new(),
         };
+
+        // Attempt to open the map file
         match File::open(map_file_path_str) {
+
+            // Successfully opened map file
             Ok(file) => {
+
+                // Map file is in JSON format. Deserialize it.
                 let mut de = Deserializer::from_reader(BufReader::new(file));
                 match DataFromMapfile::deserialize(&mut de) {
+
+                    // Deserialization was successful
                     Ok(data) => {
+
+                        // Iterate through all the floor tiles in the map file
                         for (y_i, line) in data.floor_tiles.iter().enumerate() {
                             for (x_i, chr) in line.chars().enumerate() {
+
+                                // Get the floor tile for the current iteration
                                 let at_pos = match chr {
                                     'r' => Some(FloorTile::RedTerritory),
                                     'b' => Some(FloorTile::BlueTerritory),
                                     'O' => Some(FloorTile::Path),
-                                    _ => None,
+                                    _ => None, // Invalid
                                 };
+
+                                // Was a valid floor tile specified?
                                 match at_pos {
+
+                                    // Yes. A valid floor tile was specified. Attempt to insert it into the map.
                                     Some(tile) => match new_game_state.floor_tiles.insert(
                                         Position {
                                             x: x_i as i32,
@@ -444,27 +464,43 @@ impl GameState {
                                         },
                                         tile,
                                     ) {
+
+                                        // Successfully inserted the new floor tile
                                         None => (),
+
+                                        // There was already a tile where we tried to insert the new floor tile
                                         Some(_) => eprintln!(
                                             "Error: During game map initialization: there was already a tile at position ({},{}). This line should not be reached.",
                                             x_i, y_i
                                         ),
                                     },
-                                    None => (),
+
+                                    // Invalid floor tile specification. Panic
+                                    None => panic!("Invalid floor tile specified at position ({},{}).", x_i, y_i),
                                 }
                             }
                         }
+
+                        // Place the blue base
                         new_game_state.player_state_blue.base =
                             Some(PlayerBase::new(data.blue_base, TeamColor::Blue));
+                        
+                        // Place the red base
                         new_game_state.player_state_red.base =
                             Some(PlayerBase::new(data.red_base, TeamColor::Red));
+                        
+                        // Place the enemy spawners
                         for from_mapfile in data.spawners {
                             new_game_state.add_enemy_spawner(from_mapfile);
                         }
                     }
+
+                    // Deserialization was unsuccessful. Panic
                     Err(err) => panic!("Unable to deserialize map data: {}", err.to_string()),
                 }
             }
+
+            // Unable to open map file. Panic
             Err(err) => panic!(
                 "Failed to open map file {}: {}",
                 map_file_path_str,
@@ -758,6 +794,7 @@ impl GameState {
 }
 
 ////////// PLAYER ACTIONS + VALIDATION //////////
+// TODO: use JSON schema to validate inputs more easily
 
 fn try_set_team_name(
     game_state: &mut GameState,
@@ -767,23 +804,41 @@ fn try_set_team_name(
     todo!()
 }
 
-// Call this function
-fn try_buy_builder(game_state: &mut GameState, team_color: TeamColor) -> Result<(), String> {
+// Buys a builder if possible. Returns an error if unable to buy a builder.
+fn try_buy_builder(
+    // we need to modify the game state if the input is valid
+    game_state: &mut GameState,
+
+    // we need to know which team this action is for
+    team_color: TeamColor,
+) -> Result<(), String> {
+
+    // get the player state object for the team which is performing the bulider action
     let player_state = match team_color {
         TeamColor::Red => &mut game_state.player_state_red,
         TeamColor::Blue => &mut game_state.player_state_blue,
     };
+
+    // see if there's a price listed for the next builder to buy
     match BUILDER_PRICES.get(player_state.builder_count as usize) {
+
+        // Yes, there is a price for the next builder. Does the player have enough money?
         Some(&price) => match player_state.money >= price {
+
+            // Player has enough money. Buy the builder.
             true => Ok({
                 player_state.builder_count += 1;
                 player_state.money -= price;
             }),
+
+            // Player doesn't have enough money
             false => Err(format!(
                 "The next builder costs ${}. You only have ${}",
                 price, player_state.money
             )),
         },
+
+        // No, there is not a price for the next builder: reached max amount of builders
         None => Err(format!(
             "The maximum number of builders per player is {}. You can't buy another one.",
             BUILDER_PRICES.len()
@@ -811,13 +866,14 @@ struct BuilderAction {
 // Try to perform a builder action based on what the agent's output,
 // Return an error if it was invalid, otherwise perform the action
 fn try_perform_builder_action(
+
     // we need to modify the game state if the input is valid
     game_state: &mut GameState,
 
     // we need the input itself
     builder_action: BuilderAction,
 
-    // we need to know which player's input
+    // we need to know which team this action is for
     team_color: TeamColor,
 ) -> Result<(), String> {
     // get the player state object for the team which is performing the bulider action
@@ -842,66 +898,70 @@ fn try_perform_builder_action(
                     // Yes, the team color and floor tile type match
                     (FloorTile::RedTerritory, TeamColor::Red)
                     | (FloorTile::BlueTerritory, TeamColor::Blue) =>
-                    
+
                     // Is there already an entity at that position?
-                    match game_state
-                        .entity_position
-                        .get(&Position { x, y })
                     {
-                        // No entity already at the target position: did the agent specify a tower type to build?
-                        None => match builder_action.tower_type {
+                        match game_state.entity_position.get(&Position { x, y }) {
 
-                            // Yes, the agent specified a tower type.
-                            Some(tow_type) => {
+                            // No entity already at the target position: did the agent specify a tower type to build?
+                            None => match builder_action.tower_type {
 
-                                // Attempt to create a tower with the specified tower type
-                                match Tower::new(Position { x, y }, team_color, tow_type.clone()) {
+                                // Yes, the agent specified a tower type.
+                                Some(tow_type) => {
 
-                                    // Tower was successfully created (but not placed on the map yet)
-                                    Ok(new_tower) => {
+                                    // Attempt to create a tower with the specified tower type
+                                    match Tower::new(
+                                        Position { x, y },
+                                        team_color,
+                                        tow_type.clone(),
+                                    ) {
 
-                                        // Does the player have enough money to place that tower?
-                                        match player_state.money >= new_tower.stats.cost {
+                                        // Tower was successfully created (but not placed on the map yet)
+                                        Ok(new_tower) => {
 
-                                            // Yes, there is enough money to place the tower
-                                            true => Ok({
-                                                
-                                                // Complete the purchase and place the new tower
-                                                player_state.money -= new_tower.stats.cost;
-                                                game_state.add_tower(
-                                                    tow_type,
-                                                    Position { x, y },
-                                                    team_color,
-                                                );
-                                            }),
+                                            // Does the player have enough money to place that tower?
+                                            match player_state.money >= new_tower.stats.cost {
 
-                                            // Not enough money to place the tower
-                                            false => Err(format!(
-                                                "You're too poor to build the \"{}\" tower, which costs ${}. You only have ${}",
-                                                new_tower.stats.tower_type,
-                                                new_tower.stats.cost,
-                                                player_state.money
-                                            )),
+                                                // Yes, there is enough money to place the tower
+                                                true => Ok({
+
+                                                    // Complete the purchase and place the new tower
+                                                    player_state.money -= new_tower.stats.cost;
+                                                    game_state.add_tower(
+                                                        tow_type,
+                                                        Position { x, y },
+                                                        team_color,
+                                                    );
+                                                }),
+
+                                                // Not enough money to place the tower
+                                                false => Err(format!(
+                                                    "You're too poor to build the \"{}\" tower, which costs ${}. You only have ${}",
+                                                    new_tower.stats.tower_type,
+                                                    new_tower.stats.cost,
+                                                    player_state.money
+                                                )),
+                                            }
                                         }
+
+                                        // An error occurred when trying to create the tower
+                                        Err(e_str) => Err(e_str),
                                     }
-
-                                    // An error occurred when trying to create the tower
-                                    Err(e_str) => Err(e_str),
                                 }
-                            }
 
-                            // No tower type was specified
-                            None => Err(format!(
-                                "Builder action_type was \"build\", but no tower type was specified"
+                                // No tower type was specified
+                                None => Err(format!(
+                                    "Builder action_type was \"build\", but no tower type was specified"
+                                )),
+                            },
+
+                            // There is an entity in the way at the target position
+                            Some(_) => Err(format!(
+                                "There was already something at the target position ({},{})",
+                                x, y
                             )),
-                        },
-
-                        // There is an entity in the way at the target position
-                        Some(_) => Err(format!(
-                            "There was already something at the target position ({},{})",
-                            x, y
-                        )),
-                    },
+                        }
+                    }
 
                     // No, the team color and tile type don't match
                     _ => Err(format!(
@@ -1016,24 +1076,46 @@ fn try_perform_builder_action(
     }
 }
 
+// Queue a mercenary if it's possible to do so. Otherwise, return an error string.
 fn try_queue_mercenary(
+    // We need to modify the game state if the move is valid
     game_state: &mut GameState,
+
+    // Which direction should the mercenary go?
     oct_direction: String,
+
+    // Which team is queuing the mercenary?
     team_color: TeamColor,
 ) -> Result<(), String> {
+    // Get the player state object for the team which is performing the bulider action
     let player_state = match team_color {
         TeamColor::Red => &mut game_state.player_state_red,
         TeamColor::Blue => &mut game_state.player_state_blue,
     };
+
+    // Get the specified player's base
     match &mut player_state.base {
+
+        // Player's base exists. Get the position where the new mercenary would go.
         Some(player_base) => match parse_direction(oct_direction, player_base.position) {
+
+            // Able to get the new mercenary's position. Is there a floor tile at that position?
             Ok(new_pos) => match game_state.floor_tiles.get(&new_pos) {
+
+                // There's a floor tile at the new mercenary's position. What kind of tile is it?
                 Some(floor_tile) => match floor_tile {
+
+                    // There's a path tile at the new mercenary's position.
+                    // Does the player have enough money to buy the new mercenary?
                     FloorTile::Path => match player_state.money >= MERCENARY_PRICE {
+
+                        // Player has enough money to buy the new mercenary. Buy the mercenary and queue it.
                         true => Ok({
                             player_state.money -= MERCENARY_PRICE;
                             player_base.mercenaries_queued.push_back(new_pos);
                         }),
+
+                        // Player does not have enough money. Error
                         false => Err(format!(
                             "You're too poor to buy a mercenary. Mercenaries cost ${}. You only have ${}.",
                             MERCENARY_PRICE, player_state.money
@@ -1041,10 +1123,16 @@ fn try_queue_mercenary(
                     },
                     _ => Err(format!("Mercenary must start on a path tile")),
                 },
+
+                // There's no floor tile at the new mercenary's position. Error
                 None => Err(format!("Mercenary can't go out-of-bounds")),
             },
+
+            // Unable to get new mercenary's position. Error
             Err(e_str) => Err(e_str),
         },
+
+        // Player's base does not exist. Error
         None => Err(format!(
             "Player base does not exist, cannot queue mercenary"
         )),
