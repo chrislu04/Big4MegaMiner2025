@@ -1,0 +1,5 @@
+- finish basic game server functionality
+- support numpy pytorch and tensorflow
+- ensure API works smoothly with RL -> give explicit set of choices at each phase
+- logfile
+- user controls
