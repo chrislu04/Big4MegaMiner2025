@@ -20,7 +20,7 @@ func _on_ui_start_game(is_ai1, is_ai2):
 	player2_ai = is_ai2
 	
 	var output = []
-	OS.execute("python", ["MegaMiner_BackEnd/main.py", GlobalPaths.AI_agent1_file_path, GlobalPaths.AI_agent2_file_path], output)
+	OS.execute("python", [GlobalPaths.backendPath, GlobalPaths.AI_agent1_file_path, GlobalPaths.AI_agent2_file_path], output)
 	print(output)
 	for i in output:
 		print(i)

@@ -68,3 +68,7 @@ func _on_go_pressed(): ## I love hard coding!
 
 func _on_build_pressed() -> void:
 	build.emit(true, $"Game UI/RightSideStates/Human Control/Label/SpinBox".value, $"Game UI/RightSideStates/Human Control/Label/SpinBox2".value)
+
+
+func _on_backend_finder_file_selected(path: String) -> void:
+	GlobalPaths.backendPath = path

@@ -1,6 +1,6 @@
 extends Node
 
-var backendPath : String = "MegaMiner_BackEnd/main.py"
+var backendPath : String = "MegaMiner2025/py/main.py"
 
 var AI_agent1_file_path : String = ""
 var AI_agent2_file_path : String = ""

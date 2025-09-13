@@ -11,6 +11,14 @@ script = ExtResource("1_ibotj")
 player_select_one = NodePath("Human AI select/Left Side Pick")
 player_select_two = NodePath("Human AI select/Right Side Pick")
 
+[node name="Backend finder" type="FileDialog" parent="."]
+title = "Open a File"
+visible = true
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+use_native_dialog = true
+
 [node name="Main Menu" type="Control" parent="."]
 visible = false
 layout_mode = 3
@@ -135,7 +143,6 @@ ok_button_text = "Open"
 dialog_hide_on_ok = true
 file_mode = 0
 access = 2
-root_subfolder = "C:\\Users\\kenji\\OneDrive\\Desktop\\GitHub Projects\\Mega-Miner-2025-Visualizer\\MegaMiner_BackEnd\\AI_Agents"
 use_native_dialog = true
 
 [node name="Right Side Pick" type="Control" parent="Human AI select" node_paths=PackedStringArray("human_icon", "ai_icon", "line_edit", "file_picker", "file_dialog")]
@@ -218,7 +225,6 @@ ok_button_text = "Open"
 dialog_hide_on_ok = true
 file_mode = 0
 access = 2
-root_subfolder = "C:\\Users\\kenji\\OneDrive\\Desktop\\GitHub Projects\\Mega-Miner-2025-Visualizer\\MegaMiner_BackEnd\\AI_Agents"
 use_native_dialog = true
 
 [node name="Back" type="Button" parent="Human AI select"]
@@ -392,6 +398,7 @@ offset_right = 262.563
 offset_bottom = 31.0
 alignment = 1
 
+[connection signal="file_selected" from="Backend finder" to="." method="_on_backend_finder_file_selected"]
 [connection signal="pressed" from="Main Menu/HBoxContainer/Play Game" to="." method="_on_play_game_pressed"]
 [connection signal="pressed" from="Main Menu/HBoxContainer/Watch Replay" to="." method="_on_watch_replay_pressed"]
 [connection signal="pressed" from="Main Menu/HBoxContainer/Quit" to="." method="_on_quit_pressed"]
