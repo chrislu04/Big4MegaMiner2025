@@ -8,14 +8,150 @@ There are 2 players:
 
 Each player represents a nation. The red and blue nations are at war with each other. Both nation blames the other for the ongoing demon invasion, and will fight to the death despite the current world-ending catastrophe (said demon invasion).
 
+--Gold--
+
+Each player starts the game with 20 gold.
+
 --Turns--
 
 The game is turn based, starting at turn 0, and ending at turn 1000.
 
---Gold Stashes--
+-- 4 Phases Per Turn--
 
-Each player has a stash of gold.
-Each stash of gold starts the game with 20 gold.
+Each turn is divided into 3 phases, which happen sequentially.
+In the first 2 phases, each player makes decisions.
+The result of both players' actions is always applied at once.
+
+--Phase 1: Builder Action--
+
+In this Phase, Each player may choose to do one of the following:
+1. Build one tower
+2. Destroy one tower
+3. Do Nothing
+
+--Tower Build Action--
+
+If a player chooses to build a tower, they must also choose an (X,Y) position to build it at, and a tower to build.
+
+If the Tower Build Action is valid, it is performed: a tower is built at the specified position, and the price of the tower type is subtracted from the gold of the player who built it.
+
+If the Tower Build Action is not valid, it is not performed, and the player does NOT get a second chance to build or destroy this turn.
+
+--Valid Tower Build Action--
+
+A choice of tower position is valid if:
+1. It is in the territory of the player who is building it
+( There must be a Red Territory tile at that position if the Red Player chose to build there, etc. )
+2. There is no entity at that position
+
+A choice of tower is valid if:
+1. The player has enough money to buy the tower
+
+--Tower Destroy Action--
+
+If a player chooses to destroy a tower, they must also choose an (X,Y) position to destroy a tower at.
+
+If the Tower Destroy Action is valid it is performed: the tower at (X,Y) is destroyed, and half of its price is refunded.
+
+If the Tower Destroy Action is not valid, it is not performed, and the player does NOT get a second chance to build or destroy this turn.
+
+--Valid Tower Destroy Action--
+
+A choice of tower position is valid if and only if:
+1. It is in the territory of the player who is destroying a tower there
+( There must be a Red Territory tile at that position if the Red Player chose to build there, etc. )
+2. There is a tower there.
+
+--Phase 2: Buy Mercenaries--
+
+Each player has the choice to buy a Mercenary.
+Mercenaries cost 20 gold.
+The player who buys a mercenary must select a direction ( NSEW )
+If the mercenary purchase is valid, a Mercenary will be queued in the selected direction, and 20 gold will be subtracted from the player's gold.
+
+--Valid Mercenary Purchase--
+
+1. There is a path tile in the selected direction
+2. The player has 20 or more gold
+3. There is not already a queued mercenary in that direction
+
+--Phase 3: World Update--
+
+--Phase 3 Part 1: Mercenary Turn--
+
+For fairness' sake, all Mercenaries move at the same time.
+
+Mercenaries follow the shortest sequence of adjacent path tiles to the enemy's Player Base.
+
+Mercernaries can walk over demon spawners.
+
+A Mercenary is Moving if it is not Fighting or Waiting.
+
+A Mercenary is Waiting if:
+1. An allied Mercenary directly in front of it is fighting
+2. An allied Mercenary directly in front of it is waiting
+
+A Mercenary is Fighting if there is a rival Mercenary or Demon blocking its path.
+A Mercenary is Fighting if it is two spaces away from the enemy's Player Base, leaving room for the enemy to spawn a Mercenary adjacent to their base.
+
+When two rival Mercenaries both want to move into the same space, they can't move ( they are Fighting ).
+
+1. Figure out which Mercenaries are Fighting/Moving/Waiting.
+
+2. Move all Moving Mercenaries.
+
+3. For each Fighting Mercenary, subtract 7 HP from its opponent ( Demon, enemy Mercenary, or enemy Player Base )
+
+Zero or less HP means that a Mercenary/Demon has suffered Mortal Wounds. However, Mercenaries are fanatical, so this will not stop them from hitting their opponent this turn.
+
+4. Remove all Demons with Mortal Wounds from the game.
+
+5. Remove all Mercenaries with Mortal Wounds from the game.
+
+6. Check for Win/Lose condition ( see Win/Lose Condition section )
+
+--Phase 3 Part 2: Demon Turn--
+
+Demons generally follow the same rules for Fighting/Waiting/Moving as Mercenaries.
+
+1. Figure out which Demons are Fighting/Moving/Waiting.
+
+2. Move all Moving Demons.
+
+3. For each Fighting Demon, subtract 7 HP from its opponent ( Mercenary, or Player Base )
+
+4. Remove all Mercenaries with Mortal Wounds from the game.
+
+5. Check for Win/Lose condition ( see Win/Lose Condition section )
+
+--Phase 3 Part 3: Mercenary Spawn--
+
+For each direction a Mercenary is queued in, spawn a Mercenary there if there is no allied Mercenary blocking the path.
+
+--Phase 3 Part 4: Demon Spawn--
+
+If the current turn is a multiple of 10, set queued demons to 1.
+
+If the Demon Spawner has a queued demon, and there is nothing in the way, spawn a Demon in the same position as the spawner, and set queued demons to 0.
+
+--Phase 3 Part 5: Tower Turn--
+
+For each tower, subtract 1 turn from its current cooldown.
+
+If the tower's current cooldown is zero, set its current cooldown back to its max cooldown, and then perform the tower's Action.
+
+As before, determine what Demons/Mercenaries have mortal wounds, and remove them if they do have mortal wounds.
+
+--Tower Action--
+
+Houses add 12 gold to their player's Gold.
+
+The Crossbow and Cannon towers attack the closest Demon/Enemy Mercenary to their Base that's in their range.
+
+The Crossbow does 1 damage
+The Cannon does 3 damage
+
+The Minigun does 2 damage to all enemies in its range
 
 --Tiles--
 
@@ -56,7 +192,7 @@ The Demon Spawner is a portal to hell. It has no allegiance, other than to despa
 
 The Demon Spawner is a type of entity.
 Each Demon Spawner has one Target, which is one of the player bases.
-Note: The Target will change periodically.
+Note: The Target will change every time a demon is spawned.
 Each Demon Spawner has up to 1 queued Demon.
 Demon Spawners can only be on path tiles.
 
@@ -109,148 +245,6 @@ Maximum cooldown: 3
 Price: 8
 Range: 4
 
--- 4 Phases Per Turn--
-
-Each turn is divided into 4 phases, which happen sequentially.
-In the first 3 phases, each player makes decisions.
-The result of both players' actions is always applied at once.
-
---Phase 1: Buy Builders--
-
-We should probably get rid of builders.
-Why would a player need to build more than 1 tower per turn?
-
-Illustrating Example:
-Let's say the path between players is 10 tiles long
-Then, with just 1 builder, each player can build 10 towers in the time it takes for a mercenary to make it across the map.
-
---Phase 2: Builder Action--
-
-In this Phase, Each player may choose to do one of the following:
-1. Build one tower
-2. Destroy one tower
-3. Do Nothing
-
---Tower Build Action--
-
-If a player chooses to build a tower, they must also choose an (X,Y) position to build it at, and a tower to build.
-
-If the Tower Build Action is valid, it is performed: a tower is built at the specified position, and the price of the tower type is subtracted from the gold stash of the player who built it.
-
-If the Tower Build Action is not valid, it is not performed, and the player does NOT get a second chance to build or destroy this turn.
-
---Valid Tower Build Action--
-
-A choice of tower position is valid if and only if:
-1. It is in the territory of the player who is building it
-( There must be a Red Territory tile at that position if the Red Player chose to build there, etc. )
-2. There is no entity at that position
-
-A choice of tower is valid if and only if:
-1. The player has enough money to buy the tower
-
---Tower Destroy Action--
-
-If a player chooses to destroy a tower, they must also choose an (X,Y) position to destroy a tower at.
-
-If the Tower Destroy Action is valid it is performed: the tower at (X,Y) is destroyed, and half of its price is refunded.
-
-If the Tower Destroy Action is not valid, it is not performed, and the player does NOT get a second chance to build or destroy this turn.
-
---Valid Tower Destroy Action--
-
-A choice of tower position is valid if and only if:
-1. It is in the territory of the player who is destroying a tower there
-( There must be a Red Territory tile at that position if the Red Player chose to build there, etc. )
-2. There is a tower there.
-
---Phase 3: Buy Mercenaries--
-
-Each player has the choice to buy a Mercenary.
-Mercenaries cost 20 gold.
-The player who buys a mercenary must select a direction ( NSEW )
-If the mercenary purchase is valid, a Mercenary will be queued in the selected direction, and 20 gold will be subtracted from the player's stash.
-
---Valid Mercenary Purchase--
-
-1. There is a path tile in the selected direction
-2. The player has 20 or more gold
-3. There is not already a queued mercenary in that direction
-
---Phase 4: World Update--
-
---Phase 4 Part 1: Mercenary Turn--
-
-For fairness' sake, all Mercenaries move at the same time.
-
-Mercenaries follow the shortest sequence of adjacent path tiles to the enemy's Player Base.
-
-A Mercenary is Moving if it is not Fighting or Waiting.
-
-A Mercenary is Waiting if:
-1. An allied Mercenary directly in front of it is fighting
-2. An allied Mercenary directly in front of it is waiting
-
-A Mercenary is Fighting if there is a rival Mercenary or Demon blocking its path.
-A Mercenary is Fighting if it is two spaces away from the enemy's Player Base, leaving room for the enemy to spawn a Mercenary adjacent to their base.
-
-When two rival Mercenaries both want to move into the same space, they both block each others' paths.
-
-1. Figure out which Mercenaries are Fighting/Moving/Waiting.
-
-2. Move all Moving Mercenaries.
-
-3. For each Fighting Mercenary, subtract 7 HP from its opponent ( Demon, enemy Mercenary, or enemy Player Base )
-
-Zero or less HP means that a Mercenary/Demon has suffered Mortal Wounds. However, Mercenaries are fanatical, so this will not stop them from hitting their opponent this turn.
-
-4. Remove all Mercenaries with Mortal Wounds from the game.
-
-5. Remove all Demons with Mortal Wounds from the game.
-
-6. Check for Win/Lose condition ( see Win/Lose Condition section )
-
---Phase 4 Part 2: Demon Turn--
-
-Demons generally follow the same rules for Fighting/Waiting/Moving as Mercenaries.
-
-1. Figure out which Demons are Fighting/Moving/Waiting.
-
-2. Move all Moving Demons.
-
-3. For each Fighting Demon, subtract 7 HP from its opponent ( Mercenary, or Player Base )
-
-4. Remove all Mercenaries with Mortal Wounds from the game.
-
-5. Check for Win/Lose condition ( see Win/Lose Condition section )
-
---Phase 4 Part 3: Mercenary Spawn--
-
-For each direction a Mercenary is queued in, spawn a Mercenary there if there is no allied Mercenary blocking the path.
-
---Phase 4 Part 4: Demon Spawn--
-
-If the current turn is a multiple of 10, set queued demons to 1.
-
-If the Demon Spawner has a queued demon, and there is nothing in the way, spawn a Demon in the same position as the spawner, and set queued demons to 0.
-
---Phase 4 Part 5: Tower Turn--
-
-For each tower, subtract 1 turn from its current cooldown.
-
-If the tower's current cooldown is zero, set its current cooldown back to its max cooldown, and then perform the tower's Action.
-
---Tower Action--
-
-Houses add 12 gold to their player's Gold Stash.
-
-The Crossbow and Cannon towers attack the closest Demon/Enemy Mercenary to their Base that's in their range.
-
-The Crossbow does 1 damage
-The Cannon does 3 damage
-
-The Minigun does 2 damage to all enemies in its range
-
 --Win/Lose Condition--
 
 Winning/Losing is only determined when it is checked.
@@ -269,7 +263,7 @@ Then, if both sums are equal, break the tie based on the number of Mercenaries e
 
 Then, if both have the same number of Mercenaries, break the tie based on the sum of HP of mercenaries.
 
-Finally, break the tie with a fair coin flip.
+Finally, break the tie with a fair coin flip. TODO: maybe not, maybe just split points
 ( Do this IRL with a real coin, it's more fun that way )
 
 --Rules For Tile Layout--
@@ -281,3 +275,13 @@ Otherwise, one player will have access to tower configurations that the other pl
 
 Paths should not intersect.
 Otherwise, it could be impossible to determine where Mercenaries should go.
+
+Each player should start with a house.
+
+TODO: make demon spawning behavior fair
+
+TODO: get rid of confusion about which player you are, because that determines which direction is which
+
+TODO: visual indicator the turn before the demon spawner spawns a demon
+
+TODO: dynamic music
