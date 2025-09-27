@@ -13,7 +13,7 @@ player_select_two = NodePath("Human AI select/Right Side Pick")
 
 [node name="Backend finder" type="FileDialog" parent="."]
 title = "Open a File"
-visible = true
+position = Vector2i(0, 36)
 ok_button_text = "Open"
 file_mode = 0
 access = 2

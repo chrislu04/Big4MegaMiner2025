@@ -12,7 +12,9 @@ var player1_ai : bool
 var player2_ai : bool
 
 var alt : bool = false
+
 @onready var tiles = $Tiles
+@onready var entities: Node2D = $Entities
 
 ## Sets up the game visuals
 func _on_ui_start_game(is_ai1, is_ai2):
@@ -21,7 +23,7 @@ func _on_ui_start_game(is_ai1, is_ai2):
 	
 	var output = []
 	OS.execute("python", [GlobalPaths.backendPath, GlobalPaths.AI_agent1_file_path, GlobalPaths.AI_agent2_file_path], output)
-	print(output)
+	#print(output)
 	for i in output:
 		print(i)
 	## Draw the map, bases, & enemy spawners
@@ -42,7 +44,7 @@ func _draw_game_from_gamestate(game_state : String):
 	
 	_draw_grid(game_state_json)
 	
-	#_draw_entities(game_state_json)
+	_draw_entities(game_state_json)
 
 func _draw_grid(game_state_json : Dictionary):
 	var previous_y = 0
@@ -84,18 +86,20 @@ func _draw_grid(game_state_json : Dictionary):
 	
 	tiles.position.x = (get_viewport_rect().size.x - (highest_x * 32)) / 2
 	tiles.position.y = (get_viewport_rect().size.y - (highest_y * 32)) / 2
+	entities.position = tiles.position
 
 ## Draws the mercanaries, enemies, spawner, buildings
 func _draw_entities(game_state_json : Dictionary):
 	
 	for entity : String in game_state_json["entity_position"]:
 		var entity_info = JSON.parse_string(entity)
-		print(entity_info)
+		#print(entity_info["x"])
+		#print(game_state_json["entity_position"][entity]["entity_type"])
 		if game_state_json["entity_position"][entity]["entity_type"] == "mercenary": ## <-- Error at this line, fix it later
 			var sprite = Sprite2D.new()
 			sprite.texture = preload("res://Assets/Base_Skin/blue_recruit.png")
-			sprite.position = Vector2(game_state_json["entity_position"]["x"],game_state_json["entity_position"]["y"])
-			
+			sprite.position = Vector2(entity_info["x"] * 32, entity_info["y"] * 32)
+			entities.add_child(sprite)
 	
 
 ## Make this when the game backend is done

@@ -1,26 +1,34 @@
 import sys
 import subprocess
-import Game
+from Game import Game
+from pathlib import Path
 
-file_path : str = "C:/Users/kenji/OneDrive/Desktop/GitHub Projects/Mega-Miner-2025-Visualizer/MegaMiner_BackEnd/AI_Agents/Agent1.py"
+game = Game()
 
-#game = Game.Game()
+can_start : bool = False
 
+## Tries to find two ai files if there is no arguments supplied
+def find_files_by_pattern(pattern, search_path):
+    search_path_obj = Path(search_path)
+    matched_files = list(search_path_obj.rglob(pattern))
+    return matched_files
+
+default_search_dir = 'AI_Agents/'
+file_pattern = "*.py"
 
 if __name__ == "__main__":
 
-    print(f"Arguments count: {len(sys.argv)}")
-    if len(sys.argv) > 1:
-        print(sys.argv[1])
-        try:                 
-            ans = subprocess.check_output(["python", sys.argv[1]])
-            print(ans)
-        except subprocess.CalledProcessError as e:
-           print(f"Command failed with return code {e.returncode}")
-    try:
-        ans = subprocess.check_output(["python", file_path])
-        print(ans)
-    except subprocess.CalledProcessError as e:
-        print(f"Command failed with return code {e.returncode}")
+    ## First check if there are no arguments supplied with the program
+    if len(sys.argv) <= 1: ## for python code the path to the file is an argument supplied, so there will always be 1 system arg
+        files_found = find_files_by_pattern(file_pattern, default_search_dir)
+        if len(files_found) >= 2 :
+            print(f"Found and using files '{files_found[0]}' and '{files_found[1]}'")
+            game.load_ai_paths(files_found[0], files_found[1])
+            can_start = True
+        else:
+            print("Not enough AI Files supplied!")
     
-    #print(game.save_game_State_to_json())
+    if can_start:
+        game.run()
+
+    
