@@ -1,29 +1,27 @@
 import Constants
 import math
 
-# Probably going to merge these two classes into one main function
-# Also, define the map with a 2D Array
-
-class PlayerState:
+class GameState:
     def __init__(self, team_color: str) -> None:
+        self.turns_progressed = 0
+        self.victory = None
         if team_color in ['r','b']:
             self.team_color = team_color
         else:
             raise Exception("Player team_color must be 'r' or 'b'")
-        team_name = None
-        money = Constants.INITIAL_MONEY
-        self.mercenaries = list()
-        self.towers = list()
+        self.team_name = None
+        self.money = Constants.INITIAL_MONEY
 
-class GameState:
-    def __init__(self) -> None:
-        self.turns_progressed = 0
-        self.victory = None
+        # Map specifications
         self.map_width = None
         self.map_height = None
-        self.player_state_r = PlayerState('r')
-        self.player_state_b = PlayerState('b')
-        self.map_tiles = dict() # (x,y) -> blue territory, red territory, path, etc.
-        self.entity_lookup = dict() # (x,y) -> Mercenary, Enemy, Tower, Spawner, etc.
-        self.enemies = list()
-        self.enemy_spawners = list()
+        self.entity_grid = [] # This is going to be a 2D array, needs input from map_width and map_height
+
+        self.player_base_r = None # call PlayerBase() to define more, PlayerBase.py still needs updated
+        self.player_base_b = None # call PlayerBase() to define more, PlayerBase.py still needs updated
+
+        # Arrays that will hold the active entities for each type
+        self.mercs = []
+        self.towers = []
+        self.demons = []
+        self.demon_spawners = []
