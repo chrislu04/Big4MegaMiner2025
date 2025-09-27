@@ -1,9 +1,9 @@
 from Entity import Entity
 
 class Tower(Entity):
-    def __init__(self, x: int, y: int, team_color: str, cooldown: int) -> None:
-        self.x = x
-        self.y = y
+    def __init__(self, health: int, x: int, y: int, team_color: str, cooldown: int) -> None:
+        super().__init__(self, health, x, y)
+        self.health = 20
         self.cooldown = cooldown
 
         if team_color in ['r','b']:
