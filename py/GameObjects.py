@@ -38,13 +38,12 @@ class EnemySpawner:
         self.reload_time_left = Constants.ENEMY_SPAWNER_RELOAD_TURNS
 
 class TowerType:
-    def __init__(self, name: str, damage: int, money_cost: int, tower_range: int, reload_turns: int, health: int) -> None:
+    def __init__(self, name: str, damage: int, money_cost: int, tower_range: int, reload_turns: int) -> None:
         self.name = name
         self.damage = damage
         self.money_cost = money_cost
         self.tower_range = tower_range
         self.reload_turns = reload_turns
-        self.health = health
 
 class Tower:
     def __init__(self, x: int, y: int, tower_type: TowerType, team_color: str) -> None:
@@ -53,12 +52,17 @@ class Tower:
         self.tower_type = tower_type
         # BALANCE: initial reload formula: encourange long-term planning, but not too much
         # BALANCE: don't let the initial reload time be zero
-        self.reload_turns_left = math.ceil(self.tower_type.reload_turns//2)
+        #self.reload_turns_left = math.ceil(self.tower_type.reload_turns//2)
         self.kills = 0
         if team_color in ['r','b']:
             self.team = team_color
         else:
             raise Exception("Mercenary team_color must be 'r' or 'b'") # TF2 reference?
+
+    def __update__(self, tower_type: TowerType) -> None:
+        self.tower_type = tower_type
+        if tower_type == 'house':
+            print("HOUSE GENERATED MONEY")
 
 class PlayerState:
     def __init__(self, team_color: str) -> None:
@@ -67,7 +71,6 @@ class PlayerState:
         else:
             raise Exception("Player team_color must be 'r' or 'b'")
         team_name = None
-        builder_count = 1
         money = Constants.INITIAL_MONEY
         self.mercenaries = list()
         self.towers = list()
@@ -86,7 +89,9 @@ class GameState:
         self.enemy_spawners = list()
 
 TOWER_TYPES = dict()
-TOWER_TYPES["crossbow"] = TowerType(name="crossbow", damage=3,  money_cost=2, tower_range=2, reload_turns=2, health=100)
-TOWER_TYPES["cannon"]   = TowerType(name="cannon",   damage=20, money_cost=5, tower_range=2, reload_turns=4, health=100)
-TOWER_TYPES["minigun"]  = TowerType(name="minigun",  damage=1,  money_cost=4, tower_range=2, reload_turns=1, health=100)
-TOWER_TYPES["house"]    = TowerType(name="house",    damage=0,  money_cost=3, tower_range=0, reload_turns=6, health=100)
+TOWER_TYPES["crossbow"] = TowerType(name="crossbow", damage=3,  money_cost=2, tower_range=2, reload_turns=2)
+TOWER_TYPES["cannon"]   = TowerType(name="cannon",   damage=20, money_cost=5, tower_range=2, reload_turns=4)
+TOWER_TYPES["minigun"]  = TowerType(name="minigun",  damage=1,  money_cost=4, tower_range=2, reload_turns=1)
+TOWER_TYPES["house"]    = TowerType(name="house",    damage=0,  money_cost=3, tower_range=0, reload_turns=6)
+
+Tower(1, 1, 'house', 'r')
