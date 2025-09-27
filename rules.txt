@@ -8,9 +8,9 @@ There are 2 players:
 
 Each player represents a nation. The red and blue nations are at war with each other. Both nation blames the other for the ongoing demon invasion, and will fight to the death despite the current world-ending catastrophe (said demon invasion).
 
---Gold--
+--Money--
 
-Each player starts the game with 20 gold.
+Each player starts the game with 20 money.
 
 --Turns--
 

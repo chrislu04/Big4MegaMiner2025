@@ -16,6 +16,7 @@ class GameState:
         self.map_width = None
         self.map_height = None
         self.entity_grid = [] # This is going to be a 2D array, needs input from map_width and map_height
+        self.tile_grid = [] # List of strings
 
         self.player_base_r = None # call PlayerBase() to define more, PlayerBase.py still needs updated
         self.player_base_b = None # call PlayerBase() to define more, PlayerBase.py still needs updated

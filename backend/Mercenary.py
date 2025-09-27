@@ -5,7 +5,6 @@ class Mercenary:
         self.hp = Constants.MERCENARY_INITIAL_HP
         self.x = x
         self.y = y
-        self.attack_power = Constants.MERCENARY_ATTACK_POWER
 
         if team_color in ['r','b']:
             self.team = team_color
