@@ -5,12 +5,10 @@ class GameState:
     def __init__(self, team_color: str, map_width: int, map_height: int) -> None:
         self.turns_progressed = 0
         self.victory = None
-        if team_color in ['r','b']:
-            self.team_color = team_color
-        else:
-            raise Exception("Player team_color must be 'r' or 'b'")
-        self.team_name = None
-        self.money = Constants.INITIAL_MONEY
+        self.team_name_r = None
+        self.team_name_b = None
+        self.money_r = Constants.INITIAL_MONEY
+        self.money_b = Constants.INITIAL_MONEY
 
         # Map specifications
         self.map_width = map_width
