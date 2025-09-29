@@ -22,6 +22,7 @@ class GameState:
 
         # Arrays that will hold the active entities for each type
         self.mercs = []
+        # Do we need the split these into per-team lists? Like having towers_r and towers_b?
         self.towers = []
         self.demons = []
         self.demon_spawners = []
