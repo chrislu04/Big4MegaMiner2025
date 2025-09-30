@@ -6,7 +6,7 @@
 # import sys
 import json
 #import copy
-from GameObjects import GameState
+from GameState import GameState
 import subprocess
 
 class Game:

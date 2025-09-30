@@ -1,5 +1,6 @@
 import Constants
 import math
+import PlayerBase
 
 class GameState:
     def __init__(self, team_color: str, map_width: int, map_height: int) -> None:
@@ -19,8 +20,8 @@ class GameState:
         self.tile_grid = [] # List of strings
 
         # TODO: this should come from parameters to this constructor function
-        self.player_base_r = None # call PlayerBase() to define more, PlayerBase.py still needs updated
-        self.player_base_b = None # call PlayerBase() to define more, PlayerBase.py still needs updated
+        self.player_base_r : PlayerBase = PlayerBase() # call PlayerBase() to define more, PlayerBase.py still needs updated
+        self.player_base_b : PlayerBase = PlayerBase() # call PlayerBase() to define more, PlayerBase.py still needs updated
 
         # Arrays that will hold the active entities for each type
         self.mercs = []
