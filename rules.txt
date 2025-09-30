@@ -142,6 +142,8 @@ If the tower's current cooldown is zero, set its current cooldown back to its ma
 
 As before, determine what Demons/Mercenaries have mortal wounds, and remove them if they do have mortal wounds.
 
+Tower ranges are always in units of manhattan distance
+
 --Tower Action--
 
 Houses add 12 gold to their player's Gold.
@@ -285,3 +287,5 @@ TODO: get rid of confusion about which player you are, because that determines w
 TODO: visual indicator the turn before the demon spawner spawns a demon
 
 TODO: dynamic music
+
+TODO: give intuitive example of what we mean by "manhattan distance"
