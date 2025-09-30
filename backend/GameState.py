@@ -13,19 +13,25 @@ class GameState:
         # Map specifications
         self.map_width = map_width
         self.map_height = map_height
-        # This grid is just "0" for now, but the width and height are set
+
+        # TODO: this should come from parameters to this contructor function
         self.entity_grid = [ [0 for i in range(map_height)] , [0 for i in range(map_width)]]
         self.tile_grid = [] # List of strings
 
+        # TODO: this should come from parameters to this constructor function
         self.player_base_r = None # call PlayerBase() to define more, PlayerBase.py still needs updated
         self.player_base_b = None # call PlayerBase() to define more, PlayerBase.py still needs updated
 
         # Arrays that will hold the active entities for each type
         self.mercs = []
-        # Do we need the split these into per-team lists? Like having towers_r and towers_b?
         self.towers = []
         self.demons = []
         self.demon_spawners = []
 
-        # Compute mercenary paths
-        
+        # Compute mercenary paths, from Red to Blue player bases
+        self.mercenary_path_left  = [] # start from left-adjacent tile to player base
+        self.mercenary_path_right = [] # start from left-adjacent tile to player base
+        self.mercenary_path_up    = [] # start from left-adjacent tile to player base
+        self.mercenary_path_down  = [] # start from left-adjacent tile to player base
+
+        if self.tile_grid[][]
