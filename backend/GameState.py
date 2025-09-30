@@ -26,3 +26,6 @@ class GameState:
         self.towers = []
         self.demons = []
         self.demon_spawners = []
+
+        # Compute mercenary paths
+        

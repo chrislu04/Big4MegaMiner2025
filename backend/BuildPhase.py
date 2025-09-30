@@ -4,14 +4,14 @@ from GameState import GameState
 
 # Phase 1 | Manages building towers and such
 
-def build_tower_phase(x: int, y: int, game_state: GameState, ai_action: AIAction) -> None:
+def build_tower_phase(game_state: GameState, ai_action: AIAction) -> None:
     # Make sure:
     # 1: enough money
     # 2: the space chosen is open
 
     if ai_action.action_r.build_tower:
-        x = None # x that is selected to be built at
-        y = None # y that is selected to be built at
+        x = ai_action.x # x that is selected to be built at
+        y = ai_action.y # y that is selected to be built at
 
         # Need to further define the Tower and Tower subclasses to fully
         # set up the rest of this phase, mainly for detection of which
@@ -57,8 +57,8 @@ def build_tower_phase(x: int, y: int, game_state: GameState, ai_action: AIAction
     ## --- BLUE TEAM TOWERS --- ##
 
     if ai_action.action_b.build_tower:
-        x = None # x that is selected to be built at
-        y = None # y that is selected to be built at
+        x = ai_action.x # x that is selected to be built at
+        y = ai_action.y # y that is selected to be built at
 
         # Need to further define the Tower and Tower subclasses to fully
         # set up the rest of this phase, mainly for detection of which
