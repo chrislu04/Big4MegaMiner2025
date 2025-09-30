@@ -14,8 +14,8 @@ class Mercenary:
             raise Exception("Mercenary team_color must be 'r' or 'b'") # TF2 reference?
         
     # Helper function do find what path this merc is on. 
-    # Side effect: passed list item 0 will be path coordinate list, item 1 will be position in list
-    def get_current_path(self, game_state: GameState, data):
+    # TODO: Store current path and path index in merc object
+    def get_current_path(self, game_state: GameState):
         current_path = []
         possible_paths = [game_state.mercenary_path_down, 
                     game_state.mercenary_path_left, game_state.mercenary_path_right,
@@ -26,16 +26,14 @@ class Mercenary:
             if ([self.x, self.y] in path):
                 current_path = path
 
-        data[0] = current_path
-        # position of merc along path (red to blue)
-        data[1] = current_path.index([self.x, self.y])
-
+        # return current path and position along current path
+        return (current_path, current_path.index([self.x, self.y]))
+    
     # Helper function that returns coordinates of the path tile forward or back from the merc's pos
     def get_adjacent_path_tile(self, game_state: GameState, delta: int):
-        data = []
-        self.get_current_path(game_state, data)
-        path = data[0]
-        path_pos = data[1]
+        path_data = self.get_current_path(game_state)
+        path = path_data[0]
+        path_pos = path_data[1]
 
         # if we are at the end of path, return last tile 
         # otherwise, return next tiles
@@ -44,10 +42,13 @@ class Mercenary:
     
     def set_behind_waiting(self, game_state: GameState):
         behind_pos = self.get_adjacent_path_tile(game_state, -1)
-        behind_merc: Mercenary = game_state.entity_grid[behind_pos[0]][behind_pos[1]]
+        behind_entity = game_state.entity_grid[behind_pos[0]][behind_pos[1]]
         # base case: we are in the first tile in our path, do not recurse
         if self.x == behind_pos[0] and self.y == behind_pos[1]:
             return
+        # base case: entity in behind pos does not contain merc
+        elif type(behind_entity) != Mercenary:
+            return
         else:
-            behind_merc.state = 'waiting'
-            behind_merc.set_behind_waiting(game_state)
+            behind_entity.state = 'waiting'
+            behind_entity.set_behind_waiting(game_state)
