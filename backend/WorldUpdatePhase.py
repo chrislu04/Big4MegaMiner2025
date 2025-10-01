@@ -5,11 +5,9 @@ from UpdateMercenaries import update_mercenaries
 from UpdateDemons import update_demons
 from SpawnMercenaries import spawn_mercenaries
 from SpawnDemons import spawn_demons
-from PlayerBase import PlayerBase
 from House import House
 from Cannon import Cannon
 from Minigun import Minigun
-from Crossbow import Crossbow
 import Constants
 
 def world_update_phase(game_state: GameState):
@@ -61,11 +59,9 @@ def check_wincon(game_state: GameState):
             
             if len(r_towers) != len(b_towers):
                 if len(r_towers) > len(b_towers):
-                    pass
-                    # Team R is the winner!
+                    return "Team R is the winner!"
                 else:
-                    pass
-                    # Team B is the winner!
+                    return "Team B is the winner!"
             else:
                 ## Then, if both players have built the same number of towers, break the tie based on the sum of prices of those towers.
                 # Equals the total price of the total amount of towers per team
