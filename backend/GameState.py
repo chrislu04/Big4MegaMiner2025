@@ -1,10 +1,10 @@
 import Constants
 import math
-import PlayerBase
+from PlayerBase import PlayerBase
 
 class GameState:
     def __init__(self, team_color: str, map_width: int, map_height: int) -> None:
-        self.turns_progressed = 0
+        self.turns_progressed = 999
         self.victory = None
         self.team_name_r = None
         self.team_name_b = None
@@ -20,8 +20,8 @@ class GameState:
         self.tile_grid = [] # List of strings
 
         # TODO: this should come from parameters to this constructor function
-        self.player_base_r : PlayerBase = PlayerBase() # call PlayerBase() to define more, PlayerBase.py still needs updated
-        self.player_base_b : PlayerBase = PlayerBase() # call PlayerBase() to define more, PlayerBase.py still needs updated
+        self.player_base_r : PlayerBase = PlayerBase(0,0,"r") # call PlayerBase() to define more, PlayerBase.py still needs updated
+        self.player_base_b : PlayerBase = PlayerBase(0,1,"b") # call PlayerBase() to define more, PlayerBase.py still needs updated
 
         # Arrays that will hold the active entities for each type
         self.mercs = []
@@ -30,10 +30,10 @@ class GameState:
         self.demon_spawners = []
 
         # Compute mercenary paths, from Red to Blue player bases
-        self.mercenary_path_left  = self.compute_mercenary_path((player_base_r.x-1, player_base_r.y))
-        self.mercenary_path_right = self.compute_mercenary_path((player_base_r.x+1, player_base_r.y))
-        self.mercenary_path_up    = self.compute_mercenary_path((player_base_r.x, player_base_r.y-1))
-        self.mercenary_path_down  = self.compute_mercenary_path((player_base_r.x, player_base_r.y+1))
+        # self.mercenary_path_left  = self.compute_mercenary_path((self.player_base_r.x-1, self.player_base_r.y))
+        # self.mercenary_path_right = self.compute_mercenary_path((self.player_base_r.x+1, self.player_base_r.y))
+        # self.mercenary_path_up    = self.compute_mercenary_path((self.player_base_r.x, self.player_base_r.y-1))
+        # self.mercenary_path_down  = self.compute_mercenary_path((self.player_base_r.x, self.player_base_r.y+1))
 
     def compute_mercenary_path(self, start_point: tuple) -> list:
         # See if there's a path starting at the starting point

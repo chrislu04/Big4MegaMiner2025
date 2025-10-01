@@ -1,5 +1,4 @@
 import sys
-import subprocess
 from Game import Game
 from pathlib import Path
 
@@ -13,7 +12,7 @@ def find_files_by_pattern(pattern, search_path):
     matched_files = list(search_path_obj.rglob(pattern))
     return matched_files
 
-default_search_dir = 'AI_Agents/'
+default_search_dir = 'Backend/AI_Agents/'
 file_pattern = "*.py"
 
 
@@ -21,6 +20,7 @@ file_pattern = "*.py"
 ## First check if there are no arguments supplied with the program
 if len(sys.argv) <= 1: ## for python code the path to the file is an argument supplied, so there will always be 1 system arg
     files_found = find_files_by_pattern(file_pattern, default_search_dir)
+    print(files_found)
     if len(files_found) >= 2 :
         print(f"Found and using files '{files_found[0]}' and '{files_found[1]}'")
         game.load_ai_paths(files_found[0], files_found[1])

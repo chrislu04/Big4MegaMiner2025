@@ -7,6 +7,8 @@
 import json
 #import copy
 from GameState import GameState
+from AIAction import AIAction
+from BuildPhase import build_tower_phase ## This is dumb, move it into game once finished
 import subprocess
 
 class Game:
@@ -16,8 +18,7 @@ class Game:
         # Path to the Agent2.py file
         self.agent_path_2 : str = agent_path_2
 
-        self.game_state : GameState = GameState()
-        self.game_state.map_tiles["1"] = 23
+        self.game_state : GameState = GameState("r",1,1)
 
     ## Kind of useless??? 
     def reset(self):
@@ -46,23 +47,17 @@ class Game:
                 print(f"Command failed with return code {e.returncode}")
             
             ## an example on how to parse though actions and change the game state
-            action = self.decode_action(AI_1_action)
-
+            action_r : AIAction = self.decode_action(AI_1_action)
+            action_b : AIAction = self.decode_action(AI_2_action)
             ## ----Update game state with towers, and queues---- ##
 
-            ## This should probable in the decode action function,
-            if len(action) < 2:
-                pass ## Not enough actions supplied
-            else:
-                match action[0]:
-                    case "build":
-                        if self.can_build(action[0], action[1]):
-                            self.build(action[0], action[1])
-                    case "queue":
-                        pass
-                    case "destroy":
-                        if self.can_destroy(action[0], action[1]):
-                            self.destroy()
+            ##Call buy phase
+            build_tower_phase(self.game_state, action_r, action_b)
+
+            ##Get actions again for merc buy phase
+
+
+            ## call merc buy phase
             
             ## ----Update game state with towers, and queues---- ##
 
@@ -87,36 +82,21 @@ class Game:
         self.AI_Path_2 = path_two
     
     ## Decodes whatever the ai file will sent into actually usable information,
-    ##  AI are returning byte strings right now which we decode into strings
-    ## This is most likely to change later, it is this way for testing persposees
-    def decode_action(self, action : str):
-        action : bool = True
-        coordx : bool = False
-        coordy : bool = False
-        full_action = []
+    ## This is most likely to change later
+    def decode_action(self, action : str) -> AIAction:
+        action_string  : str = action.split(" ")
+        ai_action : AIAction
 
-        for string in action.split(" "):
-            if action:
-                match string.lower():
-                    case "build":
-                        full_action.append("build")
-                        coordx = True
-                    case "queue":
-                        full_action.append("queue")
-                        coordx = True ## Queing is different then placement so it probably won't use coordinates, maybe use paths?
-                    case "destroy":
-                        full_action.append("build")
-                        coordx = True
-                action = False
-            elif coordx:
-                full_action.append(int(string))
-                coordx = False
-                coordy = True
-            elif coordy:
-                full_action.append(int(string))
-                break
+        match action_string[0].lower():
+            case "build":
+                ai_action = AIAction(int(action_string[1]), int(action_string[2]), action_string[3], buy=True,) ##Making a lot of bold assumptions here
+            case "destroy":                                                                                     
+                ai_action = AIAction(int(action_string[1]), int(action_string[2]), action_string[3], destory=True,) 
+            case "queue":
+                ai_action = AIAction(0, 0, action_string[3], queue=True,) ## Queuing wouldn't need an x or y, ai would just add a direction as the params
+
     
-        return full_action
+        return ai_action
                 
 
     ##---------------ACTIONS-----------------##
