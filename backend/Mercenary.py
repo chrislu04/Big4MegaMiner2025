@@ -1,6 +1,6 @@
 import Constants
 from GameState import GameState
-
+import Utils
 class Mercenary:
     def __init__(self, x: int, y: int, team_color: str, state: str) -> None:
         self.hp = Constants.MERCENARY_INITIAL_HP
@@ -38,7 +38,7 @@ class Mercenary:
         # if we are at the end of path, return last tile 
         # otherwise, return next tiles
         delta *= 1 if self.team == 'r' else -1
-        return path[min(max(path_pos + delta, 0), len(path))]
+        return path[Utils.clamp(path_pos + delta, 0, len(path))]
     
     def set_behind_waiting(self, game_state: GameState):
         behind_pos = self.get_adjacent_path_tile(game_state, -1)
