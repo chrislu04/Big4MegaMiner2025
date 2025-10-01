@@ -63,5 +63,23 @@ def update_towers(game_state: GameState):
 
 # Ordered by priority of attack
 # TODO: figure out what this priority is, and put that in the rules
-def find_all_enemies_in_range(game_state: GameState, x: int, y: int, team_color: str, range: int) -> list:
-    pass # TODO
+def find_all_enemies_in_range(game_state: GameState, x: int, y: int, team_color: str, max_dist: int) -> list:
+    enemies = []
+    for xi in range(x-max_dist,x+max_dist):
+        for yi in range(y-max_dist,y+max_dist):
+            if xi == x and yi == y: continue
+            
+            # get the entity at each position in range
+            entity = game_state.entity_grid[xi][yi]
+
+            # demons are always enemies
+            if isinstance(entity, Demon):
+                enemies.append(entity)
+            
+            # shoot enemy mercs
+            elif isinstance(entity, Mercenary):
+                if entity.team_color != team_color:
+                    enemies.append(entity)
+    
+    # TODO: sort these based on priority
+    return enemies
