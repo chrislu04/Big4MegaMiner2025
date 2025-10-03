@@ -30,8 +30,8 @@ def set_all_merc_states(game_state: GameState, mercs: List[Mercenary],
     for merc in mercs:
         next_tile1 = merc.get_adjacent_path_tile(game_state, 1)
         next_tile2 = merc.get_adjacent_path_tile(game_state, 2)
-        blocking_entity1 = game_state.entity_grid[next_tile1[0], next_tile1[1]]
-        blocking_entity2 = game_state.entity_grid[next_tile2[0], next_tile2[1]]
+        blocking_entity1 = game_state.entity_grid[next_tile1[0]][next_tile1[1]]
+        blocking_entity2 = game_state.entity_grid[next_tile2[0]][next_tile2[1]]
 
         # fighting if rival merc or demon or player base is within 1 space
         if (type(blocking_entity1) == type(Demon) or 

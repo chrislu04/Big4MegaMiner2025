@@ -7,6 +7,6 @@ if len(sys.argv) > 1:
     game_state = json.loads(sys.argv[1])
 
 action = "build" 
-coordsX = "10"
-coordsY = "10"
+coordsX = "6"
+coordsY = "3"
 print(action, coordsX, coordsY, "crossbow")

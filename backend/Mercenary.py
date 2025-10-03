@@ -3,7 +3,7 @@ from GameState import GameState
 import Utils
 class Mercenary:
     def __init__(self, x: int, y: int, team_color: str, state: str) -> None:
-        self.hp = Constants.MERCENARY_INITIAL_HP
+        self.health = Constants.MERCENARY_INITIAL_HP
         self.x = x
         self.y = y
         self.state = state
@@ -20,14 +20,15 @@ class Mercenary:
         possible_paths = [game_state.mercenary_path_down, 
                     game_state.mercenary_path_left, game_state.mercenary_path_right,
                     game_state.mercenary_path_up]
-    
         # Assumes no overlapping paths. If merc is on any path tile in path, we are on that path
         for path in possible_paths:
-            if ([self.x, self.y] in path):
+            if path == None: #<- in case there aren't 4 paths, it will skip iterating over a none value (which cases an error)
+                continue 
+            if (self.x, self.y) in path:
                 current_path = path
-
+                
         # return current path and position along current path
-        return (current_path, current_path.index([self.x, self.y]))
+        return (current_path, current_path.index((self.x, self.y)))
     
     # Helper function that returns coordinates of the path tile forward or back from the merc's pos
     def get_adjacent_path_tile(self, game_state: GameState, delta: int):

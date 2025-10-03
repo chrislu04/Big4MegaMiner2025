@@ -6,12 +6,15 @@ const ALT_PATH = preload("res://Assets/Base_Skin/alt_path.png")
 const GRASS = preload("res://Assets/Base_Skin/grass.png")
 const PATH = preload("res://Assets/Base_Skin/path.png")
 
-var placeholder : bool = false
+var previous_game_state : String = ""
+var current_game_state : String = ""
 
 var player1_ai : bool
 var player2_ai : bool
 
 var alt : bool = false
+
+var initial : bool  = true
 
 @onready var tiles = $Tiles
 @onready var entities: Node2D = $Entities
@@ -22,105 +25,88 @@ func _on_ui_start_game(is_ai1, is_ai2):
 	player2_ai = is_ai2
 	
 	var output = []
-	OS.execute("python", [GlobalPaths.backendPath, GlobalPaths.AI_agent1_file_path, GlobalPaths.AI_agent2_file_path], output)
-	#print(output)
+	OS.execute("python", [GlobalPaths.backendPath, "-v"], output)
+	
 	for i in output:
 		print(i)
-	## Draw the map, bases, & enemy spawners
-	
-	## Set team names
-	
-	## Draw the finished start
-	_draw_game_from_gamestate("place_holder")
+	#_draw_game_from_gamestate(output[0])
 	
 
 ## Updates world visuals
 func _draw_game_from_gamestate(game_state : String):
 	## We're currently using a dummy game_state for testing purposes
-	var jsonfile = FileAccess.open("res://Data/dummy.json", FileAccess.READ)
-	var game_state_json = JSON.parse_string(jsonfile.get_as_text())
+	var jsonfile = FileAccess.open("res://Data/intial.json", FileAccess.READ)
+	var game_state_json = JSON.parse_string(game_state)
 	
+	if initial:
+		_draw_grid(game_state_json["TileGrid"])
+		
+		initial = false
 	
-	
-	_draw_grid(game_state_json)
-	
-	_draw_entities(game_state_json)
+	#_draw_entities(game_state_json)
 
-func _draw_grid(game_state_json : Dictionary):
+func _update_grid_grom_gamestate():
+	pass
+
+func _draw_grid(tile_grid : Array):
 	var previous_y = 0
-	var highest_x : float
-	var highest_y : float
 	
-	for tile : String in game_state_json["floor_tiles"]:
-		
-		var tile_info = JSON.parse_string(tile)
-		if tile_info["x"] > highest_x:
-			highest_x = tile_info["x"]
-		if tile_info["y"] > highest_y:
-			highest_y = tile_info["y"]
-		
-		
-		if tile_info["y"] == previous_y:
+	for x in range(tile_grid.size()):
+		for y in range(tile_grid[x].size()):
 			alt = !alt
-		else:
-			previous_y = tile_info["y"]
-		
-		if (game_state_json["floor_tiles"][tile] == 2):
-			var sprite = Sprite2D.new()
-			if alt:
-				sprite.texture = ALT_PATH
+			if previous_y == y:
+				alt = !alt
 			else:
-				sprite.texture = PATH
+				previous_y = y
 			
-			sprite.position = Vector2(tile_info["x"] * 32, tile_info["y"] * 32)
-			tiles.add_child(sprite)
-		else:
 			var sprite = Sprite2D.new()
-			if alt:
-				sprite.texture = ALT_GRASS
-			else:
-				sprite.texture = GRASS
+			if tile_grid[x][y] == 'b':
+				if alt:
+					sprite.texture = ALT_GRASS
+				else:
+					sprite.texture = GRASS
+			elif tile_grid[x][y] == 'r':
+				if alt:
+					sprite.texture = ALT_GRASS
+				else:
+					sprite.texture = GRASS
+			elif tile_grid[x][y] == 'Path':
+				if alt:
+					sprite.texture = ALT_PATH
+				else:
+					sprite.texture = PATH
 			
-			sprite.position = Vector2(tile_info["x"] * 32, tile_info["y"] * 32)
+			sprite.position = Vector2(x * 32, y * 32)
 			tiles.add_child(sprite)
 	
-	tiles.position.x = (get_viewport_rect().size.x - (highest_x * 32)) / 2
-	tiles.position.y = (get_viewport_rect().size.y - (highest_y * 32)) / 2
-	entities.position = tiles.position
+	tiles.position.x = (get_viewport_rect().size.x - (tile_grid.size() * 32)) / 2
+	tiles.position.y = (get_viewport_rect().size.y - (tile_grid[0].size() * 32)) / 2
 
 ## Draws the mercanaries, enemies, spawner, buildings
-func _draw_entities(game_state_json : Dictionary):
+func _draw_entities(game_state_json : Array):
 	
-	for entity : String in game_state_json["entity_position"]:
-		var entity_info = JSON.parse_string(entity)
-		#print(entity_info["x"])
-		#print(game_state_json["entity_position"][entity]["entity_type"])
-		if game_state_json["entity_position"][entity]["entity_type"] == "mercenary": ## <-- Error at this line, fix it later
-			var sprite = Sprite2D.new()
-			sprite.texture = preload("res://Assets/Base_Skin/blue_recruit.png")
-			sprite.position = Vector2(entity_info["x"] * 32, entity_info["y"] * 32)
-			entities.add_child(sprite)
+	pass
 	
 
 ## Make this when the game backend is done
 func _process(delta):
 	
-	if placeholder:
-		## First Grab current gamestate from backend, save it to output
-		#var output = []
-		#OS.execute("python.exe", ["MegaMiner_BackEnd/main.py",10, "Hi"], output)
+	#if placeholder:
+		### First Grab current gamestate from backend, save it to output
+		##var output = []
+		##OS.execute("python.exe", ["MegaMiner_BackEnd/main.py",10, "Hi"], output)
+		##
+		#### Second, execute the python files with the gamestate as a parametter, then save the output actions
+		##var agentOutput1 = []
+		##var agentOutput2 = []
+		##OS.execute("python.exe", [GlobalPaths.AI_agent1_file_path], agentOutput1)
+		##OS.execute("python.exe", [GlobalPaths.AI_agent2_file_path], agentOutput2)
 		#
-		### Second, execute the python files with the gamestate as a parametter, then save the output actions
-		#var agentOutput1 = []
-		#var agentOutput2 = []
-		#OS.execute("python.exe", [GlobalPaths.AI_agent1_file_path], agentOutput1)
-		#OS.execute("python.exe", [GlobalPaths.AI_agent2_file_path], agentOutput2)
-		
-		## Send the output actions to the backend, save the new gamestate
-		#OS.execute("whatever.exe", ["function_arguments"], output) ##The backend isn't finished
-		
-		## draw the new gamestate
-		_draw_game_from_gamestate("place_holder")
+		### Send the output actions to the backend, save the new gamestate
+		##OS.execute("whatever.exe", ["function_arguments"], output) ##The backend isn't finished
+		#
+		### draw the new gamestate
+		#_draw_game_from_gamestate("place_holder")
 		
 		pass
 

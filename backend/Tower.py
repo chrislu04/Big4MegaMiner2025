@@ -4,8 +4,8 @@ import math
 from PlayerBase import PlayerBase
 
 class Tower(Entity):
-    def __init__(self, x: int, y: int, team_color: str, cooldown: int, range : int, attack : int , value : int, playerbase : PlayerBase) -> None:
-        super().__init__(self, 20, value, attack, x, y)
+    def __init__(self, x: int, y: int, team_color: str, cooldown: int, range : int, attack : int , value : int, playerbase : PlayerBase = None):
+        super().__init__(1, value, attack, x, y)
         self.cooldown_max = cooldown
         self.current_cooldown = 0
         self.tower_range = range
@@ -14,7 +14,7 @@ class Tower(Entity):
         if team_color in ['r','b']:
             self.team = team_color
         else:
-            raise Exception("Mercenary team_color must be 'r' or 'b'") # TF2 reference?
+            raise Exception("Tower team_color must be 'r' or 'b'") # TF2 reference?
     
     ## Called when a tower gets added to the grid
     def buildt(self, map_array):
@@ -34,7 +34,7 @@ class Tower(Entity):
 
             if isinstance(whats_on_path, Mercenary): ## if the ent
                 if whats_on_path.team != self.team:
-                    whats_on_path.hp -= self.attack_power
+                    whats_on_path.health -= self.attack_power
                     self.current_cooldown = self.cooldown_max 
 
 
@@ -45,7 +45,7 @@ class Tower(Entity):
                 if xi == self.x and yi == self.y: continue
                 
                 if math.sqrt((xi - self.x) * (xi - self.x) + (yi - self.y)* (yi - self.y)) == self.tower_range: ##This is the circle equation, I like my tower range to be cirlces 
-                    if map_array[xi][yi] == "#": ## We're using the tile grid since we don't need to know the entities to know where a path is
+                    if map_array[xi][yi] == 'Path': ## We're using the tile grid since we don't need to know the entities to know where a path is
                         paths.append((xi,yi))
 
         ## It is currently sorted by top-left to bottom-right, change it later based on closet first, weakest second
