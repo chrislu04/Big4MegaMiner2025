@@ -82,9 +82,10 @@ def check_wincon(game_state: GameState):
                 # Equals the total price of the total amount of towers per team
                 r_total_cost = 0
                 b_total_cost = 0
-                current_team = tower.team_color
 
                 for tower in r_towers:
+                    current_team = tower.team_color
+
                     if isinstance(tower, House):
                         if current_team == 'r':
                             r_total_cost += Constants.HOUSE_PRICE
@@ -100,7 +101,7 @@ def check_wincon(game_state: GameState):
                             r_total_cost += Constants.MINIGUN_PRICE
                         else:
                             b_total_cost += Constants.MINIGUN_PRICE
-                    else:
+                    else:   ## Crossbow
                         if current_team == 'r':
                             r_total_cost += Constants.CROSSBOW_PRICE
                         else:
