@@ -7,7 +7,7 @@ import numpy as np
 class GameState:
     ## Does game state need team_color?
     def __init__(self, team_color: str, map_width: int, map_height: int) -> None:
-        self.turns_progressed = 990
+        self.turns_progressed = 950
         self.victory = None
         self.team_name_r = None
         self.team_name_b = None
@@ -48,7 +48,7 @@ class GameState:
     ##Uses RGB values to construct a map, full red is red terratoy, full blue is blue terrarort, full green is path, black is void
     ##using r, b, and # == path, _ = void
     def make_tile_grid_from_image(self):
-        map_image_path = "C:/MegaMiner/MegaMiner2025/backend/maps/map.png"
+        map_image_path = "backend/maps/map.png"
         image = Image.open(map_image_path)
         pix_arry = np.asarray(image)
         tile_grid = []

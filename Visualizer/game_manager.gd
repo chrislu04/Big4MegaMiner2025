@@ -8,6 +8,9 @@ const PATH = preload("res://Assets/Base_Skin/path.png")
 const BLUE_RECRUIT = preload("res://Assets/Base_Skin/blue_recruit.png")
 const RED_RECRUIT = preload("res://Assets/Base_Skin/red_recruit.png")
 
+const BASE = preload("res://Assets/Base_Skin/base.png")
+const CROSSBOW = preload("res://Assets/Base_Skin/crossbow.png")
+
 @export var UI : GameUI
 
 var previous_game_state : Dictionary 
@@ -55,6 +58,7 @@ func _draw_game_from_gamestate(game_state : String):
 	_delete_mercs()
 	
 	_draw_mercenaries(game_state_json["Mercenaries"])
+	_draw_towers(game_state_json["Towers"])
 	
 	_update_ui(game_state_json)
 
@@ -99,7 +103,7 @@ func _delete_mercs():
 	for i in entities.get_children():
 		i.queue_free()
 
-## Draws the mercanaries, enemies, spawner, buildings
+## Draws the mercanaries
 func _draw_mercenaries(mercs : Array):
 	
 	for merc in mercs:
@@ -114,6 +118,23 @@ func _draw_mercenaries(mercs : Array):
 		sprite.position = pos
 		entities.add_child(sprite)
 
+func _draw_towers(towers : Array):
+	
+	
+	for tower in towers:
+		var base = Sprite2D.new()
+		var type = Sprite2D.new()
+		var pos = Vector2(tower["x"] * 32, tower["y"] * 32)
+		base.position = pos
+		base.texture = BASE
+		entities.add_child(base)
+		
+		var type_c = tower["Type"]
+		match tower["Type"]:
+			"Crossbow":
+				type.texture = CROSSBOW
+		base.add_child(type)
+		type.rotation = tower["AimAngle"]
 
 ## Make this when the game backend is done
 func _process(delta):

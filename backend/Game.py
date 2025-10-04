@@ -18,6 +18,7 @@ from Cannon import Cannon
 from Crossbow import Crossbow
 from Minigun import Minigun
 from House import House
+import pickle
 
 class Game:
     def __init__(self, agent_path_1 = "", agent_path_2 = ""):
@@ -137,6 +138,7 @@ class Game:
                 "Type" : tower_name, # Getting the type doesn't work
                 "x" : tow.x,
                 "y" : tow.y,
+                "AimAngle" : tow.angle * 57.2958 ##Convert radians to angle
             }
             string_towers.append(tow_dict)
 
@@ -153,6 +155,8 @@ class Game:
 
         json_string : str = json.dumps(data, indent=4)
 
+        # with open('backend/test.json', 'wb') as outp:
+        #     pickle.dump(json_string, outp, pickle.HIGHEST_PROTOCOL)
 
         return json_string
 

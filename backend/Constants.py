@@ -1,7 +1,7 @@
 
 # BALANCE: tweaking these numbers will make or break game balance
 
-INITIAL_MONEY: int = 60
+INITIAL_MONEY: int = 20
 DEMON_INITIAL_HP: int = 70
 DEMON_ATTACK_POWER: int = 10 # TODO: increase this over time?
 MERCENARY_INITIAL_HP: int = 70
