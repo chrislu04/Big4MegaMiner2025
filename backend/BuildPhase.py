@@ -5,7 +5,6 @@ from Cannon import Cannon
 from Crossbow import Crossbow
 from House import House
 from Minigun import Minigun
-# Do we need to import these here or no?
 
 # Phase 1 | Manages building towers and such
 
@@ -37,7 +36,7 @@ def build_tower_phase(game_state: GameState, ai_action_r: AIAction, ai_action_b 
                     house.buildt(game_state.tile_grid)
 
             case "cannon":
-                # If the tower being built is the house :
+                # If the tower being built is the cannon :
                 cannon = Cannon(x , y, "r")
 
                 if game_state.money_r < cannon.value:
@@ -49,7 +48,7 @@ def build_tower_phase(game_state: GameState, ai_action_r: AIAction, ai_action_b 
                     cannon.buildt(game_state.tile_grid)
 
             case "minigun":
-                # If the tower being built is the house :
+                # If the tower being built is the minigun :
                 mini = Minigun(x , y, "r")
 
                 if game_state.money_r < house.value:
@@ -60,7 +59,7 @@ def build_tower_phase(game_state: GameState, ai_action_r: AIAction, ai_action_b 
                     game_state.money_r -= mini.value
                     mini.buildt(game_state.tile_grid)
             case "crossbow":
-                # If the tower being built is the house :
+                # If the tower being built is the crossbow :
                 cross = Crossbow(x, y, team_color='r')
 
                 if game_state.money_r < cross.value:
