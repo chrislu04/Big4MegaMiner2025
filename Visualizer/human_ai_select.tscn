@@ -1,0 +1,200 @@
+[gd_scene load_steps=4 format=3 uid="uid://brguepel0j1o4"]
+
+[ext_resource type="Script" uid="uid://cubaa0k5uj4y5" path="res://Scripts/UI/left_side_pick.gd" id="1_apbam"]
+[ext_resource type="Texture2D" uid="uid://bfnrc17sopmbw" path="res://Assets/UI/Human_Icon.png" id="2_xxbwn"]
+[ext_resource type="Texture2D" uid="uid://d2m7eeuovq7fl" path="res://Assets/UI/Robot_Icon.png" id="3_bkusi"]
+
+[node name="Human AI select" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Left Side Pick" type="Control" parent="." node_paths=PackedStringArray("human_icon", "ai_icon", "line_edit", "file_picker", "file_dialog")]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -576.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_apbam")
+human_icon = NodePath("VBoxContainer/Human_Icon")
+ai_icon = NodePath("VBoxContainer/AI_Icon")
+line_edit = NodePath("VBoxContainer/HBoxContainer2/LineEdit")
+file_picker = NodePath("VBoxContainer/HBoxContainer2/file_picker")
+file_dialog = NodePath("FileDialog")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Left Side Pick"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -128.0
+offset_top = 36.0
+offset_right = 135.0
+offset_bottom = 102.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Human_Icon" type="Sprite2D" parent="Left Side Pick/VBoxContainer"]
+visible = false
+modulate = Color(0, 0, 0, 1)
+position = Vector2(136, -56)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_xxbwn")
+
+[node name="AI_Icon" type="Sprite2D" parent="Left Side Pick/VBoxContainer"]
+position = Vector2(136, -56)
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("3_bkusi")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Left Side Pick/VBoxContainer"]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="Left Side Pick/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 7.5
+placeholder_text = "Open file..."
+editable = false
+context_menu_enabled = false
+emoji_menu_enabled = false
+selecting_enabled = false
+
+[node name="file_picker" type="Button" parent="Left Side Pick/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "..."
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Left Side Pick/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Human" type="Button" parent="Left Side Pick/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Human"
+
+[node name="AI" type="Button" parent="Left Side Pick/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "AI
+"
+
+[node name="FileDialog" type="FileDialog" parent="Left Side Pick"]
+auto_translate_mode = 1
+title = "Open a File"
+ok_button_text = "Open"
+dialog_hide_on_ok = true
+file_mode = 0
+access = 2
+use_native_dialog = true
+
+[node name="Right Side Pick" type="Control" parent="." node_paths=PackedStringArray("human_icon", "ai_icon", "line_edit", "file_picker", "file_dialog")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 576.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_apbam")
+is_player_1 = false
+human_icon = NodePath("VBoxContainer/Human_Icon")
+ai_icon = NodePath("VBoxContainer/AI_Icon")
+line_edit = NodePath("VBoxContainer/HBoxContainer2/LineEdit")
+file_picker = NodePath("VBoxContainer/HBoxContainer2/file_picker")
+file_dialog = NodePath("FileDialog")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Right Side Pick"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -128.0
+offset_top = 36.0
+offset_right = 135.0
+offset_bottom = 102.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Human_Icon" type="Sprite2D" parent="Right Side Pick/VBoxContainer"]
+visible = false
+modulate = Color(0, 0, 0, 1)
+position = Vector2(136, -56)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_xxbwn")
+
+[node name="AI_Icon" type="Sprite2D" parent="Right Side Pick/VBoxContainer"]
+position = Vector2(136, -56)
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("3_bkusi")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Right Side Pick/VBoxContainer"]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="Right Side Pick/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 7.5
+placeholder_text = "Open file..."
+editable = false
+context_menu_enabled = false
+emoji_menu_enabled = false
+selecting_enabled = false
+
+[node name="file_picker" type="Button" parent="Right Side Pick/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "..."
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Right Side Pick/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Human" type="Button" parent="Right Side Pick/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Human"
+
+[node name="AI" type="Button" parent="Right Side Pick/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "AI
+"
+
+[node name="FileDialog" type="FileDialog" parent="Right Side Pick"]
+auto_translate_mode = 1
+title = "Open a File"
+ok_button_text = "Open"
+dialog_hide_on_ok = true
+file_mode = 0
+access = 2
+use_native_dialog = true
+
+[node name="Back" type="Button" parent="."]
+layout_mode = 0
+offset_right = 128.0
+offset_bottom = 64.0
+text = "Back"
+
+[node name="Go" type="Button" parent="."]
+layout_mode = 0
+offset_left = 512.0
+offset_top = 512.0
+offset_right = 640.0
+offset_bottom = 576.0
+text = "Go"
+
+[connection signal="pressed" from="Left Side Pick/VBoxContainer/HBoxContainer2/file_picker" to="Left Side Pick" method="_on_file_picker_pressed"]
+[connection signal="pressed" from="Left Side Pick/VBoxContainer/HBoxContainer/Human" to="Left Side Pick" method="_on_human_pressed"]
+[connection signal="pressed" from="Left Side Pick/VBoxContainer/HBoxContainer/AI" to="Left Side Pick" method="_on_ai_pressed"]
+[connection signal="pressed" from="Right Side Pick/VBoxContainer/HBoxContainer2/file_picker" to="Right Side Pick" method="_on_file_picker_pressed"]
+[connection signal="pressed" from="Right Side Pick/VBoxContainer/HBoxContainer/Human" to="Right Side Pick" method="_on_human_pressed"]
+[connection signal="pressed" from="Right Side Pick/VBoxContainer/HBoxContainer/AI" to="Right Side Pick" method="_on_ai_pressed"]

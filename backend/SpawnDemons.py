@@ -11,7 +11,7 @@ def spawn_demons(game_state: GameState):
             spawner.reload_time_left -= 1
         # Wait to spawn until space is clear
         elif targ_space == None:
-            targ_space = Demon(spawner.x, spawner.y, spawner.target_team)
+            targ_space = Demon(spawner.x, spawner.y, spawner.target_team, "idle")
             game_state.demons.append(targ_space)
 
             spawner.reload_time_left = spawner.reload_time_max

@@ -8,6 +8,8 @@ const PATH = preload("res://Assets/Base_Skin/path.png")
 const BLUE_RECRUIT = preload("res://Assets/Base_Skin/blue_recruit.png")
 const RED_RECRUIT = preload("res://Assets/Base_Skin/red_recruit.png")
 
+const ENEMY = preload("res://Assets/Base_Skin/enemy.png")
+
 const BASE = preload("res://Assets/Base_Skin/base.png")
 const CROSSBOW = preload("res://Assets/Base_Skin/crossbow.png")
 
@@ -27,7 +29,11 @@ var turn_interva_max : float = 2.0
 var turn_interval : float = 0
 
 @onready var tiles = $Tiles
-@onready var entities: Node2D = $Entities
+@onready var mercenaries: Node2D = $Mercenaries
+@onready var towers: Node2D = $Towers
+@onready var demons: Node2D = $Demons
+@onready var misc_entities: Node2D = $"Misc Entities"
+
 
 ## Sets up the game visuals
 func _on_ui_start_game(is_ai1, is_ai2):
@@ -55,11 +61,11 @@ func _draw_game_from_gamestate(game_state : String):
 	if initial:
 		_draw_grid(game_state_json["TileGrid"])
 		initial = false
-	_delete_mercs()
+	#_delete_mercs()
 	
 	_draw_mercenaries(game_state_json["Mercenaries"])
 	_draw_towers(game_state_json["Towers"])
-	
+	_draw_demons(game_state_json["Demons"])
 	_update_ui(game_state_json)
 
 
@@ -97,37 +103,51 @@ func _draw_grid(tile_grid : Array):
 	
 	tiles.position.x = (get_viewport_rect().size.x - (tile_grid.size() * 32)) / 2
 	tiles.position.y = (get_viewport_rect().size.y - (tile_grid[0].size() * 32)) / 2
-	entities.position = tiles.position
+	mercenaries.position = tiles.position
+	towers.position = tiles.position
+	demons.position = tiles.position
+	misc_entities.position = tiles.position
 
-func _delete_mercs():
-	for i in entities.get_children():
-		i.queue_free()
+#func _delete_mercs():
+	#for i in mercenaries.get_children():
+		#i.queue_free()
 
 ## Draws the mercanaries
 func _draw_mercenaries(mercs : Array):
-	
+	print(mercs)
+	var count = 0
 	for merc in mercs:
-		var pos = Vector2(merc["Mercenary"]["x"] * 32, merc["Mercenary"]["y"] * 32)
-		var sprite = Sprite2D.new()
-		if merc["Mercenary"]["Team"] == "b":
-			sprite.texture = BLUE_RECRUIT
-			sprite.flip_h = true
+		if mercenaries.get_child_count() - 1 < count:
+			var pos = Vector2(merc["Mercenary"]["x"] * 32, merc["Mercenary"]["y"] * 32)
+			var sprite = Sprite2D.new()
+			if merc["Mercenary"]["Team"] == "b":
+				sprite.texture = BLUE_RECRUIT
+				sprite.flip_h = true
+			else:
+				sprite.texture = RED_RECRUIT
+			
+			sprite.position = pos
+			mercenaries.add_child(sprite)
 		else:
-			sprite.texture = RED_RECRUIT
+			var child : Sprite2D = mercenaries.get_child(count)
+			var tween = get_tree().create_tween()
+			if merc["Mercenary"]["state"] == "dead":
+				child.queue_free()
+				count -= 1
+			else:
+				tween.tween_property(child, "position", Vector2(merc["Mercenary"]["x"] * 32, merc["Mercenary"]["y"] * 32), 1.0)
 		
-		sprite.position = pos
-		entities.add_child(sprite)
+		count += 1
 
-func _draw_towers(towers : Array):
+func _draw_towers(data_towers : Array):
 	
-	
-	for tower in towers:
+	for tower in data_towers:
 		var base = Sprite2D.new()
 		var type = Sprite2D.new()
 		var pos = Vector2(tower["x"] * 32, tower["y"] * 32)
 		base.position = pos
 		base.texture = BASE
-		entities.add_child(base)
+		towers.add_child(base)
 		
 		var type_c = tower["Type"]
 		match tower["Type"]:
@@ -135,6 +155,28 @@ func _draw_towers(towers : Array):
 				type.texture = CROSSBOW
 		base.add_child(type)
 		type.rotation = tower["AimAngle"]
+
+func _draw_demons(dem_array : Array):
+	var count = 0
+	for dem in dem_array:
+		if demons.get_child_count() - 1 < count:
+			var pos = Vector2(dem["x"] * 32, dem["y"] * 32)
+			var sprite = Sprite2D.new()
+			if dem["Team"] == "b":
+				sprite.flip_h = true
+				
+			sprite.texture = ENEMY
+			
+			sprite.position = pos
+			mercenaries.add_child(sprite)
+		else:
+			var child : Sprite2D = mercenaries.get_child(count)
+			var tween = get_tree().create_tween()
+			if dem["state"] == "dead":
+				child.queue_free()
+				count -= 1
+			else:
+				tween.tween_property(child, "position", Vector2(dem["x"] * 32, dem["y"] * 32), 1.0)
 
 ## Make this when the game backend is done
 func _process(delta):
@@ -157,7 +199,7 @@ func AI_game_turn():
 		print("Error handling script!: ", exit_code)
 	
 	previous_game_state = current_game_state
-	
+	#print(output[0])
 	_draw_game_from_gamestate(output[0])
 
 func _on_ui_build(red_side: bool, x: int, y: int) -> void:

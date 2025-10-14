@@ -2,7 +2,7 @@ import Constants
 from GameState import GameState
 
 class DemonSpawner:
-    def __init__(self, x: int, y: int, target_team: str, spawn_directionX : int, spawn_directionY : int) -> None:
+    def __init__(self, x: int, y: int, target_team: str) -> None:
         self.x = x
         self.y = y
         self.reload_time_max = Constants.DEMON_SPAWNER_RELOAD_TURNS

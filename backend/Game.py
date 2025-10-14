@@ -19,6 +19,7 @@ from Crossbow import Crossbow
 from Minigun import Minigun
 from House import House
 import pickle
+from DemonSpawner import DemonSpawner
 
 class Game:
     def __init__(self, agent_path_1 = "", agent_path_2 = ""):
@@ -27,7 +28,9 @@ class Game:
         # Path to the Agent2.py file
         self.agent_path_2 : str = agent_path_2
 
-        self.game_state : GameState = GameState("r",1,1) 
+        self.game_state : GameState = GameState("r",1,1)
+        self.game_state.demon_spawners.append(DemonSpawner(9, 5, "b"))
+        self.game_state.demon_spawners.append(DemonSpawner(11, 5, "r"))
 
     ## Kind of useless??? 
     def reset(self):
@@ -120,7 +123,7 @@ class Game:
             if isinstance(merca, Mercenary):
                 merc_dict : dict = {
                     "Mercenary" : {
-                        "Team" : "b",
+                        "Team" : merca.team,
                         "x" : merca.x,
                         "y" : merca.y,
                         "hp" : merca.health,
@@ -138,10 +141,21 @@ class Game:
                 "Type" : tower_name, # Getting the type doesn't work
                 "x" : tow.x,
                 "y" : tow.y,
-                "AimAngle" : tow.angle * 57.2958 ##Convert radians to angle
+                "AimAngle" : tow.angle * 57.2958 ##Convert radians to degrees
             }
             string_towers.append(tow_dict)
 
+        string_demons = []
+        for dem in self.game_state.demons:
+            if isinstance(dem, Demon):
+                dem_dict = {
+                    "Team" : dem.target_team,
+                    "x" : dem.x,
+                    "y" : dem.y,
+                    "hp" : dem.health,
+                    "state" : dem.state
+                }
+                string_demons.append(dem_dict)
 
         data : dict = {
             "Victory" : self.game_state.victory,
@@ -150,7 +164,7 @@ class Game:
             "EntityGrid" : string_entity_grid,
             "Towers" : string_towers,
             "Mercenaries" : string_mercenary,
-            "Demons" : self.game_state.demons
+            "Demons" : string_demons
         } 
 
         json_string : str = json.dumps(data, indent=4)

@@ -10,7 +10,13 @@ UI = NodePath("UI")
 [node name="Tiles" type="Node2D" parent="."]
 position = Vector2(64, 64)
 
-[node name="Entities" type="Node2D" parent="."]
+[node name="Mercenaries" type="Node2D" parent="."]
+
+[node name="Towers" type="Node2D" parent="."]
+
+[node name="Demons" type="Node2D" parent="."]
+
+[node name="Misc Entities" type="Node2D" parent="."]
 
 [node name="UI" parent="." instance=ExtResource("2_e2o6t")]
 

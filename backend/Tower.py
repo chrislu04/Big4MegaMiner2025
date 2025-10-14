@@ -20,7 +20,7 @@ class Tower(Entity):
     ## Called when a tower gets added to the grid
     def buildt(self, map_array):
         self.path = self.find_all_paths_in_range(map_array)
-        print(self.path)
+        # print(self.path)
     
     ## Called everytime the world updates
     def update(self, entity_array):
@@ -37,7 +37,7 @@ class Tower(Entity):
             if isinstance(whats_on_path, Mercenary): ## if the ent
                 if whats_on_path.team != self.team:
                     whats_on_path.health -= self.attack_power
-                    print(whats_on_path.health)
+                    # print(whats_on_path.health)
                     self.current_cooldown = self.cooldown_max
                     self.angle = math.atan2(path[1] - self.y, path[0] - self.x)
 
