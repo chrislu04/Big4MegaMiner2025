@@ -25,7 +25,7 @@ func _on_build_pressed() -> void:
 	build.emit(true, $"Game UI/RightSideStates/Human Control/Label/SpinBox".value, $"Game UI/RightSideStates/Human Control/Label/SpinBox2".value)
 
 func _update_turns_progressed(new_value):
-	$"Game UI/Panel/Turns Progressed".text = "Turns Progressed\n" + str(int(new_value))
+	$"Game UI/Panel/Turns Progressed".text = "Turns Left\n" + str(int(new_value))
 
 
 func _on_main_menu_play_game() -> void:
