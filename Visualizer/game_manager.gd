@@ -57,7 +57,7 @@ func _on_ui_start_game(is_ai1, is_ai2):
 		pass
 		print("Python Script executted successfully!")
 	else:
-		print("Error handling script!: ", exit_code)
+		push_error("Error handling script!: ", exit_code)
 	
 	var content
 	var path_to_game_state : String = GameSettings.convert_string_to_readable(output[0]).strip_edges(false, true)
@@ -213,12 +213,25 @@ func _process(delta):
 
 func AI_game_turn():
 	var output = []
-	var exit_code = OS.execute("python", [GlobalPaths.backendPath, "-v", GlobalPaths.AI_agent1_file_path, GlobalPaths.AI_agent2_file_path], output, true)
+	var exit_code = OS.execute( 				\
+		"python", 								\
+		[ 										\
+			GlobalPaths.backendPath, 			\
+			"-v",		 						\
+			GlobalPaths.AI_agent1_file_path, 	\
+			GlobalPaths.AI_agent2_file_path 	\
+		], 										\
+		output, true 							\
+	)
 	if exit_code == 0:
 		pass
-		#print("Python Script executted successfully!")
 	else:
-		print("Error handling script!: ", exit_code)
+		var py_traceback = output[0].find("Traceback (most recent call last):")
+		if py_traceback != -1:
+			push_error("Backend error:")
+			push_error(output[0].substr(py_traceback))
+		else:
+			push_error("Some error occurred, but not in the backend")
 	
 	previous_game_state = current_game_state
 	
