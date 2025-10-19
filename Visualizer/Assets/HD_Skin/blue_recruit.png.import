@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dt6yewfytytmq"
-path="res://.godot/imported/blue_recruit.png-c21d952744446a921a0ba976883db395.ctex"
+path="res://.godot/imported/blue_recruit.png-ee014bab085b682454a3041d4f1bba8b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Base_Skin/blue_recruit.png"
-dest_files=["res://.godot/imported/blue_recruit.png-c21d952744446a921a0ba976883db395.ctex"]
+source_file="res://Assets/HD_Skin/blue_recruit.png"
+dest_files=["res://.godot/imported/blue_recruit.png-ee014bab085b682454a3041d4f1bba8b.ctex"]
 
 [params]
 
