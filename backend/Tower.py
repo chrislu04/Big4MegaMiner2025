@@ -35,8 +35,14 @@ class Tower(Entity):
         for path in self.path:
             whats_on_path = entity_array[path[0]][path[1]] # I don't want to type out the entity array thing more than once lol
 
-            if isinstance(whats_on_path, Mercenary) or isinstance(whats_on_path, Demon): # if the ent
+            if isinstance(whats_on_path, Mercenary): # if the ent
                 if whats_on_path.team != self.team:
+                    whats_on_path.health -= self.attack_power
+                    # print(whats_on_path.health)
+                    self.current_cooldown = self.cooldown_max
+                    self.angle = math.atan2(path[1] - self.y, path[0] - self.x)
+            elif  isinstance(whats_on_path, Demon):
+                if whats_on_path.target_team != self.team:
                     whats_on_path.health -= self.attack_power
                     # print(whats_on_path.health)
                     self.current_cooldown = self.cooldown_max

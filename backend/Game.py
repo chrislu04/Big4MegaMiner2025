@@ -22,8 +22,8 @@ class Game:
         self.agent_path_2 : str = agent_path_2
 
         self.game_state : GameState = GameState("r",1,1)
-        self.game_state.demon_spawners.append(DemonSpawner(9, 5, "b"))
-        self.game_state.demon_spawners.append(DemonSpawner(11, 5, "r"))
+        self.game_state.demon_spawners.append(DemonSpawner(10, 5, "b"))
+        self.game_state.demon_spawners.append(DemonSpawner(12, 5, "r"))
 
         self.game_json_file_path = str(Path(__file__).parent.resolve()) + '/data/game_state_json.txt'
 
@@ -112,6 +112,7 @@ class Game:
         string_player_base_r : dict = {
             "Team" : self.game_state.player_base_r.team,
             "Health" : self.game_state.player_base_r.health,
+            "Money" : self.game_state.money_r,
             "x" : self.game_state.player_base_r.x,
             "y" : self.game_state.player_base_r.y
         }
@@ -119,6 +120,7 @@ class Game:
         string_player_base_b : dict = {
             "Team" : self.game_state.player_base_b.team,
             "Health" : self.game_state.player_base_b.health,
+            "Money" : self.game_state.money_b,
             "x" : self.game_state.player_base_b.x,
             "y" : self.game_state.player_base_b.y
         }
@@ -194,8 +196,8 @@ class Game:
             "TurnsProgressed" : self.game_state.turns_progressed,
             "CurrentPhase" : self.game_state.current_phase,
 
-            "Red Player" : string_player_base_r,
-            "Blue Player" : string_player_base_b,
+            "RedPlayer" : string_player_base_r,
+            "BluePlayer" : string_player_base_b,
 
             "TileGrid" : self.game_state.tile_grid,
             "EntityGrid" : string_entity_grid,

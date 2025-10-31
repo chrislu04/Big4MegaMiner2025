@@ -8,8 +8,10 @@
 script = ExtResource("1_ibotj")
 
 [node name="Main Menu" parent="." instance=ExtResource("2_ibotj")]
+visible = false
 
 [node name="Human AI select" parent="." instance=ExtResource("3_27fn8")]
+visible = false
 
 [node name="Game UI" type="Control" parent="."]
 layout_mode = 3
@@ -24,12 +26,42 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -64.0
-offset_right = 64.0
+offset_left = -80.0
+offset_right = 80.0
 offset_bottom = 64.0
 grow_horizontal = 2
 
 [node name="Turns Progressed" type="Label" parent="Game UI/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -67.0
+offset_top = -32.0
+offset_right = 68.0
+offset_bottom = 32.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Turns Progressed"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="LeftSideStates" type="Control" parent="Game UI"]
+layout_mode = 1
+anchor_right = 0.5
+anchor_bottom = 0.988
+offset_right = 8.0
+offset_bottom = 7.776
+
+[node name="Panel2" type="Panel" parent="Game UI/LeftSideStates"]
+layout_mode = 1
+offset_right = 104.0
+offset_bottom = 64.0
+
+[node name="Money" type="Label" parent="Game UI/LeftSideStates/Panel2"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -42,18 +74,140 @@ offset_right = 21.0
 offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
-text = "Turns Progressed"
+text = "Money"
+
+[node name="Panel3" type="Panel" parent="Game UI/LeftSideStates"]
+layout_mode = 1
+offset_left = 120.0
+offset_right = 224.0
+offset_bottom = 64.0
+
+[node name="Kills" type="Label" parent="Game UI/LeftSideStates/Panel3"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -21.0
+offset_top = -11.5
+offset_right = 21.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Kills"
+
+[node name="Panel4" type="Panel" parent="Game UI/LeftSideStates"]
+layout_mode = 1
+offset_left = 256.0
+offset_right = 360.0
+offset_bottom = 64.0
+
+[node name="Total Mercs" type="Label" parent="Game UI/LeftSideStates/Panel4"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -21.0
+offset_top = -11.5
+offset_right = 21.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Total Mercs"
+
+[node name="Base Health" type="Panel" parent="Game UI/LeftSideStates"]
+layout_mode = 1
+offset_top = 88.0
+offset_right = 104.0
+offset_bottom = 152.0
+
+[node name="Health bar" type="Label" parent="Game UI/LeftSideStates/Base Health"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -32.0
+offset_right = 52.0
+offset_bottom = 32.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Base Health 70/70"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Human Control" type="Control" parent="Game UI/LeftSideStates"]
+visible = false
+layout_mode = 1
+anchor_top = 0.79
+anchor_right = 0.986
+anchor_bottom = 1.0
+offset_top = 0.0799866
+offset_right = 0.175964
+
+[node name="Build" type="Button" parent="Game UI/LeftSideStates/Human Control"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 96.0
+offset_right = 88.0
+offset_bottom = 127.0
+text = "Build"
+
+[node name="Destroy" type="Button" parent="Game UI/LeftSideStates/Human Control"]
+layout_mode = 0
+offset_left = 40.0
+offset_right = 88.0
+offset_bottom = 31.0
+text = "Destroy"
+
+[node name="Queue" type="Button" parent="Game UI/LeftSideStates/Human Control"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 48.0
+offset_right = 88.0
+offset_bottom = 79.0
+text = "Queue"
+
+[node name="Label" type="Label" parent="Game UI/LeftSideStates/Human Control"]
+layout_mode = 0
+offset_left = 176.0
+offset_top = 56.0
+offset_right = 231.0
+offset_bottom = 79.0
+text = "Coords"
+
+[node name="SpinBox" type="SpinBox" parent="Game UI/LeftSideStates/Human Control/Label"]
+layout_mode = 0
+offset_left = 72.0
+offset_right = 158.563
+offset_bottom = 31.0
+alignment = 1
+
+[node name="SpinBox2" type="SpinBox" parent="Game UI/LeftSideStates/Human Control/Label"]
+layout_mode = 0
+offset_left = 176.0
+offset_right = 262.563
+offset_bottom = 31.0
+alignment = 1
 
 [node name="RightSideStates" type="Control" parent="Game UI"]
 layout_mode = 1
 anchor_right = 0.5
 anchor_bottom = 0.988
-offset_right = 8.0
+offset_left = 576.0
+offset_right = 576.0
 offset_bottom = 7.776
 
 [node name="Panel2" type="Panel" parent="Game UI/RightSideStates"]
 layout_mode = 1
-offset_right = 104.0
+offset_left = 208.0
+offset_right = 312.0
 offset_bottom = 64.0
 
 [node name="Money" type="Label" parent="Game UI/RightSideStates/Panel2"]
@@ -73,8 +227,8 @@ text = "Money"
 
 [node name="Panel3" type="Panel" parent="Game UI/RightSideStates"]
 layout_mode = 1
-offset_left = 120.0
-offset_right = 224.0
+offset_left = 328.0
+offset_right = 432.0
 offset_bottom = 64.0
 
 [node name="Kills" type="Label" parent="Game UI/RightSideStates/Panel3"]
@@ -94,8 +248,8 @@ text = "Kills"
 
 [node name="Panel4" type="Panel" parent="Game UI/RightSideStates"]
 layout_mode = 1
-offset_left = 256.0
-offset_right = 360.0
+offset_left = 464.0
+offset_right = 568.0
 offset_bottom = 64.0
 
 [node name="Total Mercs" type="Label" parent="Game UI/RightSideStates/Panel4"]
@@ -167,7 +321,32 @@ offset_right = 262.563
 offset_bottom = 31.0
 alignment = 1
 
+[node name="Base Health" type="Panel" parent="Game UI/RightSideStates"]
+layout_mode = 0
+offset_top = 88.0
+offset_right = 104.0
+offset_bottom = 152.0
+
+[node name="Health bar" type="Label" parent="Game UI/RightSideStates/Base Health"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.0
+offset_top = -32.0
+offset_right = 52.0
+offset_bottom = 32.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Base Health 70/70"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
 [connection signal="PlayGame" from="Main Menu" to="." method="_on_main_menu_play_game"]
 [connection signal="Back" from="Human AI select" to="." method="_on_human_ai_select_back"]
 [connection signal="Go" from="Human AI select" to="." method="_on_human_ai_select_go"]
+[connection signal="pressed" from="Game UI/LeftSideStates/Human Control/Build" to="." method="_on_build_pressed"]
 [connection signal="pressed" from="Game UI/RightSideStates/Human Control/Build" to="." method="_on_build_pressed"]

@@ -1,16 +1,18 @@
 {
     "Victory": null,
-    "TurnsProgressed": 909,
+    "TurnsProgressed": 908,
     "CurrentPhase": "mercs buy",
-    "Red Player": {
+    "RedPlayer": {
         "Team": "r",
         "Health": 200,
+        "Money": 84,
         "x": 5,
         "y": 5
     },
-    "Blue Player": {
+    "BluePlayer": {
         "Team": "b",
         "Health": 200,
+        "Money": 20,
         "x": 17,
         "y": 5
     },
@@ -340,12 +342,12 @@
             null,
             null,
             null,
-            null
+            "Crossbow"
         ],
         [
             null,
             null,
-            null,
+            "Crossbow",
             null,
             null,
             null,
@@ -417,23 +419,10 @@
             null,
             null,
             null,
-            null
-        ],
-        [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
             null,
             null
         ],
         [
-            null,
             null,
             null,
             null,
@@ -474,32 +463,7 @@
         [
             null,
             null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
-        [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
-        [
-            null,
-            null,
+            "Mercenary",
             null,
             null,
             null,
@@ -526,6 +490,44 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        [
+            null,
+            null,
+            "Mercenary",
             null,
             null,
             "base",
@@ -614,12 +616,46 @@
             null
         ]
     ],
-    "Towers": [],
-    "Mercenaries": [],
+    "Towers": [
+        {
+            "Type": "Crossbow",
+            "Team": "r",
+            "x": 2,
+            "y": 2,
+            "AimAngle": 0.0
+        },
+        {
+            "Type": "Crossbow",
+            "Team": "r",
+            "x": 1,
+            "y": 10,
+            "AimAngle": 0.0
+        }
+    ],
+    "Mercenaries": [
+        {
+            "Mercenary": {
+                "Team": "b",
+                "x": 11,
+                "y": 2,
+                "health": 10,
+                "state": "moving"
+            }
+        },
+        {
+            "Mercenary": {
+                "Team": "b",
+                "x": 16,
+                "y": 2,
+                "health": 10,
+                "state": "moving"
+            }
+        }
+    ],
     "Demons": [
         {
             "Team": "b",
-            "x": 7,
+            "x": 8,
             "y": 5,
             "health": 70,
             "state": "moving"

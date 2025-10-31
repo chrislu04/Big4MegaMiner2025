@@ -246,3 +246,6 @@ func _on_ui_build(red_side: bool, x: int, y: int) -> void:
 
 func _update_ui(gamestate):
 	UI._update_turns_progressed(gamestate["TurnsProgressed"])
+	UI._update_money_values(gamestate["RedPlayer"]["Money"], gamestate["BluePlayer"]["Money"])
+	UI._update_base_health(true,gamestate["RedPlayer"]["Health"])
+	UI._update_base_health(false,gamestate["BluePlayer"]["Health"])

@@ -27,6 +27,17 @@ func _on_build_pressed() -> void:
 func _update_turns_progressed(new_value):
 	$"Game UI/Panel/Turns Progressed".text = "Turns Progressed\n" + str(int(new_value))
 
+func _update_money_values(left_value, right_value):
+	$"Game UI/LeftSideStates/Panel2/Money".text = "$" + str(left_value)
+	
+	$"Game UI/RightSideStates/Panel2/Money".text = "$" + str(left_value)
+
+
+func _update_base_health(is_left : bool, new_value):
+	if is_left:
+		$"Game UI/LeftSideStates/Base Health/Health bar".text = "Base Health " + str(new_value) + "/70"
+	else:
+		$"Game UI/RightSideStates/Base Health/Health bar".text = "Base Health " + str(new_value) + "/70"
 
 func _on_main_menu_play_game() -> void:
 	human_ai_select.visible = true

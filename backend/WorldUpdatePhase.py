@@ -141,9 +141,9 @@ def check_wincon(game_state: GameState):
 
                         for merc in game_state.mercs:
                             if merc.team_color == 'r':
-                                r_mercs_health += merc.health
+                                r_mercs_hp += merc.health
                             else:
-                                b_mercs_health += merc.health
+                                b_mercs_hp += merc.health
                         
                         if r_mercs_health != b_mercs_health:
                             if r_mercs_health > b_mercs_health:
