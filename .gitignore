@@ -3,3 +3,4 @@ __pycache__/
 .godot/
 /android/
 *.pkl
+game_state_json.txt
