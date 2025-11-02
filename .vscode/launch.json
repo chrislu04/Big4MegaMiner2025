@@ -14,9 +14,9 @@
             "args": [
                 "${workspaceFolder}/maps/test_map.json",
                 "-a1",
-                "${workspaceFolder}/backend/AI_Agents/RandomAgent.py",
+                "${workspaceFolder}/backend/AI_Agents/AgentTemplate.py",
                 "-a2",
-                "${workspaceFolder}/backend/AI_Agents/RandomAgent.py",
+                "${workspaceFolder}/backend/AI_Agents/AgentTemplate.py",
             ]
         }
     ]

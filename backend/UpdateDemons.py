@@ -36,16 +36,15 @@ def set_all_demon_states(game_state: GameState, demons: List[Demon],
         blocking_entity2 = game_state.entity_grid[next_tile2[1]][next_tile2[0]]
 
         # fighting if rival merc or demon or player base is within 1 space
-        if (type(blocking_entity1) == type(Mercenary) or 
-            type(blocking_entity1) == type(PlayerBase) or
+        if (demon.get_attackable_player_base(game_state) != None or
+            type(blocking_entity1) == type(Mercenary) or 
             (type(blocking_entity1) == type(Demon) and blocking_entity1.target_team != demon.team)):
             demon.state = 'fighting'
             # set all demons behind us to waiting
             demon.set_behind_waiting(game_state)
         # fighting if enemy is within 2 spaces and merc within 1 space is not ally
         elif (type(blocking_entity1) == None and
-            type(blocking_entity2) == type(Demon) or 
-            type(blocking_entity2) == type(PlayerBase) or
+            type(blocking_entity2) == type(Demon) or
             (type(blocking_entity2) == type(Mercenary) and blocking_entity2.team != demon.team)):
             demon.state = 'fighting'
             # set all demons behind us to waiting
@@ -81,7 +80,12 @@ def do_demon_combat_single(game_state: GameState, demon: Demon):
     target2: Entity = game_state.entity_grid[next_tile2[1]][next_tile2[0]]
     
     # if tile 1 space in front is empty, we are contesting space with enemy 2 spaces in front 
-    if (target1 != None):
+    if target1 != None:
         target1.health -= Constants.DEMON_ATTACK_POWER
-    else:
+    elif target2 != None:
         target2.health -= Constants.DEMON_ATTACK_POWER
+    
+    # attack the player base if we have reached the end of the path
+    attackable_base = demon.get_attackable_player_base(game_state)
+    if attackable_base != None:
+        attackable_base.health -= Constants.DEMON_ATTACK_POWER

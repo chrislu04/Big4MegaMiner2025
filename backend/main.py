@@ -68,13 +68,13 @@ def get_command_line_arguments() -> argparse.Namespace:
     parser.add_argument(
         '-a1',
         '--ai_agent_file_1',
-        default='backend/AI_Agents/RandomAgent.py',
+        default='backend/AI_Agents/AgentTemplate.py',
         help='Path to the AI agent 1 python file'
     )
     parser.add_argument(
         '-a2',
         '--ai_agent_file_2',
-        default='backend/AI_Agents/RandomAgent.py',
+        default='backend/AI_Agents/AgentTemplate.py',
         help='Path to the AI agent 2 python file'
     )
     parser.add_argument(

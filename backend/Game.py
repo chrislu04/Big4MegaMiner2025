@@ -139,7 +139,4 @@ class Game:
 
         json_string : str = json.dumps(data, indent=4)
 
-        # with open('backend/test.json', 'wb') as outp:
-        #     pickle.dump(json_string, outp, pickle.HIGHEST_PROTOCOL)
-
         return json_string

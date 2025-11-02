@@ -34,16 +34,15 @@ def set_all_merc_states(game_state: GameState, mercs: List[Mercenary],
         blocking_entity2 = game_state.entity_grid[next_tile2[1]][next_tile2[0]]
 
         # fighting if rival merc or demon or player base is within 1 space
-        if (type(blocking_entity1) == type(Demon) or 
-            type(blocking_entity1) == type(PlayerBase) or
+        if (merc.get_attackable_player_base(game_state) != None or
+            type(blocking_entity1) == type(Demon) or
             (type(blocking_entity1) == type(Mercenary) and blocking_entity1.team != merc.team)):
             merc.state = 'fighting'
             # set all mercs behind us to waiting
             merc.set_behind_waiting(game_state)
         # fighting if enemy is within 2 spaces and merc within 1 space is not ally
         elif (type(blocking_entity1) == None and
-            type(blocking_entity2) == type(Demon) or 
-            type(blocking_entity2) == type(PlayerBase) or
+            type(blocking_entity2) == type(Demon) or
             (type(blocking_entity2) == type(Mercenary) and blocking_entity2.team != merc.team)):
             merc.state = 'fighting'
             # set all mercs behind us to waiting
@@ -79,7 +78,7 @@ def do_merc_combat_single(game_state: GameState, merc: Mercenary):
     target2: Entity = game_state.entity_grid[next_tile2[1]][next_tile2[0]]
     
     # if tile 1 space in front is empty, we are contesting space with enemy 2 spaces in front 
-    if (target1 != None):
+    if target1 != None:
         target1.health -= Constants.MERCENARY_ATTACK_POWER
-    else:
+    elif target2 != None:
         target2.health -= Constants.MERCENARY_ATTACK_POWER

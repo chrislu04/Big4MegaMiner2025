@@ -1,20 +1,18 @@
 import Constants
 from Entity import Entity
 from GameState import GameState
+from PlayerBase import PlayerBase
 import Utils
 
 class Demon:
-    def __init__(self, x: int, y: int, target_team: str, state: str) -> None:
+    def __init__(self, x: int, y: int, target_team: str, game_state: GameState) -> None:
         self.health = Constants.DEMON_INITIAL_health
         self.x = x
         self.y = y
         self.target_team = target_team
-        self.state = state
+        self.state = 'moving'
 
-    # Helper function do find what path this merc is on. 
-    # TODO: Store current path and path index in demon object
-    def get_current_path(self, game_state: GameState):
-        current_path = []
+        self.current_path = []
         possible_paths = [
             game_state.mercenary_path_down, 
             game_state.mercenary_path_left,
@@ -26,14 +24,16 @@ class Demon:
             if path == None: #<- in case there aren't 4 paths, it will skip iterating over a none value (which cases an error)
                 continue 
             if (self.x, self.y) in path:
-                current_path = path
+                self.current_path = path
                 
+    # Helper function do find what path this merc is on. 
+    def get_current_path(self):
         # return current path and position along current path
-        return (current_path, current_path.index((self.x, self.y)))
+        return (self.current_path, self.current_path.index((self.x, self.y)))
     
     # Helper function that returns coordinates of the path tile forward or back from the merc's pos
     def get_adjacent_path_tile(self, game_state: GameState, delta: int):
-        path_data = self.get_current_path(game_state)
+        path_data = self.get_current_path()
         path = path_data[0]
         path_pos = path_data[1]
 
@@ -54,3 +54,13 @@ class Demon:
         else:
             behind_entity.state = 'waiting'
             behind_entity.set_behind_waiting(game_state)
+
+    # If in range to attack a player base, return a reference to that player base,
+    # Otherwise, return None
+    def get_attackable_player_base(self, game_state: GameState) -> PlayerBase:
+        if self.current_path.index((self.x,self.y)) == len(self.current_path) - 2:
+            return game_state.player_base_b
+        elif self.current_path.index((self.x,self.y)) == 1:
+            return game_state.player_base_r
+        else:
+            return None
