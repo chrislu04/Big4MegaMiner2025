@@ -6,9 +6,6 @@ from Mercenary import Mercenary
 from Entity import Entity
 import Constants
 
-# NOTE: Function logic has been copy-pasted from UpdateMercenaries.py.
-# This makes the code messier but may be useful if demons & mercs need independant tweaking
-
 def update_demons(game_state: GameState):
     # Determine all demon states
     moving: List[Demon] = []

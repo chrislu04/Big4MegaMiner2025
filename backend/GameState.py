@@ -87,4 +87,4 @@ class GameState:
             return None
 
     def is_game_over(self) -> bool:
-        return self.turns_remaining <= 0
+        return self.turns_remaining <= 0 or self.victory != None

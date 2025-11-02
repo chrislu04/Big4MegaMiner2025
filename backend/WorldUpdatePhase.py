@@ -20,11 +20,11 @@ def world_update_phase(game_state: GameState):
 
     update_mercenaries(game_state)
     mortal_wound_check(game_state, game_state.mercs + game_state.demons)
-    check_wincon(game_state)
+    game_state.victory = check_wincon(game_state)
 
     update_demons(game_state)
     mortal_wound_check(game_state, game_state.mercs)
-    check_wincon(game_state)
+    game_state.victory = check_wincon(game_state)
     
     spawn_mercenaries(game_state)
     spawn_demons(game_state)
@@ -51,18 +51,18 @@ def check_wincon(game_state: GameState):
 
     # If one player's base is Destroyed and the other is not, the player with the surviving base wins.
     if team_b_health <= 0 or team_r_health <= 0:
-        if team_b_health == 0:
-            return "Team R is the winner!"
-        elif team_r_health == 0:
-            return "Team B is the winner!"
+        if team_b_health <= 0:
+            return 'r'
+        elif team_r_health <= 0:
+            return 'b'
         
     # If both players' bases are Destroyed, break the tie based on who has the most Money.
     elif team_b_health <= 0 and team_r_health <= 0:
         if team_b_money != team_r_money:
             if team_b_money > team_r_money:
-                return "Team B is the winner!"
+                return 'b'
             elif team_r_money > team_b_money:
-                return "Team R is the winner!"
+                return 'r'
         else:
             # Then, if both players have the same amount of Money, break the tie based on who has built the most towers.
             # Empty lists that will store each tower the teams have
@@ -78,9 +78,9 @@ def check_wincon(game_state: GameState):
             
             if len(r_towers) != len(b_towers):
                 if len(r_towers) > len(b_towers):
-                    return "Team R is the winner!"
+                    return 'r'
                 else:
-                    return "Team B is the winner!"
+                    return 'b'
             else:
                 # Then, if both players have built the same number of towers, break the tie based on the sum of prices of those towers.
                 # Equals the total price of the total amount of towers per team
@@ -112,11 +112,11 @@ def check_wincon(game_state: GameState):
                             b_total_cost += Constants.CROSSBOW_PRICE
                 if r_total_cost != b_total_cost:
                     if r_total_cost > b_total_cost:
-                        return "Team R is the winner!"
+                        return 'r'
                     else:
-                        return "Team B is the winner!"
+                        return 'b'
                 else:
-                    ##Then, if both sums are equal, break the tie based on the number of Mercenaries each player has.
+                    # Then, if both sums are equal, break the tie based on the number of Mercenaries each player has.
 
                     # Number of mercenaries per team
                     r_mercs = 0
@@ -130,11 +130,11 @@ def check_wincon(game_state: GameState):
                     
                     if r_mercs != b_mercs:
                         if r_mercs > b_mercs:
-                            return "Team R is the winner!"
+                            return 'r'
                         else:
-                            return "Team B is the winner!"
+                            return 'b'
                     else:
-                        ##Then, if both have the same number of Mercenaries, break the tie based on the sum of health of mercenaries.
+                        # Then, if both have the same number of Mercenaries, break the tie based on the sum of health of mercenaries.
                         r_mercs_health = 0
                         b_mercs_health = 0
 
@@ -146,11 +146,10 @@ def check_wincon(game_state: GameState):
                         
                         if r_mercs_health != b_mercs_health:
                             if r_mercs_health > b_mercs_health:
-                                return "Team R is the winner!"
+                                return 'r'
                             else:
-                                return "Team B is the winner!"
+                                return 'b'
                         else:
-                            return "A winner could not be decided... Flip a coin to determine the winner!"
+                            return 'tie'
     else:
-        return None
-        # Nobody has won yet
+        return None # Nobody has won yet
