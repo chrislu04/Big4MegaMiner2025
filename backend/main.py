@@ -25,7 +25,7 @@ def main_game_loop(ai_agent_1, ai_agent_2, game: Game):
             # "Human" input from visualizer or other parent process
             agent_1_action_string = input()
         
-        agent_1_action = decode_action(agent_1_action_string)
+        agent_1_action = AIAction.from_json(agent_1_action_string)
 
         agent_2_action_string = ""
         if ai_agent_2:
@@ -40,7 +40,7 @@ def main_game_loop(ai_agent_1, ai_agent_2, game: Game):
             # "Human" input from visualizer or other parent process
             agent_2_action_string = input()
         
-        agent_2_action = decode_action(agent_2_action_string)
+        agent_2_action = AIAction.from_json(agent_2_action_string)
 
         # Run the next turn
         game.run_turn(agent_1_action, agent_2_action)
@@ -123,32 +123,17 @@ def validate_command_line_arguments(cmd_line_args: argparse.Namespace) -> str:
     return ''
 
 
-# Decodes a string into an AIAction
-def decode_action(action : str) -> AIAction:
-    
-    action_string  : str = action.split(" ")
-    ai_action : AIAction = AIAction(0,0) # Base case, this action doesn't do anything
-
-    match action_string[0].strip().lower():
-        case "build":
-            ai_action = AIAction(int(action_string[1]), int(action_string[2]), action_string[3], buy=True,) # Making a lot of bold assumptions here
-        case "destroy":                                                                                     
-            ai_action = AIAction(int(action_string[1]), int(action_string[2]), action_string[3], destory=True,) 
-        case "queue":
-            ai_action = AIAction(0, 0, queue_direction=action_string[3], queue=True,) # Queuing wouldn't need an x or y, ai would just add a direction as the params
-    
-    return ai_action
-
-
 # Entry point for the backend
 if __name__ == '__main__':
+    # redirect stderr to logfile
+    sys.stderr = open('log.txt', 'w')
 
     cmd_line_args = get_command_line_arguments()
     validate_command_line_arguments(cmd_line_args)
 
     # Create AI agents
     ai_agent_1 = None
-    if cmd_line_args.ai_agent_file_1:
+    if not cmd_line_args.agent_1_is_human:
         ai_agent_1 = subprocess.Popen(
             [sys.executable, cmd_line_args.ai_agent_file_1],
             stdin=subprocess.PIPE,
@@ -158,7 +143,7 @@ if __name__ == '__main__':
             bufsize=1
         )
     ai_agent_2 = None
-    if cmd_line_args.ai_agent_file_2:
+    if not cmd_line_args.agent_2_is_human:
         ai_agent_2 = subprocess.Popen(
             [sys.executable, cmd_line_args.ai_agent_file_2],
             stdin=subprocess.PIPE,
@@ -191,9 +176,9 @@ if __name__ == '__main__':
     # Send initial game state and team names to the visualizer (or other parent process)
     print("--BEGIN INITIAL GAME STATE--")
     print(game.game_state_to_json())
-    print(team_name_r)
-    print(team_name_b)
     print("--END INITIAL GAME STATE--")
+    print(f"--RED TEAM NAME: {team_name_r}--")
+    print(f"--BLUE TEAM NAME: {team_name_b}--")
 
     # Main game loop
     main_game_loop(ai_agent_1, ai_agent_2, game)

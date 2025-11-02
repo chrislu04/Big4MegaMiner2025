@@ -69,7 +69,6 @@ class GameState:
 
             # Loop through new neighboring tiles until there are none left or a branch is detected
             while current_tile != None:
-                # print("Current Tile", current_tile)
                 # Find the next tile in the path
                 for neighbor in [
                     (current_tile[0] - 1, current_tile[1]),

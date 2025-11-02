@@ -1,12 +1,13 @@
 import Constants
 from PlayerBase import PlayerBase
 from GameState import GameState
+from NameSelector import select_merc_name
 import Utils
 
 
 class Mercenary:
     def __init__(self, x: int, y: int, team_color: str, game_state: GameState) -> None:
-        self.health = Constants.MERCENARY_INITIAL_health
+        self.health = Constants.MERCENARY_INITIAL_HEALTH
         self.x = x
         self.y = y
         self.state = 'moving'
@@ -14,8 +15,11 @@ class Mercenary:
         if team_color in ['r','b']:
             self.team = team_color
         else:
-            raise Exception("Mercenary team_color must be 'r' or 'b'") # TF2 reference?
+            Utils.log_msg(f"Mercenary team_color must be 'r' or 'b'") # TF2 reference?
+            return
         
+        self.name = select_merc_name(self.team)
+
         self.current_path = []
         possible_paths = [
             game_state.mercenary_path_down, 

@@ -2,15 +2,17 @@ import Constants
 from Entity import Entity
 from GameState import GameState
 from PlayerBase import PlayerBase
+from NameSelector import select_demon_name
 import Utils
 
 class Demon:
     def __init__(self, x: int, y: int, target_team: str, game_state: GameState) -> None:
-        self.health = Constants.DEMON_INITIAL_health
+        self.health = Constants.DEMON_INITIAL_HEALTH
         self.x = x
         self.y = y
         self.target_team = target_team
         self.state = 'moving'
+        self.name = select_demon_name()
 
         self.current_path = []
         possible_paths = [
@@ -58,9 +60,11 @@ class Demon:
     # If in range to attack a player base, return a reference to that player base,
     # Otherwise, return None
     def get_attackable_player_base(self, game_state: GameState) -> PlayerBase:
-        if self.current_path.index((self.x,self.y)) == len(self.current_path) - 2:
+        if (self.current_path.index((self.x,self.y)) == len(self.current_path) - 2
+            and self.target_team == 'b'):
             return game_state.player_base_b
-        elif self.current_path.index((self.x,self.y)) == 1:
+        elif (self.current_path.index((self.x,self.y)) == 1
+              and self.target_team == 'r'):
             return game_state.player_base_r
         else:
             return None

@@ -13,3 +13,5 @@ class PlayerBase(Entity):
             self.team = team_color
         else:
             raise Exception("Player base team_color must be 'r' or 'b'") # TF2 reference?
+        
+        self.name = "Red Player Base" if self.team == 'r' else "Blue Player Base"

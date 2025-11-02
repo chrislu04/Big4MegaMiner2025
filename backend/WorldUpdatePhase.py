@@ -10,6 +10,7 @@ from UpdateTowers import update_towers
 from House import House
 from Cannon import Cannon
 from Minigun import Minigun
+from Utils import log_msg
 import Constants
 from Entity import Entity
 
@@ -34,9 +35,10 @@ def world_update_phase(game_state: GameState):
 
 def mortal_wound_check(game_state: GameState, entities: List[Entity]):
     for ent in entities:
-        if ent.health <= 0:
+        if ent.health <= 0 and ent.state != "dead":
             game_state.entity_grid[ent.y][ent.x] = None
             ent.state = "dead"
+            log_msg(f"{ent.name} has suffered mortal wounds")
 
 
 def check_wincon(game_state: GameState):

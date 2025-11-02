@@ -1,6 +1,7 @@
 from DemonSpawner import DemonSpawner
 from Demon import Demon
 from GameState import GameState
+from Utils import log_msg
 
 def spawn_demons(game_state: GameState):
     for demon_spawner in game_state.demon_spawners:
@@ -16,4 +17,7 @@ def spawn_demons(game_state: GameState):
             game_state.demons.append(new_demon)
 
             spawner.reload_time_left = spawner.reload_time_max
+            log_msg(f"Spawned demon {new_demon.name} at ({new_demon.x},{new_demon.y})")
+        else:
+            log_msg(f"Waiting to spawn demon at ({spawner.x},{spawner.y})")
         

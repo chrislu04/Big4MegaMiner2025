@@ -5,6 +5,7 @@ from Mercenary import Mercenary
 from Demon import Demon
 from PlayerBase import PlayerBase
 from Entity import Entity
+from Utils import log_msg
 import Constants
 
 def update_mercenaries(game_state: GameState):
@@ -28,6 +29,8 @@ def set_all_merc_states(game_state: GameState, mercs: List[Mercenary],
                         fighting: List[Mercenary],
                         waiting: List[Mercenary]):
     for merc in mercs:
+        if merc.state == 'dead': continue
+
         next_tile1 = merc.get_adjacent_path_tile(game_state, 1)
         next_tile2 = merc.get_adjacent_path_tile(game_state, 2)
         blocking_entity1 = game_state.entity_grid[next_tile1[1]][next_tile1[0]]
@@ -56,20 +59,21 @@ def set_all_merc_states(game_state: GameState, mercs: List[Mercenary],
         if merc.state == 'waiting': waiting.append(merc)
         if merc.state == 'moving': moving.append(merc)
 
-def move_all_mercs(game_state: GameState, mercs: List[Mercenary]):
+def move_all_mercs(game_state: GameState, moving_mercs: List[Mercenary]):
     # remove moving mercs
-    for merc in mercs:
+    for merc in moving_mercs:
         game_state.entity_grid[merc.y][merc.x] = None
 
     # set new position
-    for merc in mercs:
+    for merc in moving_mercs:
         new_pos = merc.get_adjacent_path_tile(game_state, 1)
         merc.x = new_pos[0]
         merc.y = new_pos[1]
 
     # add moving mercs back
-    for merc in mercs:
+    for merc in moving_mercs:
         game_state.entity_grid[merc.y][merc.x] = merc
+        log_msg(f"Mercenary {merc.name} moved to ({merc.x},{merc.y})")
 
 def do_merc_combat_single(game_state: GameState, merc: Mercenary):
     next_tile1 = merc.get_adjacent_path_tile(game_state, 1)
@@ -80,5 +84,7 @@ def do_merc_combat_single(game_state: GameState, merc: Mercenary):
     # if tile 1 space in front is empty, we are contesting space with enemy 2 spaces in front 
     if target1 != None:
         target1.health -= Constants.MERCENARY_ATTACK_POWER
+        log_msg(f'Mercenary {merc.name} attacked opponent {target1.name} at ({next_tile1[0]},{next_tile1[1]})')
     elif target2 != None:
         target2.health -= Constants.MERCENARY_ATTACK_POWER
+        log_msg(f'Mercenary {merc.name} attacked opponent {target2.name} at ({next_tile2[0]},{next_tile2[1]})')

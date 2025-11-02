@@ -1,6 +1,8 @@
 import json
 import subprocess
 from pathlib import Path
+from Utils import log_msg
+import Constants
 
 # GameState and related imports
 from GameState import GameState
@@ -33,11 +35,13 @@ class Game:
 
     # Perform updates to GameState based on two AI Actions
     def run_turn(self, action_r: AIAction, action_b: AIAction):
-
+        
+        log_msg(f"-- TURN: {Constants.MAX_TURNS - self.game_state.turns_remaining}, REMAINING TURNS: {self.game_state.turns_remaining}--")
         buy_mercenary_phase(self.game_state, action_r, action_b)
         build_tower_phase(self.game_state, action_r, action_b)
         world_update_phase(self.game_state)
         self.game_state.turns_remaining -= 1
+        log_msg("")
 
 
     # Converts the game state to a json string that'll be usable by the AI's (and the visualizer later...)
@@ -127,8 +131,8 @@ class Game:
             "Victory" : self.game_state.victory,
             "TurnsRemaining" : self.game_state.turns_remaining,
 
-            "Red Player" : dict_player_base_r,
-            "Blue Player" : dict_player_base_b,
+            "PlayerBaseR" : dict_player_base_r,
+            "PlayerBaseB" : dict_player_base_b,
 
             "FloorTiles" : self.game_state.floor_tiles,
             "EntityGrid" : dict_entity_grid,

@@ -5,125 +5,119 @@ from Cannon import Cannon
 from Crossbow import Crossbow
 from House import House
 from Minigun import Minigun
+from Utils import log_msg
 
-# Phase 1 | Manages building towers and such
+# Phase 1: Build or Destroy Towers
 
-def build_tower_phase(game_state: GameState, ai_action_r: AIAction, ai_action_b : AIAction) -> None:
-    # Make sure:
-    # 1: enough money
-    # 2: the space chosen is open
-    x = ai_action_r.x # x that is selected to be built at
-    y = ai_action_r.y # y that is selected to be built at
-
-    # Check if the buy action was called, then check if the tile is valid (within same territory), then check if nothing else is on the tower
-    if ai_action_r.buy_tower_action and game_state.tile_grid[y][x] == "r" and game_state.entity_grid[y][x] is None:
-
-        # Need to further define the Tower and Tower subclasses to fully
-        # set up the rest of this phase, mainly for detection of which
-        # tower has been chosen to be built
-        match ai_action_r.tower_to_build.lower():
-            case "house":
-                # If the tower being built is the house :
-                house : House = House(x, y, team_color='r')
-                
-                if game_state.money_r < house.value:
-                    raise Exception("Not enough money!")
-                else:
-                    game_state.towers.append(house)
-                    game_state.entity_grid[y][x] = house # Update the grid to represent the newly built tower at the correct position
-                    game_state.money_r -= house.value
-                    house.buildt(game_state.tile_grid)
-
-            case "cannon":
-                # If the tower being built is the cannon :
-                cannon = Cannon(x , y, team_color='r')
-
-                if game_state.money_r < cannon.value:
-                    raise Exception("Not enough money!")
-                else:
-                    game_state.towers.append(cannon)
-                    game_state.entity_grid[y][x] = cannon # Update the grid to represent the newly built tower at the correct position
-                    game_state.money_r -= cannon.value
-                    cannon.buildt(game_state.tile_grid)
-
-            case "minigun":
-                # If the tower being built is the minigun :
-                mini = Minigun(x , y, "r")
-
-                if game_state.money_r < mini.value:
-                    raise Exception("Not enough money!")
-                else:
-                    game_state.towers.append(mini)
-                    game_state.entity_grid[y][x] = mini # Update the grid to represent the newly built tower at the correct position
-                    game_state.money_r -= mini.value
-                    mini.buildt(game_state.tile_grid)
-            case "crossbow":
-                # If the tower being built is the crossbow :
-                cross = Crossbow(x, y, team_color='r')
-
-                if game_state.money_r < cross.value:
-                    raise Exception("Not enough money!")
-                else:
-                    game_state.towers.append(cross)
-                    game_state.entity_grid[y][x] = cross # Update the grid to represent the newly built tower at the correct position
-                    game_state.money_r -= cross.value
-                    cross.buildt(game_state.tile_grid)
+def build_tower_phase(game_state: GameState, ai_action_r: AIAction, ai_action_b: AIAction) -> None:
+    """
+    Process tower building and destruction for both players.
+    
+    Valid build requires:
+    1. Player has enough money for the tower
+    2. Target tile is in player's territory
+    3. Target tile is empty (no entity present)
+    
+    Raises exceptions on invalid actions.
+    """
+    if ai_action_r.action == "build":
+        _build_tower(game_state, ai_action_r, is_red_player=True)
+    elif ai_action_r.action == "destroy":
+        _destroy_tower(game_state, ai_action_r, is_red_player=True)
+    
+    if ai_action_b.action == "build":
+        _build_tower(game_state, ai_action_b, is_red_player=False)
+    elif ai_action_b.action == "destroy":
+        _destroy_tower(game_state, ai_action_b, is_red_player=False)
 
 
-    # --- BLUE TEAM TOWERS --- ##
-    x = ai_action_b.x # x that is selected to be built at
-    y = ai_action_b.y
+def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -> None:
+    """Build a tower for the specified player."""
+    x, y = action.x, action.y
+    
+    # Get player-specific data
+    territory_marker = "r" if is_red_player else "b"
+    player_name = "Red" if is_red_player else "Blue"
+    money = game_state.money_r if is_red_player else game_state.money_b
+    
+    # Validate placement
+    if game_state.tile_grid[y][x] != territory_marker:
+        log_msg(f"{player_name} player tried to build outside their territory at ({x}, {y})")
+        return
+    
+    if game_state.entity_grid[y][x] is not None:
+        log_msg(f"{player_name} player tried to build on occupied space at ({x}, {y})")
+        return
+    
+    # Create the towerraise Exception
+    tower = _create_tower(action.tower_name, x, y, territory_marker)
+    
+    # Check money
+    if money < tower.value:
+        log_msg(f"{player_name} player doesn't have enough money to build {action.tower_name} (costs {tower.value}, has {money})")
+        return
+    
+    # Build the tower
+    game_state.towers.append(tower)
+    game_state.entity_grid[y][x] = tower
+    tower.buildt(game_state.tile_grid)
+    
+    # Deduct money
+    if is_red_player:
+        game_state.money_r -= tower.value
+    else:
+        game_state.money_b -= tower.value
+    
+    log_msg(f"{player_name} built a {action.tower_name} tower at ({x},{y})")
 
-     # Check if the buy action was called, then check if the tile is valid (within same territory), then check if nothing else is on the tower
-    if ai_action_b.buy_tower_action and game_state.tile_grid[y][x] == "b" and not game_state.entity_grid[y][x] is None:
 
-        # Need to further define the Tower and Tower subclasses to fully
-        # set up the rest of this phase, mainly for detection of which
-        # tower has been chosen to be built
-        match ai_action_b.tower_to_build.lower():
-            case "house":
-                # If the tower being built is the house :
-                house = House(x , y, team_color='b')
+def _destroy_tower(game_state: GameState, action: AIAction, is_red_player: bool) -> None:
+    """Destroy a tower and refund half its value."""
+    x, y = action.x, action.y
+    
+    # Get player-specific data
+    territory_marker = "r" if is_red_player else "b"
+    player_name = "Red" if is_red_player else "Blue"
+    
+    # Validate destruction
+    if game_state.tile_grid[y][x] != territory_marker:
+        log_msg(f"{player_name} player tried to destroy tower outside their territory at ({x}, {y})")
+        return
+    
+    tower = game_state.entity_grid[y][x]
+    if tower is None:
+        log_msg(f"{player_name} player tried to destroy tower at empty location ({x}, {y})")
+        return
+    
+    if not isinstance(tower, Tower):
+        log_msg(f"{player_name} player tried to destroy non-tower entity at ({x}, {y})")
+        return
+    
+    # Destroy the tower
+    refund = tower.value // 2
+    game_state.towers.remove(tower)
+    game_state.entity_grid[y][x] = None
+    
+    # Refund money
+    if is_red_player:
+        game_state.money_r += refund
+    else:
+        game_state.money_b += refund
+    
+    log_msg(f"{player_name} destroyed a tower at ({x},{y})")
 
-                if game_state.money_b < house.value:
-                    raise Exception("Not enough money!")
-                else:
-                    game_state.towers.append(house)
-                    game_state.entity_grid[y][x] == house # Update the grid to represent the newly built tower at the correct position
-                    game_state.money_b -= house.value
-                    house.buildt(game_state.tile_grid)
 
-            case "cannon":
-                # If the tower being built is the house :
-                cannon = Cannon(x , y, "b")
-
-                if game_state.money_b < cannon.value:
-                    raise Exception("Not enough money!")
-                else:
-                    game_state.towers.append(cannon)
-                    game_state.entity_grid[y][x] == cannon # Update the grid to represent the newly built tower at the correct position
-                    game_state.money_b -= cannon.value
-                    cannon.buildt(game_state.tile_grid)
-
-            case "minigun":
-                # If the tower being built is the house :
-                mini = Minigun(x , y, "b")
-
-                if game_state.money_b < house.value:
-                    raise Exception("Not enough money!")
-                else:
-                    game_state.towers.append(mini)
-                    game_state.entity_grid[y][x] == mini # Update the grid to represent the newly built tower at the correct position
-                    game_state.money_b -= mini.value
-                    mini.buildt(game_state.tile_grid)
-            case "crossbow":
-                # If the tower being built is the house :
-                cross = Crossbow(x , y, team_color='b')
-
-                if game_state.money_b < cross.value:
-                    raise Exception("Not enough money!")
-                else:
-                    game_state.towers.append(cross)
-                    game_state.entity_grid[y][x] == cross # Update the grid to represent the newly built tower at the correct position
-                    game_state.money_b -= cross.value
-                    cross.buildt(game_state.tile_grid)
+def _create_tower(tower_name: str, x: int, y: int, team_color: str) -> Tower:
+    """Factory function to create towers by name."""
+    tower_name = tower_name.lower()
+    
+    if tower_name == "house":
+        return House(x, y, team_color=team_color)
+    elif tower_name == "cannon":
+        return Cannon(x, y, team_color=team_color)
+    elif tower_name == "minigun":
+        return Minigun(x, y, team_color=team_color)
+    elif tower_name == "crossbow":
+        return Crossbow(x, y, team_color=team_color)
+    else:
+        raise Exception(f"Invalid tower type: {tower_name}")

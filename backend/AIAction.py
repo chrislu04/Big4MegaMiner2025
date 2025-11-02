@@ -1,32 +1,65 @@
-class AIAction():
+from typing import Optional
+import json
+
+class AIAction:
+    """
+    Represents one turn of actions in the game.
+    
+    Phase 1 - Pick ONE:
+        - Build a tower: AIAction("build", x, y, tower_name)
+        - Destroy a tower: AIAction("destroy", x, y)
+        - Do nothing: AIAction("nothing", 0, 0)
+    
+    Phase 2 - Optional:
+        - Buy mercenary: add merc_direction="N" (or "S", "E", "W")
+    
+    Examples:
+        AIAction("build", 5, 3, "Cannon")
+        AIAction("build", 5, 3, "Cannon", merc_direction="N")
+        AIAction("destroy", 2, 4)
+        AIAction("nothing", 0, 0, merc_direction="S")
+    """
+    
     def __init__(
         self,
-        x : int,
-        y : int,
-        tower_to_build : str = '',
-        buy_tower : bool = False,
-        destroy_tower : bool = False,
-        queue_mercenary : bool = False,
-        queue_direction : str = ''
+        action: str,
+        x: int,
+        y: int,
+        tower_name: str = "",
+        merc_direction: str = ""
     ):
-        self.buy_tower_action = buy_tower
-        self.destroy_tower_action = destroy_tower
-        self.queue_merc_action = queue_mercenary
+        self.action = action.lower().strip()  # "build", "destroy", or "nothing"
         self.x = x
         self.y = y
-        self.tower_to_build = tower_to_build.strip() # strip get's rid of any excess spaces
-        self.queue_direction = queue_direction.strip()
+        self.tower_name = tower_name.strip()
+        self.merc_direction = merc_direction.upper().strip()  # "N", "S", "E", "W", or ""
     
-    def __str__(self):
-        action_string = ""
-        support_string = ""
-        if self.buy_tower_action:
-            action_string = "Build"
-            support_string = self.tower_to_build
-        elif self.destroy_tower_action:
-            action_string = "Destroy"
-        elif self.queue_merc_action:
-            action_string = "Buy Mercenary"
-            support_string = self.queue_direction
-
-        return f"AI Action: {action_string}, Coords: ({self.x},{self.y}), Supported Action: {support_string}"
+    def to_dict(self):
+        """Convert to dictionary for saving/sending"""
+        return {
+            'action': self.action,
+            'x': self.x,
+            'y': self.y,
+            'tower_name': self.tower_name,
+            'merc_direction': self.merc_direction
+        }
+    
+    @staticmethod
+    def from_dict(data):
+        """Load from dictionary"""
+        return AIAction(
+            data['action'],
+            data['x'],
+            data['y'],
+            data.get('tower_name', ''),
+            data.get('merc_direction', '')
+        )
+    
+    def to_json(self):
+        """Convert to JSON string"""
+        return json.dumps(self.to_dict())
+    
+    @staticmethod
+    def from_json(json_str):
+        """Load from JSON string"""
+        return AIAction.from_dict(json.loads(json_str))
