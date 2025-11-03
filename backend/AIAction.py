@@ -13,9 +13,15 @@ class AIAction:
     Phase 2 - Optional:
         - Buy mercenary: add merc_direction="N" (or "S", "E", "W")
     
+    Possible values of tower_name are:
+        - "crossbow"
+        - "cannon"
+        - "minigun"
+        - "house"
+    
     Examples:
-        AIAction("build", 5, 3, "Cannon")
-        AIAction("build", 5, 3, "Cannon", merc_direction="N")
+        AIAction("build", 5, 3, "cannon")
+        AIAction("build", 5, 3, "crossbow", merc_direction="N")
         AIAction("destroy", 2, 4)
         AIAction("nothing", 0, 0, merc_direction="S")
     """

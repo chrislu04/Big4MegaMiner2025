@@ -18,9 +18,15 @@ class AIAction:
     Phase 2 - Optional:
         - Buy mercenary: add merc_direction="N" (or "S", "E", "W")
     
+    Possible values of tower_name are:
+        - "crossbow"
+        - "cannon"
+        - "minigun"
+        - "house"
+    
     Examples:
-        AIAction("build", 5, 3, "Cannon")
-        AIAction("build", 5, 3, "Cannon", merc_direction="N")
+        AIAction("build", 5, 3, "cannon")
+        AIAction("build", 5, 3, "crossbow", merc_direction="N")
         AIAction("destroy", 2, 4)
         AIAction("nothing", 0, 0, merc_direction="S")
     """
@@ -79,6 +85,17 @@ def get_available_queue_directions(game_state: dict, team_color: str) -> list:
     
     return result
 
+def get_available_build_spaces(game_state: dict, team_color: str):
+    result = []
+
+    for y, row in enumerate(game_state['FloorTiles']):
+        for x, chr_at_x in enumerate(row):
+            if chr_at_x == team_color:
+                if game_state['EntityGrid'][y][x] == None:
+                    result.append((x,y))
+
+    return result
+
 # -- AGENT CLASS (COMPETITORS WILL IMPLEMENT THIS) --
 class Agent:
     def initialize_and_set_name(self, initial_game_state: dict, team_color: str) -> str:
@@ -98,6 +115,7 @@ class Agent:
         # Competitors: For your convenience, it's recommended that you use the helper functions given earlier in this file
         q_directions = get_available_queue_directions(game_state, self.team_color)
 
+        # This example agent just tries to buy mercenaries every turn
         return AIAction("nothing", 0, 0, merc_direction=random.choice(q_directions))
         # -- YOUR CODE ENDS HERE --
 

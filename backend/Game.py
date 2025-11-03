@@ -60,72 +60,65 @@ class Game:
             "x" : self.game_state.player_base_b.x,
             "y" : self.game_state.player_base_b.y
         }
+
         # Changing the entity grid to a bunch of strings
-        dict_entity_grid = []
-        for y in range(len(self.game_state.entity_grid)):
+        list_entity_grid = []
+        for y in self.game_state.entity_grid:
             row = []
-            for x in range(len(self.game_state.entity_grid[0])):
-                if self.game_state.entity_grid[y][x] == None:
-                    row.append(None)
-                elif self.game_state.entity_grid[y][x] == "base":
-                    row.append("base")
-                elif isinstance(self.game_state.entity_grid[y][x], Mercenary):
-                    row.append("Mercenary")
-                elif isinstance(self.game_state.entity_grid[y][x], House):
-                    row.append("House")
-                elif isinstance(self.game_state.entity_grid[y][x], Cannon):
-                    row.append("Cannon")
-                elif isinstance(self.game_state.entity_grid[y][x], Crossbow):
-                    row.append("Crossbow")
-            dict_entity_grid.append(row)
+            for ent_at_xy in y:
+                if ent_at_xy is None:
+                    row.append('')
+                else:
+                    row.append(ent_at_xy.name)
+            list_entity_grid.append(row)
 
         # Converting mercenarys to dicts in merc list
-        dict_mercenary = []
-        for merca in self.game_state.mercs:
-            if isinstance(merca, Mercenary):
-                merc_dict : dict = {
-                    "Mercenary" : {
-                        "Team" : merca.team,
-                        "x" : merca.x,
-                        "y" : merca.y,
-                        "health" : merca.health,
-                        "state" : merca.state
-                    }
-                }
-                dict_mercenary.append(merc_dict)
+        list_mercenary = []
+        for merc in self.game_state.mercs:
+            merc_dict : dict = {
+                "Name" : merc.name,
+                "Team" : merc.team,
+                "x" : merc.x,
+                "y" : merc.y,
+                "Health" : merc.health,
+                "State" : merc.state
+            }
+            list_mercenary.append(merc_dict)
 
-        dict_towers = []
+        list_towers = []
         for tow in self.game_state.towers:
-            tower_name = ""
+            tower_type = ""
             if isinstance(tow, Crossbow):
-                tower_name = "Crossbow"
+                tower_type = "Crossbow"
             elif isinstance(tow, House):
-                tower_name = "House"
+                tower_type = "House"
             elif isinstance(tow, Cannon):
-                tower_name = "Cannon"
+                tower_type = "Cannon"
             elif isinstance(tow, Minigun):
-                tower_name = "Minigun"
-                
+                tower_type = "Minigun"
+            
             tow_dict : dict = {
-                "Type" : tower_name, # Getting the type doesn't work
+                "Name" : tow.name,
+                "Type" : tower_type,
                 "Team" : tow.team,
                 "x" : tow.x,
                 "y" : tow.y,
-                "AimAngle" : tow.angle * 57.2958 ##Convert radians to degrees
+                "AimAngle" : tow.angle * 57.2958 # Convert radians to degrees
             }
             dict_towers.append(tow_dict)
 
-        dict_demons = []
+        list_demons = []
         for dem in self.game_state.demons:
             if isinstance(dem, Demon):
                 dem_dict = {
+                    "Name" : dem.name,
                     "Team" : dem.target_team,
                     "x" : dem.x,
                     "y" : dem.y,
-                    "health" : dem.health,
-                    "state" : dem.state
+                    "Health" : dem.health,
+                    "State" : dem.state
                 }
-                dict_demons.append(dem_dict)
+                list_demons.append(dem_dict)
 
         data : dict = {
             "Victory" : self.game_state.victory,
@@ -136,12 +129,12 @@ class Game:
             "PlayerBaseB" : dict_player_base_b,
 
             "FloorTiles" : self.game_state.floor_tiles,
-            "EntityGrid" : dict_entity_grid,
-            "Towers" : dict_towers,
-            "Mercenaries" : dict_mercenary,
-            "Demons" : dict_demons
+            "EntityGrid" : list_entity_grid,
+            "Towers" : list_towers,
+            "Mercenaries" : list_mercenary,
+            "Demons" : list_demons
         } 
 
-        json_string : str = json.dumps(data, indent=4)
+        json_string : str = json.dumps(data)
 
         return json_string

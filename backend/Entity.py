@@ -6,4 +6,5 @@ class Entity:
         self.y = y
         self.health = health
         self.value = value ##Value is how much the entity cost
-        self.attack_power = attak 
+        self.attack_power = attak
+        self.name = 'NO NAME'
