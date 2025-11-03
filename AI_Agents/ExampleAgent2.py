@@ -79,6 +79,16 @@ def get_available_queue_directions(game_state: dict, team_color: str) -> list:
     
     return result
 
+def get_available_build_spaces(game_state: dict, team_color: str) -> list:
+    result = []
+    
+    for y in game_state['FloorTiles']:
+        for x in y:
+            if x == team_color:
+                result.append((x,y))
+
+    return result
+
 # -- AGENT CLASS (COMPETITORS WILL IMPLEMENT THIS) --
 class Agent:
     def initialize_and_set_name(self, initial_game_state: dict, team_color: str) -> str:

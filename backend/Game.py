@@ -130,6 +130,7 @@ class Game:
         data : dict = {
             "Victory" : self.game_state.victory,
             "TurnsRemaining" : self.game_state.turns_remaining,
+            "CurrentTurn" : Constants.MAX_TURNS - self.game_state.turns_remaining,
 
             "PlayerBaseR" : dict_player_base_r,
             "PlayerBaseB" : dict_player_base_b,

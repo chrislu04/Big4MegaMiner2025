@@ -5,6 +5,7 @@ from PlayerBase import PlayerBase
 from NameSelector import select_demon_name
 import Utils
 
+
 class Demon:
     def __init__(self, x: int, y: int, target_team: str, game_state: GameState) -> None:
         self.health = Constants.DEMON_INITIAL_HEALTH
