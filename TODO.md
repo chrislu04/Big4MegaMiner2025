@@ -1,7 +1,7 @@
 Playtesting:
 - Try to find edge cases
 - Try lots of different maps
-- 
+- Is the game balanced?
 
 Documentation:
 - Intuitive explanation of the game mechanics, with expandable "details" sections
