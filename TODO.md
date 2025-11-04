@@ -1,3 +1,7 @@
+- disqualify contestants when they error out
+
+- demon spawners switch targets?
+
 - use relative paths in the code, so that it's portable
 - ensure API works smoothly with RL -> give explicit set of choices at each phase
 

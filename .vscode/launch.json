@@ -9,7 +9,7 @@
             "program": "${workspaceFolder}/backend/main.py",
             "console": "integratedTerminal",
             "args": [
-                "${workspaceFolder}/maps/test_map.json",
+                "${workspaceFolder}/maps/map.json",
                 "-a1",
                 "${workspaceFolder}/AI_Agents/ExampleAgent2.py",
                 "-a2",
