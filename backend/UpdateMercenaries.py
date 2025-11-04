@@ -28,36 +28,58 @@ def set_all_merc_states(game_state: GameState, mercs: List[Mercenary],
                         moving: List[Mercenary],
                         fighting: List[Mercenary],
                         waiting: List[Mercenary]):
+    
     for merc in mercs:
-        if merc.state == 'dead': continue
+        if merc.state == 'dead':
+            continue
+        else:
+            merc.state = 'deciding'
+    
+    for merc in mercs:
+        if merc.state != 'deciding':
+            continue
 
         next_tile1 = merc.get_adjacent_path_tile(game_state, 1)
         next_tile2 = merc.get_adjacent_path_tile(game_state, 2)
         blocking_entity1 = game_state.entity_grid[next_tile1[1]][next_tile1[0]]
         blocking_entity2 = game_state.entity_grid[next_tile2[1]][next_tile2[0]]
 
-        # fighting if rival merc or demon or player base is within 1 space
-        if (merc.get_attackable_player_base(game_state) != None or
-            type(blocking_entity1) == type(Demon) or
-            (type(blocking_entity1) == type(Mercenary) and blocking_entity1.team != merc.team)):
-            merc.state = 'fighting'
-            # set all mercs behind us to waiting
-            merc.set_behind_waiting(game_state)
-        # fighting if enemy is within 2 spaces and merc within 1 space is not ally
-        elif (type(blocking_entity1) == None and
-            type(blocking_entity2) == type(Demon) or
-            (type(blocking_entity2) == type(Mercenary) and blocking_entity2.team != merc.team)):
-            merc.state = 'fighting'
-            # set all mercs behind us to waiting
-            merc.set_behind_waiting(game_state)
-        # if not waiting or fighting, then moving
-        elif merc.state != 'waiting':
-            merc.state = 'moving'
+        # check for entities that guarantee 'fighting' or 'waiting'
+
+        # fighting if rival merc or demon is within 1 space
+        if blocking_entity1 is not None:
+            if isinstance(blocking_entity1, Demon):
+                # Demons move in the next phase, so Mercs and Demons won't move in tandem
+                if blocking_entity1.target_team == merc.team:
+                    merc.state = 'fighting'
+                    merc.block_entity_behind(game_state)
+                else:
+                    merc.state = 'waiting'
+                    merc.block_entity_behind(game_state)
+            elif isinstance(blocking_entity1, Mercenary) and blocking_entity1.team != merc.team:
+                merc.state = 'fighting'
+                merc.block_entity_behind(game_state)
+        # fighting if there is no enemy 1 space away and there is an enemy is within 2 spaces
+        else:
+            if merc.get_attackable_player_base(game_state) != None:
+                merc.state = 'fighting'
+                merc.block_entity_behind(game_state)
+            elif blocking_entity2 is not None:
+                if isinstance(blocking_entity2, Mercenary) and blocking_entity2.team != merc.team:
+                    merc.state = 'fighting'
+                    merc.block_entity_behind(game_state)
+                # Mercs and demons move during different phases, so path tiles are never contested between them
         
+        # if not guaranteed blocked by anything, then moving
+        if merc.state == 'deciding':
+            merc.state = 'moving'
+    
+    for merc in mercs:
         # add to correct list
         if merc.state == 'fighting': fighting.append(merc)
         if merc.state == 'waiting': waiting.append(merc)
         if merc.state == 'moving': moving.append(merc)
+
 
 def move_all_mercs(game_state: GameState, moving_mercs: List[Mercenary]):
     # remove moving mercs
@@ -75,6 +97,7 @@ def move_all_mercs(game_state: GameState, moving_mercs: List[Mercenary]):
         game_state.entity_grid[merc.y][merc.x] = merc
         log_msg(f"Mercenary {merc.name} moved to ({merc.x},{merc.y})")
 
+
 def do_merc_combat_single(game_state: GameState, merc: Mercenary):
     next_tile1 = merc.get_adjacent_path_tile(game_state, 1)
     next_tile2 = merc.get_adjacent_path_tile(game_state, 2)
@@ -88,3 +111,9 @@ def do_merc_combat_single(game_state: GameState, merc: Mercenary):
     elif target2 != None:
         target2.health -= Constants.MERCENARY_ATTACK_POWER
         log_msg(f'Mercenary {merc.name} attacked opponent {target2.name} at ({next_tile2[0]},{next_tile2[1]})')
+    else:
+        # attack the player base if we have reached the end of the path, and there is nobody else to fight
+        attackable_base = merc.get_attackable_player_base(game_state)
+        if attackable_base != None:
+            attackable_base.health -= Constants.MERCENARY_ATTACK_POWER
+            log_msg(f'Mercenary {merc.name} attacked {attackable_base.name} at ({attackable_base.x},{attackable_base.y})')

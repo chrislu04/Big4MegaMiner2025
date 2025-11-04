@@ -6,7 +6,6 @@ from UpdateMercenaries import update_mercenaries
 from UpdateDemons import update_demons
 from SpawnMercenaries import spawn_mercenaries
 from SpawnDemons import spawn_demons
-from UpdateTowers import update_towers
 from House import House
 from Cannon import Cannon
 from Minigun import Minigun
@@ -22,15 +21,19 @@ def world_update_phase(game_state: GameState):
     update_mercenaries(game_state)
     mortal_wound_check(game_state, game_state.mercs + game_state.demons)
     game_state.victory = check_wincon(game_state)
+    if game_state.victory != None: return
 
     update_demons(game_state)
     mortal_wound_check(game_state, game_state.mercs)
     game_state.victory = check_wincon(game_state)
+    if game_state.victory != None: return
     
     spawn_mercenaries(game_state)
     spawn_demons(game_state)
 
-    update_towers(game_state)
+    for tower in game_state.towers:
+        tower.update(game_state)
+    mortal_wound_check(game_state, game_state.mercs + game_state.demons)
 
 
 def mortal_wound_check(game_state: GameState, entities: List[Entity]):
@@ -56,8 +59,10 @@ def check_wincon(game_state: GameState):
         # If one of the players has their base intact while the other is destroyed, they win
         if not (team_b_health <= 0 and team_r_health <= 0):
             if team_b_health <= 0:
+                log_msg("The Blue Player's base has been destroyed. The Red Nation survives!")
                 return 'r'
             elif team_r_health <= 0:
+                log_msg("The Red Player's base has been destroyed. The Blue Nation survives!")
                 return 'b'
     else:
         # If no base has been destroyed, nobody has won yet

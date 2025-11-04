@@ -6,16 +6,22 @@ class AIAction:
     Represents one turn of actions in the game.
     
     Phase 1 - Pick ONE:
-        - Build a tower: AIAction("build", x, y, tower_name)
+        - Build a tower: AIAction("build", x, y, tower_type)
         - Destroy a tower: AIAction("destroy", x, y)
         - Do nothing: AIAction("nothing", 0, 0)
     
     Phase 2 - Optional:
         - Buy mercenary: add merc_direction="N" (or "S", "E", "W")
     
+    Possible values of tower_type are:
+        - "crossbow"
+        - "cannon"
+        - "minigun"
+        - "house"
+    
     Examples:
-        AIAction("build", 5, 3, "Cannon")
-        AIAction("build", 5, 3, "Cannon", merc_direction="N")
+        AIAction("build", 5, 3, "cannon")
+        AIAction("build", 5, 3, "crossbow", merc_direction="N")
         AIAction("destroy", 2, 4)
         AIAction("nothing", 0, 0, merc_direction="S")
     """
@@ -25,13 +31,13 @@ class AIAction:
         action: str,
         x: int,
         y: int,
-        tower_name: str = "",
+        tower_type: str = "",
         merc_direction: str = ""
     ):
         self.action = action.lower().strip()  # "build", "destroy", or "nothing"
         self.x = x
         self.y = y
-        self.tower_name = tower_name.strip()
+        self.tower_type = tower_type.strip()
         self.merc_direction = merc_direction.upper().strip()  # "N", "S", "E", "W", or ""
     
     def to_dict(self):
@@ -40,7 +46,7 @@ class AIAction:
             'action': self.action,
             'x': self.x,
             'y': self.y,
-            'tower_name': self.tower_name,
+            'tower_type': self.tower_type,
             'merc_direction': self.merc_direction
         }
     
@@ -51,7 +57,7 @@ class AIAction:
             data['action'],
             data['x'],
             data['y'],
-            data.get('tower_name', ''),
+            data.get('tower_type', ''),
             data.get('merc_direction', '')
         )
     

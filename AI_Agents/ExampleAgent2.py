@@ -11,16 +11,22 @@ class AIAction:
     Represents one turn of actions in the game.
     
     Phase 1 - Pick ONE:
-        - Build a tower: AIAction("build", x, y, tower_name)
+        - Build a tower: AIAction("build", x, y, tower_type)
         - Destroy a tower: AIAction("destroy", x, y)
         - Do nothing: AIAction("nothing", 0, 0)
     
     Phase 2 - Optional:
         - Buy mercenary: add merc_direction="N" (or "S", "E", "W")
     
+    Possible values of tower_type are:
+        - "crossbow"
+        - "cannon"
+        - "minigun"
+        - "house"
+    
     Examples:
-        AIAction("build", 5, 3, "Cannon")
-        AIAction("build", 5, 3, "Cannon", merc_direction="N")
+        AIAction("build", 5, 3, "cannon")
+        AIAction("build", 5, 3, "crossbow", merc_direction="N")
         AIAction("destroy", 2, 4)
         AIAction("nothing", 0, 0, merc_direction="S")
     """
@@ -30,13 +36,13 @@ class AIAction:
         action: str,
         x: int,
         y: int,
-        tower_name: str = "",
+        tower_type: str = "",
         merc_direction: str = ""
     ):
         self.action = action.lower().strip()  # "build", "destroy", or "nothing"
         self.x = x
         self.y = y
-        self.tower_name = tower_name.strip()
+        self.tower_type = tower_type.strip()
         self.merc_direction = merc_direction.upper().strip()  # "N", "S", "E", "W", or ""
     
     def to_dict(self):
@@ -45,7 +51,7 @@ class AIAction:
             'action': self.action,
             'x': self.x,
             'y': self.y,
-            'tower_name': self.tower_name,
+            'tower_type': self.tower_type,
             'merc_direction': self.merc_direction
         }
     
@@ -58,6 +64,7 @@ def is_out_of_bounds(game_state: dict, x: int, y: int) -> bool:
     return x < 0 or x >= len(game_state['FloorTiles'][0]) or y < 0 or y >= len(game_state['FloorTiles'])
 
 # team_color should be 'r' or 'b'
+# Return a list of strings representing available mercenary queue directions like: ["N","S","W"]
 def get_available_queue_directions(game_state: dict, team_color: str) -> list:
     result = []
     
@@ -77,7 +84,23 @@ def get_available_queue_directions(game_state: dict, team_color: str) -> list:
             result.append(offsets[offset])
     
     return result
-    
+
+# team_color should be 'r' or 'b'
+# Return a list of coordinates that are available for building
+def get_available_build_spaces(game_state: dict, team_color: str):
+    result = []
+
+    for y, row in enumerate(game_state['FloorTiles']):
+        for x, chr_at_x in enumerate(row):
+            if chr_at_x == team_color:
+                if game_state['EntityGrid'][y][x] == '':
+                    result.append((x,y))
+
+    return result
+
+# team_color should be 'r' or 'b'
+def get_my_money_amount(game_state: dict, team_color: str) -> int:
+    return game_state["RedTeamMoney"] if team_color == 'r' else game_state["BlueTeamMoney"]
 
 # -- AGENT CLASS (COMPETITORS WILL IMPLEMENT THIS) --
 class Agent:
@@ -88,6 +111,11 @@ class Agent:
         # It's essential that you keep track of which team you're on
         self.team_color = team_color
 
+        self.num_houses = 0
+        self.num_cannons = 0
+        self.num_crossbows = 0
+        self.num_miniguns = 0
+
         # Return a string representing your team's name
         return "Your Team Name"
         # -- YOUR CODE ENDS HERE --
@@ -97,11 +125,43 @@ class Agent:
         # -- YOUR CODE BEGINS HERE --
         # Competitors: For your convenience, it's recommended that you use the helper functions given earlier in this file
         q_directions = get_available_queue_directions(game_state, self.team_color)
+        build_spaces = get_available_build_spaces(game_state, self.team_color)
+        my_money = get_my_money_amount(game_state, self.team_color)
 
-        return AIAction("nothing", 0, 0, merc_direction=random.choice(q_directions))
+        turn = game_state["CurrentTurn"]
+
+        # Always build a house on the first turn
+        if turn == 0:
+            house_x, house_y = random.choice(build_spaces)
+            self.num_houses += 1
+            return AIAction("build", house_x, house_y, 'house')
+        else:
+            # Build house or mercenary in the early-game
+            if turn < 10:
+                probability_merc = (turn + 50) / 100.0
+
+                if random.random() < probability_merc:
+                    return AIAction("nothing", 0, 0, merc_direction=random.choice(q_directions))
+                else:
+                    house_x, house_y = random.choice(build_spaces)
+                    return AIAction("build", house_x, house_y, 'house')
+            # Build towers later
+            elif len(build_spaces) > 0:
+                tower_choices = [
+                    'cannon',
+                    'crossbow',
+                    'minigun',
+                ]
+                tower = random.choice(tower_choices)
+                tower_x, tower_y = random.choice(build_spaces)
+                return AIAction("build", tower_x, tower_y, tower, merc_direction=random.choice(q_directions))
+            else:
+                return AIAction("nothing",0,0,merc_direction=random.choice(q_directions))
+
         # -- YOUR CODE ENDS HERE --
 
-# -- DRIVER CODE --
+
+# -- DRIVER CODE (LEAVE THIS AS-IS) --
 # Competititors: Altering code below this line will result in disqualification!
 if __name__ == '__main__':
 

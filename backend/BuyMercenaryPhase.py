@@ -30,7 +30,6 @@ def _process_mercenary_purchase(game_state: GameState, action: AIAction, is_red_
         player_name = "Blue"
     
     if action.merc_direction == "":
-        log_msg(f"{player_name} decided not to queue a merc")
         return
 
     # Check if player has enough money

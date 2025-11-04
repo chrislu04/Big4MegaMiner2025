@@ -41,7 +41,7 @@ def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -
     money = game_state.money_r if is_red_player else game_state.money_b
     
     # Validate placement
-    if game_state.tile_grid[y][x] != territory_marker:
+    if game_state.floor_tiles[y][x] != territory_marker:
         log_msg(f"{player_name} player tried to build outside their territory at ({x}, {y})")
         return
     
@@ -49,26 +49,26 @@ def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -
         log_msg(f"{player_name} player tried to build on occupied space at ({x}, {y})")
         return
     
-    # Create the towerraise Exception
-    tower = _create_tower(action.tower_name, x, y, territory_marker)
+    # Create the tower
+    tower = _create_tower(action.tower_type, x, y, territory_marker, game_state)
+    if tower is None: return
     
     # Check money
-    if money < tower.value:
-        log_msg(f"{player_name} player doesn't have enough money to build {action.tower_name} (costs {tower.value}, has {money})")
+    if money < tower.price:
+        log_msg(f"{player_name} player doesn't have enough money to build {action.tower_type} (costs {tower.price}, has {money})")
         return
     
     # Build the tower
     game_state.towers.append(tower)
     game_state.entity_grid[y][x] = tower
-    tower.buildt(game_state.tile_grid)
     
     # Deduct money
     if is_red_player:
-        game_state.money_r -= tower.value
+        game_state.money_r -= tower.price
     else:
-        game_state.money_b -= tower.value
+        game_state.money_b -= tower.price
     
-    log_msg(f"{player_name} built a {action.tower_name} tower at ({x},{y})")
+    log_msg(f"{player_name} built a {action.tower_type} tower at ({x},{y})")
 
 
 def _destroy_tower(game_state: GameState, action: AIAction, is_red_player: bool) -> None:
@@ -80,7 +80,7 @@ def _destroy_tower(game_state: GameState, action: AIAction, is_red_player: bool)
     player_name = "Red" if is_red_player else "Blue"
     
     # Validate destruction
-    if game_state.tile_grid[y][x] != territory_marker:
+    if game_state.floor_tiles[y][x] != territory_marker:
         log_msg(f"{player_name} player tried to destroy tower outside their territory at ({x}, {y})")
         return
     
@@ -94,7 +94,7 @@ def _destroy_tower(game_state: GameState, action: AIAction, is_red_player: bool)
         return
     
     # Destroy the tower
-    refund = tower.value // 2
+    refund = tower.price // 2
     game_state.towers.remove(tower)
     game_state.entity_grid[y][x] = None
     
@@ -107,17 +107,19 @@ def _destroy_tower(game_state: GameState, action: AIAction, is_red_player: bool)
     log_msg(f"{player_name} destroyed a tower at ({x},{y})")
 
 
-def _create_tower(tower_name: str, x: int, y: int, team_color: str) -> Tower:
+def _create_tower(tower_type: str, x: int, y: int, team_color: str, game_state: GameState) -> Tower:
     """Factory function to create towers by name."""
-    tower_name = tower_name.lower()
+    tower_type = tower_type.lower()
     
-    if tower_name == "house":
-        return House(x, y, team_color=team_color)
-    elif tower_name == "cannon":
-        return Cannon(x, y, team_color=team_color)
-    elif tower_name == "minigun":
-        return Minigun(x, y, team_color=team_color)
-    elif tower_name == "crossbow":
-        return Crossbow(x, y, team_color=team_color)
+    if tower_type == "house":
+        return House(x, y, team_color, game_state)
+    elif tower_type == "cannon":
+        return Cannon(x, y, team_color, game_state)
+    elif tower_type == "minigun":
+        return Minigun(x, y, team_color, game_state)
+    elif tower_type == "crossbow":
+        return Crossbow(x, y, team_color, game_state)
     else:
-        raise Exception(f"Invalid tower type: {tower_name}")
+        team_name = 'Red' if team_color == 'r' else 'Blue'
+        log_msg(f"{team_name} team tried to build an invalid type of tower: {tower_type}")
+        return None
