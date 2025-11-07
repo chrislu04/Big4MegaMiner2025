@@ -8,83 +8,130 @@ const PATH = preload("res://Assets/Base_Skin/path.png")
 
 
 const BLUE_RECRUIT = preload("res://Assets/Topdown skin/blue recruit.png")
-const RED_RECRUIT = preload("res://Assets/Topdown skin/red recruit.png")
+
+const RED_RECRUIT = preload("uid://can1bceehb1qy")
+
 const ENEMY = preload("res://Assets/Topdown skin/enemy.png")
+
 const BASE = preload("res://Assets/Topdown skin/base.png")
 const CROSSBOW = preload("res://Assets/Topdown skin/crossbow.png")
+
+const RED_CASTLE : Texture = preload("res://Assets/HD_Skin/base.svg")
 
 @export var UI : GameUI
 
 var previous_game_state : Dictionary 
 var current_game_state : Dictionary
 
-var player1_ai : bool
-var player2_ai : bool
+var is_player1_ai : bool
+var is_player2_ai : bool
+
+var play1ready : bool = false
+var play2ready : bool = false
 
 var alt : bool = false
 var initial : bool  = true
+
 var backend_running : bool = false
 
-var turn_interva_max : float = 2.0 
+var turn_interval_max : float = 2.0 
 var turn_interval : float = 0
 var path_to_game_state
 
-@onready var tiles = $Tiles
-@onready var mercenaries: Node2D = $Mercenaries
-@onready var towers: Node2D = $Towers
-@onready var demons: Node2D = $Demons
-@onready var misc_entities: Node2D = $"Misc Entities"
+@onready var world: Node2D = $World
+@onready var tiles = $World/Tiles
+@onready var mercenaries: Node2D = $World/Mercenaries
+@onready var towers: Node2D = $World/Towers
+@onready var demons: Node2D = $World/Demons
+@onready var misc_entities: Node2D = $"World/Misc Entities"
 
+var processID
+var stdio : FileAccess
+var thread
+var stderr : FileAccess
+
+
+func _ready():
+	UI.action.connect(_on_ui_action)
+	
 
 # Sets up the game visuals
 func _on_ui_start_game(is_ai1, is_ai2):
-	player1_ai = is_ai1
-	player2_ai = is_ai2
+	is_player1_ai = is_ai1
+	is_player2_ai = is_ai2
+	var process_info 
 	
-	var output = []
-	var exit_code = OS.execute( 				\
-		"python", 								\
-		[ 										\
-			GlobalPaths.backendPath, 			\
-			"-v", "-i", 						\
-			GlobalPaths.AI_agent1_file_path, 	\
-			GlobalPaths.AI_agent2_file_path 	\
-		], 										\
-		output, true 							\
-	)
-	
-	if exit_code == 0:
-		pass
-		print("Python Script executted successfully!")
+	if is_ai1 and is_ai2:
+		process_info = OS.execute_with_pipe("python", 
+			[GlobalPaths.backendPath, GameSettings.default_map, "-a1", GlobalPaths.AI_agent1_file_path, "-a2",GlobalPaths.AI_agent2_file_path, "-v"], 
+			true)
+		
+	elif not is_ai1 and is_ai2:
+		process_info = OS.execute_with_pipe("python", 
+			[GlobalPaths.backendPath, GameSettings.default_map, "-h1" , "-a2",GlobalPaths.AI_agent2_file_path, "-v"], 
+			true)
+		play2ready = true
+	elif is_ai1 and not is_ai2:
+		process_info = OS.execute_with_pipe("python", 
+			[GlobalPaths.backendPath, GameSettings.default_map, "-a1", GlobalPaths.AI_agent1_file_path, "-h2", "-v"], 
+			true)
+		play1ready = true
 	else:
-		push_error("Error handling script!: ", exit_code)
+		process_info = OS.execute_with_pipe("python", 
+			[GlobalPaths.backendPath, GameSettings.default_map, "-h1", "-h2", "-v"], 
+			true)
 	
-	var content
-	var path_to_game_state : String = GameSettings.convert_string_to_readable(output[0]).strip_edges(false, true)
 	
-	if FileAccess.file_exists(path_to_game_state):
-		var file = FileAccess.open(path_to_game_state, FileAccess.READ)
-		if file:
-			content = file.get_as_text()
-			file.close()
-		else:
-			printerr("Couldn't Open File! ", FileAccess.get_open_error())
-	else:
-		printerr("File doesn't exist!")
-
-	_draw_game_from_gamestate(content)
-	backend_running = true
+	processID = process_info["pid"]
+	stdio = process_info["stdio"]
+	stderr = process_info["stderr"]
+	
+	if stdio != null:
+		print(stdio.get_line())
+		var content = stdio.get_line() ##Initial State
+		print(stdio.get_line())
+		print(stdio.get_line())
+		print(stdio.get_line())
+		var first_turn = stdio.get_line() #First turn
+	
+	
+		_draw_game_from_gamestate(content)
+		await get_tree().create_timer(2.0).timeout
+		_draw_game_from_gamestate(first_turn)
+		turn_interval = turn_interval_max
+		backend_running = true
 
 
 # Updates world visuals
 func _draw_game_from_gamestate(game_state : String):
 	var game_state_json = JSON.parse_string(game_state)
 	current_game_state = game_state_json
-	print(current_game_state)
+	
 	if initial:
-		_draw_grid(game_state_json["TileGrid"])
+		_draw_grid(game_state_json["FloorTiles"])
+		
+		## Setting up castles
+		var castle = Sprite2D.new()
+		
+		castle.texture = RED_CASTLE
+		castle.scale.x = 32 /  RED_CASTLE.get_size().x
+		castle.scale.y = 32 / RED_CASTLE.get_size().y
+		
+		castle.position = Vector2(game_state_json["PlayerBaseR"]["x"] * 32, game_state_json["PlayerBaseR"]["y"] * 32)
+		misc_entities.add_child(castle)
+		
+		var castle_b = Sprite2D.new()
+		
+		castle_b.texture = preload("uid://bh23hjmsxnw56")
+		castle_b.scale.x = 32 /  castle_b.texture.get_size().x
+		castle_b.scale.y = 32 / castle_b.texture.get_size().y
+		
+		castle_b.position = Vector2(game_state_json["PlayerBaseB"]["x"] * 32, game_state_json["PlayerBaseB"]["y"] * 32)
+		misc_entities.add_child(castle_b)
+		
+		
 		initial = false
-	#_delete_mercs()
+	
 	
 	_draw_mercenaries(game_state_json["Mercenaries"])
 	_draw_towers(game_state_json["Towers"])
@@ -93,42 +140,39 @@ func _draw_game_from_gamestate(game_state : String):
 
 
 func _draw_grid(tile_grid : Array):
-	var previous_y = 0
-	
-	for x in range(tile_grid.size()):
-		for y in range(tile_grid[x].size()):
-			alt = !alt
-			if previous_y == y:
-				alt = !alt
-			else:
-				previous_y = y
-			
+	var layer_y : int = 0
+	for layer in tile_grid:
+		var character_x = 0
+		for character in layer:
 			var sprite = Sprite2D.new()
-			if tile_grid[x][y] == 'b':
+			alt = !alt
+
+			if character == 'b':
 				if alt:
 					sprite.texture = ALT_GRASS
 				else:
 					sprite.texture = GRASS
-			elif tile_grid[x][y] == 'r':
-				if alt:
-					sprite.texture = ALT_GRASS
-				else:
-					sprite.texture = GRASS
-			elif tile_grid[x][y] == 'Path':
+			elif character == 'O':
 				if alt:
 					sprite.texture = ALT_PATH
 				else:
 					sprite.texture = PATH
-			
-			sprite.position = Vector2(x * 32, y * 32)
+			elif character == 'r':
+				if alt:
+					sprite.texture = ALT_GRASS
+				else:
+					sprite.texture = GRASS
+				
+			sprite.position = Vector2(character_x * 32, layer_y * 32)
 			tiles.add_child(sprite)
+			character_x += 1
+		layer_y += 1
 	
-	tiles.position.x = (get_viewport_rect().size.x - (tile_grid.size() * 32)) / 2
-	tiles.position.y = (get_viewport_rect().size.y - (tile_grid[0].size() * 32)) / 2
-	mercenaries.position = tiles.position
-	towers.position = tiles.position
-	demons.position = tiles.position
-	misc_entities.position = tiles.position
+	
+	
+	world.position.x = (get_viewport_rect().size.x - (tile_grid[0].length() * 32)) / 2
+	world.position.y = (get_viewport_rect().size.y - (tile_grid.size() * 32)) / 2
+	GlobalPaths.tile_grid = tiles
 
 #func _delete_mercs():
 	#for i in mercenaries.get_children():
@@ -140,24 +184,29 @@ func _draw_mercenaries(mercs : Array):
 	var count = 0
 	for merc in mercs:
 		if mercenaries.get_child_count() - 1 < count:
-			var pos = Vector2(merc["Mercenary"]["x"] * 32, merc["Mercenary"]["y"] * 32)
+			var pos = Vector2(merc["x"] * 32, merc["y"] * 32)
 			var sprite = Sprite2D.new()
-			if merc["Mercenary"]["Team"] == "b":
+			if merc["Team"] == "b":
 				sprite.texture = BLUE_RECRUIT
 				sprite.flip_h = true
 			else:
-				sprite.texture = RED_RECRUIT
+				sprite = RED_RECRUIT.instantiate()
 			
 			sprite.position = pos
 			mercenaries.add_child(sprite)
 		else:
-			var child : Sprite2D = mercenaries.get_child(count)
+			var child = mercenaries.get_child(count)
 			var tween = get_tree().create_tween()
-			if merc["Mercenary"]["state"] == "dead":
+			if merc["State"] == "dead":
 				child.queue_free()
 				count -= 1
+			elif merc["State"] == "moving":
+				if merc["Team"] == "r":
+					child.move(position - Vector2(merc["x"] * 32, merc["y"] * 32))
+				tween.tween_property(child, "position", Vector2(merc["x"] * 32, merc["y"] * 32), turn_interval_max)
 			else:
-				tween.tween_property(child, "position", Vector2(merc["Mercenary"]["x"] * 32, merc["Mercenary"]["y"] * 32), 1.0)
+				if merc["Team"] == "r":
+					child.attack(Vector2(1,0))
 		
 		count += 1
 
@@ -194,68 +243,75 @@ func _draw_demons(dem_array : Array):
 		else:
 			var child : Sprite2D = demons.get_child(count)
 			var tween = get_tree().create_tween()
-			if dem["state"] == "dead":
+			if dem["State"] == "dead":
 				child.queue_free()
 				count -= 1
 			else:
-				tween.tween_property(child, "position", Vector2(dem["x"] * 32, dem["y"] * 32), 1.0)
+				tween.tween_property(child, "position", Vector2(dem["x"] * 32, dem["y"] * 32), turn_interval_max)
 		count += 1
 
 # Make this when the game backend is done
 func _process(delta):
 	
 	if backend_running:
-		turn_interval -= 1.0 * delta
-		if turn_interval <= 0:
-			AI_game_turn()
-			turn_interval = turn_interva_max
-		
+		if is_player1_ai and is_player2_ai: ## If both players are AI
+			turn_interval -= 1.0 * delta
+			if turn_interval <= 0:
+				AI_game_turn()
+				turn_interval = turn_interval_max
+		else:
+			if play1ready and play2ready:
+			
+				if stdio.get_error() == OK:
+					var content = stdio.get_line()
+					previous_game_state = current_game_state
+					if !content.begins_with("--WINNER"):
+						_draw_game_from_gamestate(content)
+					else:
+						backend_running = false
+					stdio.store_line("--NEXT TURN--")
+					stdio.flush() # Ensure data is written to the pipe
+				
 
 func AI_game_turn():
-	var output = []
-	var exit_code = OS.execute( 				\
-		"python", 								\
-		[ 										\
-			GlobalPaths.backendPath, 			\
-			"-v",		 						\
-			GlobalPaths.AI_agent1_file_path, 	\
-			GlobalPaths.AI_agent2_file_path 	\
-		], 										\
-		output, true 							\
-	)
-	if exit_code == 0:
-		pass
+	var content : String = ""
+	if stdio.get_error() == OK:
+		stdio.store_line("--NEXT TURN--")
+		stdio.flush() # Ensure data is written to the pipe
+		content = stdio.get_line()
 	else:
-		var py_traceback = output[0].find("Traceback (most recent call last):")
-		if py_traceback != -1:
-			push_error("Backend error:")
-			push_error(output[0].substr(py_traceback))
-		else:
-			push_error("Some error occurred, but not in the backend")
+		printerr("Open file error: ", stdio.get_error())
+		backend_running = false
 	
 	previous_game_state = current_game_state
 	
-	var content
-	var path_to_game_state : String = GameSettings.convert_string_to_readable(output[0]).strip_edges(false, true)
-	
-	if FileAccess.file_exists(path_to_game_state):
-		var file = FileAccess.open(path_to_game_state, FileAccess.READ)
-		if file:
-			content = file.get_as_text()
-			file.close()
-		else:
-			printerr("Couldn't Open File! ", FileAccess.get_open_error())
+	if !content.begins_with("--WINNER"):
+		_draw_game_from_gamestate(content)
 	else:
-		printerr("File doesn't exist!")
+		backend_running = false
+
+
+func _on_ui_action(is_player1 : bool, action : String , x: int, y: int, to_build : String ,merc : String) -> void:
+	if is_player1:
+		play1ready = true
+	else:
+		play2ready = true
 	
-	#print(output[0])
-	_draw_game_from_gamestate(content)
-
-
-func _on_ui_build(red_side: bool, x: int, y: int) -> void:
-	var output = []
-	OS.execute("python", [GlobalPaths.backendPath, x, y, output])
-
+	if stdio.get_error() == OK:
+		print("{\"action\": \"" + action + "\", \"x\": " + str(x) + ", \"y\": " + str(y) + ", \"tower_name\": \"" + to_build + "\", \"merc_direction\": \"" + merc + "\"}")
+		stdio.store_line("{\"action\": \"" + action + "\", \"x\": " + str(x) + ", \"y\": " + str(y) + ", \"tower_name\": \"" + to_build + "\", \"merc_direction\": \"" + merc + "\"}")
+		stdio.flush() # Ensure data is written to the pipe
 
 func _update_ui(gamestate):
-	UI._update_turns_progressed(gamestate["TurnsProgressed"])
+	UI._update_turns_progressed(gamestate["TurnsRemaining"])
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		if processID != null:
+			OS.kill(processID) ##Terminates the process
+			get_tree().quit()
+
+func _close_backend():
+	stdio.close()
+	stderr.close()
+	OS.kill(processID)

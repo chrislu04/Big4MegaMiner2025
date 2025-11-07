@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bh23hjmsxnw56"
-path="res://.godot/imported/Blue_base.png-b7e9123a46f25dd8350985426acbee1e.ctex"
+uid="uid://dkfkg704amuav"
+path="res://.godot/imported/red_recruit_walk.png-1d2dd1ffc666534f602a86075dbe2775.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/HD_Skin/Blue_base.png"
-dest_files=["res://.godot/imported/Blue_base.png-b7e9123a46f25dd8350985426acbee1e.ctex"]
+source_file="res://Assets/HD_Skin/red_recruit_walk.png"
+dest_files=["res://.godot/imported/red_recruit_walk.png-1d2dd1ffc666534f602a86075dbe2775.ctex"]
 
 [params]
 

@@ -21,6 +21,13 @@ config/icon="res://icon.svg"
 GlobalPaths="*res://Scripts/Global_paths.gd"
 GameSettings="*res://Scripts/GameSettings.gd"
 
+[input]
+
+click={
+"deadzone": 0.2,
+"events": [null]
+}
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

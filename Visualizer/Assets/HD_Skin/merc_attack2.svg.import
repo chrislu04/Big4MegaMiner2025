@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bh23hjmsxnw56"
-path="res://.godot/imported/Blue_base.png-b7e9123a46f25dd8350985426acbee1e.ctex"
+uid="uid://ddgygkykgybcs"
+path="res://.godot/imported/merc_attack2.svg-91016f11fe760d4e7b1279217b2c3fa7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/HD_Skin/Blue_base.png"
-dest_files=["res://.godot/imported/Blue_base.png-b7e9123a46f25dd8350985426acbee1e.ctex"]
+source_file="res://Assets/HD_Skin/merc_attack2.svg"
+dest_files=["res://.godot/imported/merc_attack2.svg-91016f11fe760d4e7b1279217b2c3fa7.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

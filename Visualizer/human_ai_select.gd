@@ -1,6 +1,6 @@
 extends Control
 
-signal Go(ready, ready2)
+signal Go(ready : bool, ready2 : bool)
 signal Back
 
 @export var player_select_one : PlayerSelect

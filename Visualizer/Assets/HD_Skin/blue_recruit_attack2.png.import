@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bh23hjmsxnw56"
-path="res://.godot/imported/Blue_base.png-b7e9123a46f25dd8350985426acbee1e.ctex"
+uid="uid://cnl127c04hhti"
+path="res://.godot/imported/blue_recruit_attack2.png-d0d82ffb8d1c7797c922330977db25eb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/HD_Skin/Blue_base.png"
-dest_files=["res://.godot/imported/Blue_base.png-b7e9123a46f25dd8350985426acbee1e.ctex"]
+source_file="res://Assets/HD_Skin/blue_recruit_attack2.png"
+dest_files=["res://.godot/imported/blue_recruit_attack2.png-d0d82ffb8d1c7797c922330977db25eb.ctex"]
 
 [params]
 

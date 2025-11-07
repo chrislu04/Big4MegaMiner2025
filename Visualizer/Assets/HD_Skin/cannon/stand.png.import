@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bh23hjmsxnw56"
-path="res://.godot/imported/Blue_base.png-b7e9123a46f25dd8350985426acbee1e.ctex"
+uid="uid://bdunq80yr2fvi"
+path="res://.godot/imported/stand.png-e846b6cdce4cd8c429c80d45c53cfb79.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/HD_Skin/Blue_base.png"
-dest_files=["res://.godot/imported/Blue_base.png-b7e9123a46f25dd8350985426acbee1e.ctex"]
+source_file="res://Assets/HD_Skin/cannon/stand.png"
+dest_files=["res://.godot/imported/stand.png-e846b6cdce4cd8c429c80d45c53cfb79.ctex"]
 
 [params]
 

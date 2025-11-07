@@ -7,18 +7,18 @@
 script = ExtResource("1_e2o6t")
 UI = NodePath("UI")
 
-[node name="Tiles" type="Node2D" parent="."]
-position = Vector2(64, 64)
-
-[node name="Mercenaries" type="Node2D" parent="."]
-
-[node name="Towers" type="Node2D" parent="."]
-
-[node name="Demons" type="Node2D" parent="."]
-
-[node name="Misc Entities" type="Node2D" parent="."]
-
 [node name="UI" parent="." instance=ExtResource("2_e2o6t")]
 
-[connection signal="build" from="UI" to="." method="_on_ui_build"]
+[node name="World" type="Node2D" parent="."]
+
+[node name="Tiles" type="Node2D" parent="World"]
+
+[node name="Mercenaries" type="Node2D" parent="World"]
+
+[node name="Towers" type="Node2D" parent="World"]
+
+[node name="Demons" type="Node2D" parent="World"]
+
+[node name="Misc Entities" type="Node2D" parent="World"]
+
 [connection signal="start_game" from="UI" to="." method="_on_ui_start_game"]
