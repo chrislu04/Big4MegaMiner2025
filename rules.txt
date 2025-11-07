@@ -275,6 +275,8 @@ The configuration of tiles needs to be fair.
 The layout of tiles must have bilateral and/or biradial symmetry.
 Otherwise, one player will have access to tower configurations that the other player doesn't.
 
+The map should have no more than 400 tiles total
+
 Paths should not intersect.
 Otherwise, it could be impossible to determine where Mercenaries should go.
 
