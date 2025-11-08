@@ -8,7 +8,7 @@ import Utils
 
 class Demon:
     def __init__(self, x: int, y: int, target_team: str, game_state: GameState) -> None:
-        self.health = Constants.DEMON_INITIAL_HEALTH
+        self.health = Constants.DEMON_INITIAL_HEALTH + game_state.demon_spawner_activation_count * Constants.DEMON_HEALTH_INCREASE_PER_SPAWN
         self.x = x
         self.y = y
         self.target_team = target_team

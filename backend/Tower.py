@@ -22,7 +22,7 @@ class Tower(Entity):
     ):
         super().__init__(1,x,y)
         self.cooldown_max = cooldown
-        self.current_cooldown = 0
+        self.current_cooldown = self.cooldown_max
         self.tower_range = range
         self.attack_pow = attack_pow
         self.price = price

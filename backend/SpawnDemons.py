@@ -20,4 +20,5 @@ def spawn_demons(game_state: GameState):
             log_msg(f"Spawned demon {new_demon.name} at ({new_demon.x},{new_demon.y})")
         else:
             log_msg(f"Waiting to spawn demon at ({spawner.x},{spawner.y})")
-        
+    
+    game_state.demon_spawner_activation_count += 1

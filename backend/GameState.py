@@ -17,6 +17,9 @@ class GameState:
         self.mercs = []
         self.towers = []
         self.demons = []
+
+        # use this to increase demon health per spawn
+        self.demon_spawner_activation_count = 0
         
         # Initialization which depends on the map JSON
         self.floor_tiles = map_json_data['FloorTiles']
