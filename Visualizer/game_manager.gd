@@ -1,12 +1,9 @@
 extends Node2D
 
 
-const ALT_GRASS = preload("res://Assets/Base_Skin/alt_grass.png")
-const ALT_PATH = preload("res://Assets/Base_Skin/alt_path.png")
-const GRASS = preload("res://Assets/Base_Skin/grass.png")
-const PATH = preload("res://Assets/Base_Skin/path.png")
-
-
+const GRASS_RED_TEX = preload("res://Assets/HD_Skin/grass_red.png")
+const GRASS_BLUE_TEX = preload("res://Assets/HD_Skin/grass_blue.png")
+const PATH_TEX = preload("res://Assets/HD_Skin/path.png")
 const BLUE_RECRUIT = preload("res://Assets/Topdown skin/blue recruit.png")
 
 const RED_RECRUIT = preload("uid://can1bceehb1qy")
@@ -32,7 +29,6 @@ var is_player2_ai : bool
 var play1ready : bool = false
 var play2ready : bool = false
 
-var alt : bool = false
 var initial : bool  = true
 
 var backend_running : bool = false
@@ -149,32 +145,35 @@ func _draw_game_from_gamestate(game_state : String):
 
 func _draw_grid(tile_grid : Array):
 	var layer_y : int = 0
+	var alt_y = false
 	for layer in tile_grid:
 		var character_x = 0
+		var alt_x = false
+		
 		for character in layer:
 			var sprite = Sprite2D.new()
-			alt = !alt
 
 			if character == 'b':
-				if alt:
-					sprite.texture = ALT_GRASS
-				else:
-					sprite.texture = GRASS
+				sprite.texture = GRASS_BLUE_TEX
 			elif character == 'O':
-				if alt:
-					sprite.texture = ALT_PATH
-				else:
-					sprite.texture = PATH
+				sprite.texture = PATH_TEX
 			elif character == 'r':
-				if alt:
-					sprite.texture = ALT_GRASS
-				else:
-					sprite.texture = GRASS
-				
+				sprite.texture = GRASS_RED_TEX
+			
+			if alt_x == alt_y:
+				sprite.self_modulate = Color8(255, 255, 255)
+			else:
+				sprite.self_modulate = Color8(200, 200, 200)
+			
+			sprite.scale = Vector2(0.125,0.125)
 			sprite.position = Vector2(character_x * 32, layer_y * 32)
 			tiles.add_child(sprite)
 			character_x += 1
+			
+			alt_x = !alt_x
+			
 		layer_y += 1
+		alt_y = !alt_y
 	
 	
 	
