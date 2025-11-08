@@ -47,8 +47,19 @@ class Tower(Entity):
     def tower_activation(self, game_state: GameState):
         log_msg("Unimplemented tower_activation function!") # override in subclass
 
+    def get_adjacent_targets(self, target, game_state: GameState):
+        ahead_pos = target.get_adjacent_path_tile(game_state, +1)
+        ahead_ent = game_state.entity_grid[ahead_pos[1]][ahead_pos[0]]
+        
+        behind_pos = target.get_adjacent_path_tile(game_state, -1)
+        behind_ent = game_state.entity_grid[behind_pos[1]][behind_pos[0]]
 
-    def shoot_single_priority_target(self, game_state: GameState):
+        if isinstance(ahead_ent, Mercenary) and ahead_ent.team != self.team:
+            ahead_ent.health -= self.attack_pow
+        elif isinstance(behind_ent, Mercenary) and behind_ent.team != self.team:
+            behind_ent.health -= self.attack_pow
+
+    def shoot_single_priority_target(self, game_state: GameState, do_splash_damage=False):
         potential_targets = []
 
         for path in self.path:
@@ -79,6 +90,10 @@ class Tower(Entity):
         target.health -= self.attack_pow
         self.current_cooldown = self.cooldown_max
         self.angle = math.atan2(path[1] - self.y, path[0] - self.x)
+
+        if do_splash_damage:
+            self.get_adjacent_targets(self, target, game_state)
+            # Check for the surrounding tiles to see if enemy mercs are there, and damage them as well
 
         log_msg(f'Tower {self.name} hit {target.name} for {self.attack_pow} damage')
 

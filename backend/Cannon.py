@@ -18,9 +18,8 @@ class Cannon(Tower):
         Constants.CANNON_PRICE += Constants.TOWER_PRICE_INCREASE_PER_BUY;
 
         self.radius = 2 # Cannon shots have a splash radius, this variable shows that
-                        # But looking in the rules txt, cannon doesn't have this ability, so remove this? Discuss later
         
         self.name = select_tower_name('CA', self.team)
     
     def tower_activation(self, game_state: GameState):
-        super().shoot_single_priority_target(game_state)
+        super().shoot_single_priority_target(game_state, True)
