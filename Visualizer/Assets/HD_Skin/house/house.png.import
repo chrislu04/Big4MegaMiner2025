@@ -2,26 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-<<<<<<< Updated upstream:Visualizer/Assets/HD_Skin/house/house.png.import
-uid="uid://bciq54f3p3yiw"
+uid="uid://daxrm1p6vfnlu"
 path="res://.godot/imported/house.png-dce2b7b488db5b59ed06774684389161.ctex"
-=======
-uid="uid://ribt1mrcvakv"
-path="res://.godot/imported/alt_path.png-53a1ec15395d10c0d3e672ac23888dcf.ctex"
->>>>>>> Stashed changes:Visualizer/Assets/HD_Skin/alt_path.png.import
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-<<<<<<< Updated upstream:Visualizer/Assets/HD_Skin/house/house.png.import
 source_file="res://Assets/HD_Skin/house/house.png"
 dest_files=["res://.godot/imported/house.png-dce2b7b488db5b59ed06774684389161.ctex"]
-=======
-source_file="res://Assets/HD_Skin/alt_path.png"
-dest_files=["res://.godot/imported/alt_path.png-53a1ec15395d10c0d3e672ac23888dcf.ctex"]
->>>>>>> Stashed changes:Visualizer/Assets/HD_Skin/alt_path.png.import
 
 [params]
 

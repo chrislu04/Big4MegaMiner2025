@@ -2,26 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-<<<<<<< Updated upstream:Visualizer/Assets/HD_Skin/cannon/cannon.png.import
-uid="uid://px2v73fj7qag"
+uid="uid://buu33hg5kdt1a"
 path="res://.godot/imported/cannon.png-4868df4fec0306ebfb438c878406b82f.ctex"
-=======
-uid="uid://b3iqngqxdecu6"
-path="res://.godot/imported/base.png-e668dc04bea7e33a2d19b17917612073.ctex"
->>>>>>> Stashed changes:Visualizer/Assets/HD_Skin/base.png.import
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-<<<<<<< Updated upstream:Visualizer/Assets/HD_Skin/cannon/cannon.png.import
 source_file="res://Assets/HD_Skin/cannon/cannon.png"
 dest_files=["res://.godot/imported/cannon.png-4868df4fec0306ebfb438c878406b82f.ctex"]
-=======
-source_file="res://Assets/HD_Skin/base.png"
-dest_files=["res://.godot/imported/base.png-e668dc04bea7e33a2d19b17917612073.ctex"]
->>>>>>> Stashed changes:Visualizer/Assets/HD_Skin/base.png.import
 
 [params]
 

@@ -2,26 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-<<<<<<< Updated upstream:Visualizer/Assets/HD_Skin/stand.png.import
-uid="uid://bctc06b0w20pa"
+uid="uid://du12m1l8peegs"
 path="res://.godot/imported/stand.png-99ebb325d45a7f5aa221e486bb9ded15.ctex"
-=======
-uid="uid://d24h66kt8ybs6"
-path="res://.godot/imported/alt_grass.png-0594539b8938d0044cb2b229cc193155.ctex"
->>>>>>> Stashed changes:Visualizer/Assets/HD_Skin/alt_grass.png.import
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-<<<<<<< Updated upstream:Visualizer/Assets/HD_Skin/stand.png.import
 source_file="res://Assets/HD_Skin/stand.png"
 dest_files=["res://.godot/imported/stand.png-99ebb325d45a7f5aa221e486bb9ded15.ctex"]
-=======
-source_file="res://Assets/HD_Skin/alt_grass.png"
-dest_files=["res://.godot/imported/alt_grass.png-0594539b8938d0044cb2b229cc193155.ctex"]
->>>>>>> Stashed changes:Visualizer/Assets/HD_Skin/alt_grass.png.import
 
 [params]
 
