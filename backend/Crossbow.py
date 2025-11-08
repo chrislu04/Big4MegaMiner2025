@@ -15,6 +15,8 @@ class Crossbow(Tower):
             game_state
         )
 
+        Constants.CROSSBOW_PRICE += Constants.CROSSBOW_BASE_PRICE;
+
         self.name = select_tower_name('CR', self.team)
     
     def tower_activation(self, game_state: GameState):

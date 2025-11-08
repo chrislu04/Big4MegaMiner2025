@@ -15,6 +15,8 @@ class Cannon(Tower):
             game_state
         )
 
+        Constants.CANNON_PRICE += Constants.CANNON_BASE_PRICE;
+
         self.radius = 2 # Cannon shots have a splash radius, this variable shows that
                         # But looking in the rules txt, cannon doesn't have this ability, so remove this? Discuss later
         
