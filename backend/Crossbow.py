@@ -15,7 +15,7 @@ class Crossbow(Tower):
             game_state
         )
 
-        Constants.CROSSBOW_PRICE += Constants.CROSSBOW_BASE_PRICE;
+        Constants.CROSSBOW_PRICE += Constants.TOWER_PRICE_INCREASE_PER_BUY;
 
         self.name = select_tower_name('CR', self.team)
     

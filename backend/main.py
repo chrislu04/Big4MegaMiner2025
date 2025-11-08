@@ -27,7 +27,7 @@ def main_game_loop(ai_agent_1, ai_agent_2, game: Game):
         
         
         agent_1_action = AIAction.from_json(agent_1_action_string)
-# {"action": "build", "x": 4, "y": 4, "tower_type": "cannon", "merc_direction": ""}
+        
         agent_2_action_string = ""
         if ai_agent_2:
             # Send game state to agent
