@@ -4,5 +4,7 @@ __pycache__/
 /android/
 *.pkl
 log.txt
+.idea/
+training/
 *png.import
 builds
