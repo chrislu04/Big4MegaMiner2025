@@ -12,7 +12,7 @@ class Crossbow(Tower):
             Constants.CROSSBOW_MAX_COOLDOWN,
             Constants.CROSSBOW_RANGE,
             Constants.CROSSBOW_DAMAGE,
-            Constants.CROSSBOW_PRICE,
+            game_state.minigun_price,
             game_state
         )
 

@@ -12,7 +12,7 @@ class House(Tower):
             Constants.HOUSE_MAX_COOLDOWN,
             Constants.HOUSE_RANGE,
             Constants.MINIGUN_DAMAGE, # "I would be dangerous, I just don't FEEL like it!"
-            Constants.HOUSE_PRICE,
+            game_state.house_price,
             game_state
         )
 

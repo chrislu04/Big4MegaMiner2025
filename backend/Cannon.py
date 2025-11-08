@@ -12,7 +12,7 @@ class Cannon(Tower):
             Constants.CANNON_MAX_COOLDOWN,
             Constants.CANNON_RANGE,
             Constants.CANNON_DAMAGE,
-            Constants.CANNON_PRICE,
+            game_state.cannon_price,
             game_state
         )
 

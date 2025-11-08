@@ -12,7 +12,7 @@ class Minigun(Tower):
             Constants.MINIGUN_MAX_COOLDOWN,
             Constants.MINIGUN_RANGE,
             Constants.MINIGUN_DAMAGE,
-            Constants.MINIGUN_PRICE,
+            game_state.minigun_price,
             game_state
         )
         
