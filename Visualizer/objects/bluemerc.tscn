@@ -1,14 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://drwant6008fgr"]
+[gd_scene load_steps=7 format=3 uid="uid://drwant6008fgr"]
 
 [ext_resource type="Texture2D" uid="uid://dt6yewfytytmq" path="res://Assets/HD_Skin/blue_recruit.png" id="1_giles"]
 [ext_resource type="Script" uid="uid://cc0evfk3hw80j" path="res://objects/blueMerc.gd" id="1_nmgfi"]
 [ext_resource type="Texture2D" uid="uid://byna5r0fsc8dk" path="res://Assets/HD_Skin/blue_recruit_attack1.png" id="2_8iwix"]
 [ext_resource type="Texture2D" uid="uid://cnl127c04hhti" path="res://Assets/HD_Skin/blue_recruit_attack2.png" id="3_88mlc"]
 [ext_resource type="Texture2D" uid="uid://du04fdl6wqxli" path="res://Assets/HD_Skin/blue_recruit_walk.png" id="4_1pbvo"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_6g0cv"]
-atlas = ExtResource("1_giles")
-region = Rect2(0, 0, 312, 312)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_5tm6n"]
 animations = [{
@@ -28,7 +24,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_6g0cv")
+"texture": ExtResource("1_giles")
 }],
 "loop": true,
 "name": &"default",
@@ -48,7 +44,6 @@ animations = [{
 
 [node name="Bluemerc" type="AnimatedSprite2D"]
 sprite_frames = SubResource("SpriteFrames_5tm6n")
-animation = &"attack"
+animation = &"walk"
 autoplay = "default"
-frame_progress = 0.026014106
 script = ExtResource("1_nmgfi")

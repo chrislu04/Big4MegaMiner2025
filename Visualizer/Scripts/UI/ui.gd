@@ -37,9 +37,9 @@ func _update_money_values(left_value, right_value):
 
 func _update_base_health(is_left : bool, new_value):
 	if is_left:
-		$"Game UI/LeftSideStates/Health/Health".text = "Base Health " + str(new_value) + "/70"
+		$"Game UI/LeftSideStates/Health/Health".text = "Base Health\n" + str(new_value) + "/200"
 	else:
-		$"Game UI/RightSideStates/Health/Health".text = "Base Health " + str(new_value) + "/70"
+		$"Game UI/RightSideStates/Health/Health".text = "Base Health\n" + str(new_value) + "/200"
 
 func _on_main_menu_play_game() -> void:
 	human_ai_select.visible = true

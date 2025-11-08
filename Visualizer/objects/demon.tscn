@@ -40,5 +40,6 @@ animations = [{
 
 [node name="demon" type="AnimatedSprite2D"]
 sprite_frames = SubResource("SpriteFrames_qh3hn")
+animation = &"walk"
 autoplay = "default"
 script = ExtResource("1_v40ab")

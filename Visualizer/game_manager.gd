@@ -203,11 +203,10 @@ func _draw_mercenaries(mercs : Array):
 			var sprite : RedMerc
 			if merc["Team"] == "b":
 				sprite = BLUE_RECRUIT.instantiate()
-				sprite.flip_h = true
+				
 			else:
 				sprite = RED_RECRUIT.instantiate()
 				
-			
 			sprite.position = pos
 			mercenaries.add_child(sprite)
 		else:
@@ -218,7 +217,7 @@ func _draw_mercenaries(mercs : Array):
 				count -= 1
 			elif merc["State"] == "moving":
 				var tween = get_tree().create_tween()
-				child.move(position - Vector2(merc["x"] * 32, merc["y"] * 32))
+				child.move(child.position - Vector2(merc["x"] * 32, merc["y"] * 32))
 				tween.tween_property(child, "position", Vector2(merc["x"] * 32, merc["y"] * 32), turn_interval_max)
 				tween.tween_callback(child.idle)
 			else:
@@ -236,7 +235,6 @@ func _draw_towers(data_towers : Array):
 		base.texture = BASE
 		towers.add_child(base)
 		
-		#var type_c = tower["Type"]
 		match tower["Type"]:
 			"Crossbow":
 				current_tower.texture = CROSSBOW
@@ -258,7 +256,7 @@ func _draw_demons(dem_array : Array):
 			var pos = Vector2(dem["x"] * 32, dem["y"] * 32)
 			var sprite : RedMerc = ENEMY.instantiate()
 			if dem["Team"] == "b":
-				sprite.flip_h = true
+				sprite.flip_h = false
 			
 			sprite.position = pos
 			demons.add_child(sprite)

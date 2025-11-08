@@ -65,21 +65,25 @@ func _ready() -> void:
 	my_shader.shader = GHOST
 	current_build.material = my_shader
 
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and current_action != "":
+			active = false
+		
+			action.emit(is_player_1, current_action, current_build.position.x / 32 , current_build.position.y / 32, current_build_name, "")
+			current_mercenary_dir = ""
+			current_build_name = ""
+			
+			current_action = ""
+			house_options.hide()
+			mercenary_options.hide()
 func _process(_delta: float) -> void:
 	
 	if GlobalPaths.tile_grid and active:
 		current_build.position = GlobalPaths.tile_grid.get_local_mouse_position().snapped(Vector2(32.0,32.0))
 		
-	if Input.is_action_just_pressed("click") and current_action != "":
-		active = false
-		
-		action.emit(is_player_1, current_action, current_build.position.x / 32 , current_build.position.y / 32, current_build_name, "")
-		current_mercenary_dir = ""
-		current_build_name = ""
-		
-		current_action = ""
-		house_options.hide()
-		mercenary_options.hide()
+	#if Input.is_action_just_pressed("click") and current_action != "":
+		#
 
 func _on_next_turn():
 	active = true
