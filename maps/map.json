@@ -13,11 +13,11 @@
         "bbbbbbbbbbb           rrrrrrrrrrr"
     ],
     "PlayerBaseR": {
-        "x": 5,
+        "x": 27,
         "y": 5
     },
     "PlayerBaseB": {
-        "x": 27,
+        "x": 5,
         "y": 5
     },
     "DemonSpawners": [

@@ -49,17 +49,17 @@ class GameState:
             ))
 
         # Compute mercenary paths, from Red to Blue player bases
-        self.mercenary_path_left  = self.compute_mercenary_path((self.player_base_r.x-1, self.player_base_r.y))
-        self.mercenary_path_right = self.compute_mercenary_path((self.player_base_r.x+1, self.player_base_r.y))
-        self.mercenary_path_up    = self.compute_mercenary_path((self.player_base_r.x, self.player_base_r.y-1))
-        self.mercenary_path_down  = self.compute_mercenary_path((self.player_base_r.x, self.player_base_r.y+1))
+        self.mercenary_path_left  = self.compute_mercenary_path((self.player_base_r.x-1, self.player_base_r.y), (self.player_base_r.x, self.player_base_r.y), (self.player_base_b.x, self.player_base_b.y))
+        self.mercenary_path_right = self.compute_mercenary_path((self.player_base_r.x+1, self.player_base_r.y), (self.player_base_r.x, self.player_base_r.y), (self.player_base_b.x, self.player_base_b.y))
+        self.mercenary_path_up    = self.compute_mercenary_path((self.player_base_r.x, self.player_base_r.y-1), (self.player_base_r.x, self.player_base_r.y), (self.player_base_b.x, self.player_base_b.y))
+        self.mercenary_path_down  = self.compute_mercenary_path((self.player_base_r.x, self.player_base_r.y+1), (self.player_base_r.x, self.player_base_r.y), (self.player_base_b.x, self.player_base_b.y))
 
 
     def is_out_of_bounds(self, x: int, y: int) -> bool:
         return x < 0 or x >= len(self.floor_tiles[0]) or y < 0 or y >= len(self.floor_tiles)
 
     
-    def compute_mercenary_path(self, start_point: tuple) -> list:
+    def compute_mercenary_path(self, start_point: tuple, red_base_location: tuple, blue_base_location: tuple) -> list:
         
         if self.is_out_of_bounds(start_point[0],start_point[1]): return None
 
@@ -82,6 +82,8 @@ class GameState:
                     current_tile = None
                     if (neighbor not in traversed and
                         not self.is_out_of_bounds(neighbor[0], neighbor[1]) and
+                        not neighbor == red_base_location and
+                        not neighbor == blue_base_location and
                         self.floor_tiles[neighbor[1]][neighbor[0]] == 'O'):
                         traversed.add(neighbor)
                         if current_tile == None: current_tile = neighbor

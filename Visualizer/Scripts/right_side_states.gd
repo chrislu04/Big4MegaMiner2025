@@ -6,7 +6,7 @@ const HOUSE = preload("uid://bciq54f3p3yiw")
 const CROSSBOW_FIRE = preload("uid://b4dqo57cak8b5")
 const GATLING = preload("uid://2cfukvxbe1ah")
 
-const GHOST = preload("uid://26apgdhkxkk7")
+const GHOST = preload("res://Assets/shaders/ghost.gdshader")
 
 var current_build : Sprite2D
 var current_build_name : String
