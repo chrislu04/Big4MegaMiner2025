@@ -1,5 +1,6 @@
 from Game import Game
 from AIAction import AIAction
+from Utils import log_msg
 import Constants
 import os
 import argparse
@@ -25,9 +26,12 @@ def main_game_loop(ai_agent_1, ai_agent_2, game: Game):
             # "Human" input from visualizer or other parent process
             agent_1_action_string = input()
         
-        
-        agent_1_action = AIAction.from_json(agent_1_action_string)
-        
+        agent_1_action = AIAction('nothing',0,0)
+        try:
+            agent_1_action = AIAction.from_json(agent_1_action_string)
+        except:
+            log_msg('Agent 1 produced invalid JSON! Agent 1 forfeits their turn!')
+
         agent_2_action_string = ""
         if ai_agent_2:
             # Send game state to agent
@@ -41,7 +45,11 @@ def main_game_loop(ai_agent_1, ai_agent_2, game: Game):
             # "Human" input from visualizer or other parent process
             agent_2_action_string = input()
         
-        agent_2_action = AIAction.from_json(agent_2_action_string)
+        agent_2_action = AIAction('nothing',0,0)
+        try:
+            agent_2_action = AIAction.from_json(agent_2_action_string)
+        except:
+            log_msg('Agent 2 produced invalid JSON! Agent 2 forfeits their turn!')
 
         # Run the next turn
         game.run_turn(agent_1_action, agent_2_action)
