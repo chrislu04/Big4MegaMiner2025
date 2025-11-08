@@ -66,10 +66,10 @@ class Tower(Entity):
 
         if isinstance(ahead_ent, Demon):
             ahead_ent.health -= attack_pow
-            log_msg("Hit an enemy demon that was ahead of me, with the cannon AOE")
+            log_msg("Hit a demon that was ahead of me, with the cannon AOE")
         if isinstance(behind_ent, Demon):
             behind_ent.health -= attack_pow
-            log_msg("Hit an enemy demon that was behind me, with the cannon AOE")
+            log_msg("Hit a demon that was behind me, with the cannon AOE")
 
     def shoot_single_priority_target(self, game_state: GameState, do_splash_damage=False):
         potential_targets = []

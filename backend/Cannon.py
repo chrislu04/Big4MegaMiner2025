@@ -2,6 +2,7 @@ import Constants
 from Tower import Tower
 from GameState import GameState
 from NameSelector import select_tower_name
+from Utils import get_increased_tower_price
 
 class Cannon(Tower):
     def __init__(self, x: int, y: int, team_color: str, game_state: GameState) -> None:
@@ -15,7 +16,7 @@ class Cannon(Tower):
             game_state
         )
 
-        Constants.CANNON_PRICE += Constants.TOWER_PRICE_INCREASE_PER_BUY;
+        game_state.cannon_price = get_increased_tower_price(game_state.cannon_price, Constants.TOWER_PRICE_PERCENT_INCREASE_PER_BUY)
 
         self.radius = 2 # Cannon shots have a splash radius, this variable shows that
         
