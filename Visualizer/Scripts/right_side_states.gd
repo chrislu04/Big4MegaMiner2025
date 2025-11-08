@@ -2,6 +2,9 @@ extends Control
 
 
 const CANNON : Texture = preload("uid://px2v73fj7qag")
+const HOUSE = preload("uid://bciq54f3p3yiw")
+const CROSSBOW_FIRE = preload("uid://b4dqo57cak8b5")
+const GATLING = preload("uid://2cfukvxbe1ah")
 
 
 var current_build : Sprite2D
@@ -10,6 +13,7 @@ var current_mercenary_dir : String
 
 @export var build_button : Button
 @export var destroy_button : Button
+@export var skip_turn : Button
 
 @export var merc_up : Button
 @export var merc_down : Button
@@ -32,7 +36,12 @@ signal action(player1 : bool, build : String, x : int, y : int, tower_to_build :
 func _ready() -> void:
 	build_button.pressed.connect(_on_build_pressed)
 	destroy_button.pressed.connect(_on_destroy_pressed)
+	
 	cannon.pressed.connect(_on_cannon_pressed)
+	house.pressed.connect(_on_house_pressed)
+	minigun.pressed.connect(_on_mini_pressed)
+	cross.pressed.connect(_on_cross_pressed)
+	
 	current_build = Sprite2D.new()
 	
 
@@ -60,7 +69,9 @@ func _on_destroy_pressed():
 	current_build.hide()
 
 func _on_house_pressed():
-	pass
+	current_build.texture = HOUSE
+	current_build.scale = Vector2(32 / CANNON.get_size().x, 32 / CANNON.get_size().y)
+	current_build_name = "house"
 
 func _on_cannon_pressed():
 	current_build.texture = CANNON
@@ -68,7 +79,11 @@ func _on_cannon_pressed():
 	current_build_name = "cannon"
 
 func _on_cross_pressed():
-	pass
+	current_build.texture = CROSSBOW_FIRE
+	current_build.scale = Vector2(32 / CANNON.get_size().x, 32 / CANNON.get_size().y)
+	current_build_name = "crossbow"
 
 func _on_mini_pressed():
-	pass
+	current_build.texture = GATLING
+	current_build.scale = Vector2(32 / CANNON.get_size().x, 32 / CANNON.get_size().y)
+	current_build_name = "minigun"

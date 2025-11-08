@@ -238,7 +238,8 @@ func _draw_towers(data_towers : Array):
 				current_tower.texture = GATLING
 			"House":
 				current_tower.texture = HOUSE
-			
+		
+		current_tower.scale = Vector2(32 / current_tower.texture.get_size().x, 32 / current_tower.texture.get_size().y)
 		base.add_child(current_tower)
 		current_tower.rotation_degrees = tower["AimAngle"]
 
@@ -317,8 +318,8 @@ func _on_ui_action(is_player1 : bool, action : String , x: int, y: int, to_build
 		play2ready = true
 	
 	if stdio.get_error() == OK:
-		var player_action = "{\"action\": \"" + action + "\", \"x\": " + str(x) + ", \"y\": " + str(y) + ", \"tower_name\": \"" + to_build + "\", \"merc_direction\": \"" + merc + "\"}"
-		print(player_action)
+		var player_action = "{\"action\": \"" + action + "\", \"x\": " + str(x) + ", \"y\": " + str(y) + ", \"tower_type\": \"" + to_build + "\", \"merc_direction\": \"" + merc + "\"}"
+		#print(player_action)
 		stdio.store_line(player_action)
 		stdio.flush() # Ensure data is written to the pipe
 

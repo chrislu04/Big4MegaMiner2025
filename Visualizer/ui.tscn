@@ -47,7 +47,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Turns Progressed"
 
-[node name="RightSideStates" type="Control" parent="Game UI" node_paths=PackedStringArray("build_button", "destroy_button", "cannon", "house_options")]
+[node name="RightSideStates" type="Control" parent="Game UI" node_paths=PackedStringArray("build_button", "destroy_button", "house", "cannon", "minigun", "cross", "house_options")]
 layout_mode = 1
 anchor_right = 0.5
 anchor_bottom = 0.988
@@ -55,15 +55,18 @@ offset_bottom = 7.776001
 script = ExtResource("4_nltto")
 build_button = NodePath("Human Control/build or destroy/Build")
 destroy_button = NodePath("Human Control/build or destroy/Destroy")
+house = NodePath("Human Control/Build OPtions/House")
 cannon = NodePath("Human Control/Build OPtions/Cannon")
+minigun = NodePath("Human Control/Build OPtions/Minigun")
+cross = NodePath("Human Control/Build OPtions/Crossbow")
 house_options = NodePath("Human Control/Build OPtions")
 
-[node name="Panel2" type="Panel" parent="Game UI/RightSideStates"]
+[node name="Money" type="Panel" parent="Game UI/RightSideStates"]
 layout_mode = 1
 offset_right = 104.0
 offset_bottom = 64.0
 
-[node name="Money" type="Label" parent="Game UI/RightSideStates/Panel2"]
+[node name="Money" type="Label" parent="Game UI/RightSideStates/Money"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -99,13 +102,13 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Base Health"
 
-[node name="TeamN+ Name" type="Panel" parent="Game UI/RightSideStates"]
+[node name="TeamName" type="Panel" parent="Game UI/RightSideStates"]
 layout_mode = 1
 offset_left = 312.0
 offset_right = 416.0
 offset_bottom = 64.0
 
-[node name="Money" type="Label" parent="Game UI/RightSideStates/TeamN+ Name"]
+[node name="Money" type="Label" parent="Game UI/RightSideStates/TeamName"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -121,7 +124,6 @@ grow_vertical = 2
 text = "Team: "
 
 [node name="Human Control" type="Control" parent="Game UI/RightSideStates"]
-visible = false
 layout_mode = 1
 anchor_top = 0.79
 anchor_right = 0.986
@@ -146,6 +148,11 @@ text = "Build"
 [node name="Destroy" type="Button" parent="Game UI/RightSideStates/Human Control/build or destroy"]
 layout_mode = 2
 text = "Destroy"
+
+[node name="Skip" type="Button" parent="Game UI/RightSideStates/Human Control/build or destroy"]
+layout_mode = 2
+text = "Skip Turn
+"
 
 [node name="Build OPtions" type="HBoxContainer" parent="Game UI/RightSideStates/Human Control"]
 layout_mode = 1
