@@ -43,3 +43,28 @@ sprite_frames = SubResource("SpriteFrames_qh3hn")
 animation = &"walk"
 autoplay = "default"
 script = ExtResource("1_v40ab")
+
+[node name="Panel" type="Panel" parent="."]
+visible = false
+anchors_preset = -1
+anchor_left = 0.551
+anchor_top = 0.29500002
+anchor_right = 0.551
+anchor_bottom = 0.29500002
+offset_left = -155.912
+offset_top = -252.04001
+offset_right = 4.0879974
+offset_bottom = -156.04001
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Name" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Name: Rossevelts"
+
+[node name="HP" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Health : 20/20"

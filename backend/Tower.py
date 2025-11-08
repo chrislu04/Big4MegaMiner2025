@@ -26,8 +26,10 @@ class Tower(Entity):
         self.tower_range = range
         self.attack_pow = attack_pow
         self.price = price
-        self.angle = 0
-        
+        # self.angle = 0
+
+        self.targets = [] ##Keep track of all the positions it's targeting, instead of the angle
+
         if team_color in ['r','b']:
             self.team = team_color
         else:
@@ -40,6 +42,7 @@ class Tower(Entity):
     def update(self, game_state: GameState):
         if self.current_cooldown > 0:
             self.current_cooldown -= 1
+            self.targets = []
         else:
             self.tower_activation(game_state)
     
@@ -89,16 +92,23 @@ class Tower(Entity):
         target = potential_targets[0]
         target.health -= self.attack_pow
         self.current_cooldown = self.cooldown_max
-        self.angle = math.atan2(path[1] - self.y, path[0] - self.x)
+        self.targets.append((target.x, target.y))
+        # self.angle = math.atan2(path[1] - self.y, path[0] - self.x)
 
+<<<<<<< HEAD
         if do_splash_damage:
             self.get_adjacent_targets(self, target, game_state)
             # Check for the surrounding tiles to see if enemy mercs are there, and damage them as well
 
+=======
+        self.last_hit_targets = [(target.x, target.y)]
+>>>>>>> 9acced6803b24f572aaacef1924f44334b95a1da
         log_msg(f'Tower {self.name} hit {target.name} for {self.attack_pow} damage')
 
 
     def shoot_all_targets_in_range(self, game_state: GameState):
+
+        hit_targets = []
 
         for path in self.path:
             whats_on_path = game_state.entity_grid[path[1]][path[0]]
@@ -108,11 +118,16 @@ class Tower(Entity):
                 (isinstance(whats_on_path, Demon) and whats_on_path.target_team == self.team)):
 
                 whats_on_path.health -= self.attack_pow
-                self.angle = math.atan2(path[1] - self.y, path[0] - self.x)
+                self.targets.append((whats_on_path.x, whats_on_path.y))
+                # self.angle = math.atan2(path[1] - self.y, path[0] - self.x)
 
+                hit_targets.append((whats_on_path.x, whats_on_path.y))
                 log_msg(f'Tower {self.name} hit {whats_on_path.name} for {self.attack_pow} damage')
             
             self.current_cooldown = self.cooldown_max
+        
+        if len(hit_targets) != 0:
+            self.last_hit_targets = hit_targets
 
 
     def find_all_paths_in_range(self, game_state: GameState) -> list:

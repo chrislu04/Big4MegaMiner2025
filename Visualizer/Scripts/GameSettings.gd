@@ -3,7 +3,7 @@ extends Node
 var backend_path : String = "main.py"
 var AI_folder : String = "AI Agents"
 
-var default_map : String = "../maps/map.json"
+var default_map : String = "../maps/test_map.json"
 
 var AI_agent1_file_path : String = ""
 var AI_agent2_file_path : String = ""

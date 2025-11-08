@@ -16,7 +16,7 @@ class House(Tower):
             game_state
         )
 
-        Constants.HOUSE_PRICE += Constants.TOWER_PRICE_INCREASE_PER_BUY;
+        Constants.HOUSE_PRICE += Constants.TOWER_PRICE_INCREASE_PER_BUY
 
         self.angle = 0
         self.name = select_tower_name('H', self.team)

@@ -99,13 +99,19 @@ class Game:
             elif isinstance(tow, Minigun):
                 tower_type = "Minigun"
             
+            target_list = []
+
+            for target in tow.targets:
+                target_list.append(target)
+
             tow_dict : dict = {
                 "Name" : tow.name,
                 "Type" : tower_type,
                 "Team" : tow.team,
                 "x" : tow.x,
                 "y" : tow.y,
-                "AimAngle" : tow.angle * 57.2958 # Convert radians to degrees
+                "Targets" : target_list
+                # "AimAngle" : tow.angle * 57.2958 # Convert radians to degrees
             }
             list_towers.append(tow_dict)
 

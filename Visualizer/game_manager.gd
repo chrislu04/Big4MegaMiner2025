@@ -195,7 +195,7 @@ func _draw_grid(tile_grid : Array):
 
 # Draws the mercanaries
 func _draw_mercenaries(mercs : Array):
-	print(mercs)
+	#print(mercs)
 	var count = 0
 	for merc in mercs:
 		if mercenaries.get_child_count() - 1 < count:
@@ -212,6 +212,9 @@ func _draw_mercenaries(mercs : Array):
 		else:
 			var child : RedMerc = mercenaries.get_child(count)
 			
+			if merc["Team"] == 'r':
+				child._update_values(merc["Name"], merc["Health"])
+			
 			if merc["State"] == "dead":
 				child.free()
 				count -= 1
@@ -226,7 +229,7 @@ func _draw_mercenaries(mercs : Array):
 		count += 1
 
 func _draw_towers(data_towers : Array):
-	#print(data_towers)
+	print(data_towers)
 	for tower in data_towers:
 		var base = Sprite2D.new()
 		var current_tower = Sprite2D.new()
@@ -247,7 +250,7 @@ func _draw_towers(data_towers : Array):
 		
 		current_tower.scale = Vector2(32 / current_tower.texture.get_size().x, 32 / current_tower.texture.get_size().y)
 		base.add_child(current_tower)
-		current_tower.rotation_degrees = tower["AimAngle"]
+
 
 func _draw_demons(dem_array : Array):
 	var count = 0
@@ -276,7 +279,6 @@ func _draw_demons(dem_array : Array):
 
 # Make this when the game backend is done
 func _process(delta):
-	
 	if backend_running:
 		if is_player1_ai and is_player2_ai: ## If both players are AI
 			turn_interval -= 1.0 * delta

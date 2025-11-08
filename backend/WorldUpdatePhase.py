@@ -81,7 +81,7 @@ def check_wincon(game_state: GameState):
         b_towers = []
 
         for tower in towers:
-            current_team = towers.team_color
+            current_team = tower.team_color
             if current_team == 'r':
                 r_towers.append(tower)
             else:

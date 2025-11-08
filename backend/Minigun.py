@@ -15,7 +15,7 @@ class Minigun(Tower):
             game_state
         )
         
-        Constants.MINIGUN_PRICE += Constants.TOWER_PRICE_INCREASE_PER_BUY;
+        Constants.MINIGUN_PRICE += Constants.TOWER_PRICE_INCREASE_PER_BUY
 
         self.name = select_tower_name('M',self.team)
     
