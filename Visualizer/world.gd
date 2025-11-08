@@ -10,10 +10,10 @@ var offset : Vector2 = Vector2.ZERO
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		var mouse_relative_motion: Vector2 = event.relative
-		var new_position = position + mouse_relative_motion
+		position = position + mouse_relative_motion
 		
-		position.x = clamp(new_position.x, 0, get_viewport_rect().size.x - offset.x * 2)
-		position.y = clamp(new_position.y, 0, get_viewport_rect().size.y - offset.y)
+		#position.x = clamp(new_position.x, 0, get_viewport_rect().size.x - offset.x * 2)
+		#position.y = clamp(new_position.y, 0, get_viewport_rect().size.y - offset.y)
 	if event is InputEventMouseButton:
 		
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
