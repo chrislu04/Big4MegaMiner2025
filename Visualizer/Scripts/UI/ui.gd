@@ -23,7 +23,7 @@ func _ready():
 	human_ai_select.visible = false
 	game_ui.visible = false
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	pass
 
 func _update_turns_progressed(new_value):
@@ -80,8 +80,22 @@ func _on_right_side_states_action(is_player1: bool, build: String, x: int, y: in
 		action.emit(is_player1, build, x, y, tower_to_build, merc_direction)
 		if ai1 == ai2:
 			red_turn = !red_turn
-		
-		if red_turn:
-			print("Red players turn!")
-		else:
-			print("blue players turn!")
+			
+			$"Game UI/Turns/Player Turn".modulate = Color(255,255,255)
+			if red_turn:
+				$"Game UI/Turns/Player Turn".text = "Red Player's Turn\n<---"
+				var tween = get_tree().create_tween()
+				tween.tween_property($"Game UI/Turns/Player Turn", "modulate", Color(255,255,255,0), 5.0)
+				$"Game UI/AnimationPlayer".play("red Side glow")
+				print("Red players turn!")
+			else:
+				$"Game UI/Turns/Player Turn".text = "Blue Player's Turn\n--->"
+				var tween = get_tree().create_tween()
+				tween.tween_property($"Game UI/Turns/Player Turn", "modulate", Color(255,255,255,0), 5.0)
+				$"Game UI/AnimationPlayer".play("blue side glow")
+				print("blue players turn!")
+
+func on_next_turn():
+	$"Game UI/LeftSideStates"._on_next_turn()
+	$"Game UI/RightSideStates"._on_next_turn()
+	

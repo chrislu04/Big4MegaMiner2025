@@ -10,16 +10,6 @@ UI = NodePath("UI")
 
 [node name="UI" parent="." instance=ExtResource("2_e2o6t")]
 
-[node name="ColorRect" type="ColorRect" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 1152.0
-offset_bottom = 649.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.36, 0.92533326, 1, 1)
-
 [node name="World" type="Node2D" parent="."]
 script = ExtResource("3_feb5d")
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://csts2io3jxnsy"]
+[gd_scene load_steps=10 format=3 uid="uid://csts2io3jxnsy"]
 
 [ext_resource type="Script" uid="uid://cqig607puff42" path="res://Scripts/UI/ui.gd" id="1_ibotj"]
 [ext_resource type="PackedScene" uid="uid://ce78d0fluy0rq" path="res://main_menu.tscn" id="2_ibotj"]
@@ -6,6 +6,94 @@
 [ext_resource type="Script" uid="uid://uq0520028lh7" path="res://Scripts/right_side_states.gd" id="4_nltto"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ibotj"]
+
+[sub_resource type="Animation" id="Animation_n5ude"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("RedSide/RedSide3:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BlueSide/BlueSide3:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1e-05, 1e-05)]
+}
+
+[sub_resource type="Animation" id="Animation_y4yjw"]
+resource_name = "blue side glow"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BlueSide/BlueSide3:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1e-05), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("RedSide/RedSide3:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1, 1e-05)]
+}
+
+[sub_resource type="Animation" id="Animation_nltto"]
+resource_name = "red Side glow"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("RedSide/RedSide3:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1e-05), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BlueSide/BlueSide3:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1, 1e-05)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_y4yjw"]
+_data = {
+&"RESET": SubResource("Animation_n5ude"),
+&"blue side glow": SubResource("Animation_y4yjw"),
+&"red Side glow": SubResource("Animation_nltto")
+}
 
 [node name="UI" type="CanvasLayer"]
 script = ExtResource("1_ibotj")
@@ -38,11 +126,27 @@ color = Color(0.82, 0.32799998, 0.35260004, 1)
 polygon = PackedVector2Array(512, -8, 496, 72, 128, 72, 0, 136, -8, 136, -8, -8)
 uv = PackedVector2Array(448, 0, 448, 64, 256, 104, 128, 64, 0, 128, 0, 0)
 
-[node name="RedSide2" type="Polygon2D" parent="Game UI"]
-position = Vector2(0, 584)
-scale = Vector2(1.1612903, 1)
-color = Color(0.6, 0.23921569, 0.25490198, 1)
-polygon = PackedVector2Array(496.00003, -8, 496.00003, 64, 0, 64, 0, -72, 110.22223, -8)
+[node name="BlueSide" type="Polygon2D" parent="Game UI"]
+material = SubResource("ShaderMaterial_ibotj")
+position = Vector2(648, 0)
+color = Color(0.14509805, 0.5882353, 0.74509805, 1)
+polygon = PackedVector2Array(504, 0, 504, 128, 376, 64, 16, 64, 0, 0)
+uv = PackedVector2Array(448, 0, 448, 64, 256, 104, 128, 64, 0, 128, 0, 0)
+
+[node name="BlueSide3" type="Polygon2D" parent="Game UI/BlueSide"]
+z_index = -1
+material = SubResource("ShaderMaterial_ibotj")
+position = Vector2(504, 0)
+scale = Vector2(1e-05, 1e-05)
+color = Color(0.324, 0.9, 0.8904, 1)
+polygon = PackedVector2Array(8, -8, 8, 136, 0, 136, -128, 72, -496, 72, -512, -8)
+uv = PackedVector2Array(448, 0, 448, 64, 256, 104, 128, 64, 0, 128, 0, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Game UI"]
+libraries = {
+&"": SubResource("AnimationLibrary_y4yjw")
+}
+autoplay = "red Side glow"
 
 [node name="Turns" type="Panel" parent="Game UI"]
 layout_mode = 1
@@ -72,6 +176,18 @@ text = "Turns Progressed"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="Player Turn" type="RichTextLabel" parent="Game UI/Turns"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_top = 96.0
+offset_right = 168.0
+offset_bottom = 145.0
+bbcode_enabled = true
+text = "Red Player's Turn
+<---"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="LeftSideStates" type="Control" parent="Game UI" node_paths=PackedStringArray("build_button", "destroy_button", "queue_button", "skip_turn", "merc_up", "merc_down", "merc_left", "merc_right", "house", "cannon", "minigun", "cross", "house_options", "mercenary_options")]
 layout_mode = 1
@@ -189,12 +305,14 @@ text = "Destroy"
 
 [node name="Skip" type="Button" parent="Game UI/LeftSideStates/Human Control/build or destroy"]
 layout_mode = 2
-text = "Skip Turn
+tooltip_text = "This only passes the build action. You can still summon mercenaries!"
+text = "Pass Turn
 "
 
 [node name="Queue" type="Button" parent="Game UI/LeftSideStates/Human Control/build or destroy"]
 layout_mode = 2
-text = "Buy Mercenaries"
+text = "Buy Mercenaries
+$20"
 
 [node name="Build OPtions" type="HBoxContainer" parent="Game UI/LeftSideStates/Human Control"]
 layout_mode = 1
@@ -212,21 +330,26 @@ grow_vertical = 2
 
 [node name="House" type="Button" parent="Game UI/LeftSideStates/Human Control/Build OPtions"]
 layout_mode = 2
-text = "House"
+text = "House
+$10"
 
 [node name="Cannon" type="Button" parent="Game UI/LeftSideStates/Human Control/Build OPtions"]
 layout_mode = 2
-text = "Cannon"
+text = "Cannon
+$10"
 
 [node name="Crossbow" type="Button" parent="Game UI/LeftSideStates/Human Control/Build OPtions"]
 layout_mode = 2
-text = "Crossbow"
+text = "Crossbow
+$8"
 
 [node name="Minigun" type="Button" parent="Game UI/LeftSideStates/Human Control/Build OPtions"]
 layout_mode = 2
-text = "Minigun"
+text = "Minigun
+$25"
 
 [node name="Mercenary Directions" type="HBoxContainer" parent="Game UI/LeftSideStates/Human Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -242,19 +365,19 @@ grow_vertical = 2
 
 [node name="N" type="Button" parent="Game UI/LeftSideStates/Human Control/Mercenary Directions"]
 layout_mode = 2
-text = "North"
+text = "North/Up"
 
 [node name="S" type="Button" parent="Game UI/LeftSideStates/Human Control/Mercenary Directions"]
 layout_mode = 2
-text = "South"
+text = "South/Down"
 
 [node name="W" type="Button" parent="Game UI/LeftSideStates/Human Control/Mercenary Directions"]
 layout_mode = 2
-text = "West"
+text = "West/Left"
 
 [node name="E" type="Button" parent="Game UI/LeftSideStates/Human Control/Mercenary Directions"]
 layout_mode = 2
-text = "East"
+text = "East/Right"
 
 [node name="RightSideStates" type="Control" parent="Game UI" node_paths=PackedStringArray("build_button", "destroy_button", "queue_button", "skip_turn", "merc_up", "merc_down", "merc_left", "merc_right", "house", "cannon", "minigun", "cross", "house_options", "mercenary_options")]
 layout_mode = 1
@@ -373,14 +496,17 @@ text = "Destroy"
 
 [node name="Skip" type="Button" parent="Game UI/RightSideStates/Human Control/build or destroy"]
 layout_mode = 2
-text = "Skip Turn
+tooltip_text = "This only passes the build action. You can still summon mercenaries!"
+text = "Pass Turn
 "
 
 [node name="Queue" type="Button" parent="Game UI/RightSideStates/Human Control/build or destroy"]
 layout_mode = 2
-text = "Buy Mercenaries"
+text = "Buy Mercenaries
+$20"
 
 [node name="Build OPtions" type="HBoxContainer" parent="Game UI/RightSideStates/Human Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -396,21 +522,26 @@ grow_vertical = 2
 
 [node name="House" type="Button" parent="Game UI/RightSideStates/Human Control/Build OPtions"]
 layout_mode = 2
-text = "House"
+text = "House
+$10"
 
 [node name="Cannon" type="Button" parent="Game UI/RightSideStates/Human Control/Build OPtions"]
 layout_mode = 2
-text = "Cannon"
+text = "Cannon
+$10"
 
 [node name="Crossbow" type="Button" parent="Game UI/RightSideStates/Human Control/Build OPtions"]
 layout_mode = 2
-text = "Crossbow"
+text = "Crossbow
+$8"
 
 [node name="Minigun" type="Button" parent="Game UI/RightSideStates/Human Control/Build OPtions"]
 layout_mode = 2
-text = "Minigun"
+text = "Minigun
+$25"
 
 [node name="Mercenary Directions" type="HBoxContainer" parent="Game UI/RightSideStates/Human Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -426,19 +557,19 @@ grow_vertical = 2
 
 [node name="N" type="Button" parent="Game UI/RightSideStates/Human Control/Mercenary Directions"]
 layout_mode = 2
-text = "North"
+text = "North/Up"
 
 [node name="S" type="Button" parent="Game UI/RightSideStates/Human Control/Mercenary Directions"]
 layout_mode = 2
-text = "South"
+text = "South/Down"
 
 [node name="W" type="Button" parent="Game UI/RightSideStates/Human Control/Mercenary Directions"]
 layout_mode = 2
-text = "West"
+text = "West/Left"
 
 [node name="E" type="Button" parent="Game UI/RightSideStates/Human Control/Mercenary Directions"]
 layout_mode = 2
-text = "East"
+text = "East/Right"
 
 [connection signal="PlayGame" from="Main Menu" to="." method="_on_main_menu_play_game"]
 [connection signal="Back" from="Human AI select" to="." method="_on_human_ai_select_back"]

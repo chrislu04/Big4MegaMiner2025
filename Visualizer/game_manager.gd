@@ -15,7 +15,7 @@ const PATH = preload("res://Assets/Base_Skin/path.png")
 const BLUE_RECRUIT = preload("uid://drwant6008fgr")
 const RED_RECRUIT = preload("uid://can1bceehb1qy")
 
-const ENEMY = preload("res://Assets/Topdown skin/enemy.png")
+const ENEMY = preload("res://objects/demon.tscn")
 
 const BASE = preload("res://Assets/Topdown skin/base.png")
 const CROSSBOW = preload("res://Assets/Topdown skin/crossbow.png")
@@ -56,10 +56,11 @@ var stdio : FileAccess
 var thread
 var stderr : FileAccess
 
+signal next_turn
 
 func _ready():
 	UI.action.connect(_on_ui_action)
-	
+	next_turn.connect(UI.on_next_turn)
 
 # Sets up the game visuals
 func _on_ui_start_game(is_ai1, is_ai2):
@@ -115,7 +116,7 @@ func _on_ui_start_game(is_ai1, is_ai2):
 func _draw_game_from_gamestate(game_state : String):
 	var game_state_json = JSON.parse_string(game_state)
 	current_game_state = game_state_json
-	
+	next_turn.emit()
 	if initial:
 		_draw_grid(game_state_json["FloorTiles"])
 		
@@ -221,7 +222,6 @@ func _draw_mercenaries(mercs : Array):
 				tween.tween_property(child, "position", Vector2(merc["x"] * 32, merc["y"] * 32), turn_interval_max)
 				tween.tween_callback(child.idle)
 			else:
-				if merc["Team"] == "r":
 					child.attack(Vector2(1,0))
 		
 		count += 1
@@ -256,22 +256,24 @@ func _draw_demons(dem_array : Array):
 	for dem in dem_array:
 		if demons.get_child_count() - 1 < count:
 			var pos = Vector2(dem["x"] * 32, dem["y"] * 32)
-			var sprite = Sprite2D.new()
+			var sprite : RedMerc = ENEMY.instantiate()
 			if dem["Team"] == "b":
 				sprite.flip_h = true
-				
-			sprite.texture = ENEMY
 			
 			sprite.position = pos
 			demons.add_child(sprite)
 		else:
-			var child : Sprite2D = demons.get_child(count)
+			var child : RedMerc = demons.get_child(count)
 			if dem["State"] == "dead":
 				child.free()
 				count -= 1
-			else:
+			elif dem["State"] == "moving":
 				var tween = get_tree().create_tween()
+				child.move(Vector2(1,0))
 				tween.tween_property(child, "position", Vector2(dem["x"] * 32, dem["y"] * 32), turn_interval_max)
+				tween.tween_callback(child.idle)
+			else:
+				child.attack(Vector2(1,0))
 		count += 1
 
 # Make this when the game backend is done

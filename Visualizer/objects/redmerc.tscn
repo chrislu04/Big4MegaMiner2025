@@ -1,10 +1,21 @@
-[gd_scene load_steps=7 format=3 uid="uid://can1bceehb1qy"]
+[gd_scene load_steps=9 format=3 uid="uid://can1bceehb1qy"]
 
 [ext_resource type="Texture2D" uid="uid://5mmb65nmr0do" path="res://Assets/HD_Skin/red_recruit.png" id="1_j4k6l"]
+[ext_resource type="Shader" uid="uid://26apgdhkxkk7" path="res://Assets/shaders/ghost.gdshader" id="1_pdytq"]
 [ext_resource type="Texture2D" uid="uid://c4r84kqb5tcjo" path="res://Assets/HD_Skin/red_recruit_attack1.png" id="2_pdytq"]
 [ext_resource type="Texture2D" uid="uid://c6ronmvklbw01" path="res://Assets/HD_Skin/red_recruit_attack2.png" id="3_l2s5v"]
 [ext_resource type="Texture2D" uid="uid://dkfkg704amuav" path="res://Assets/HD_Skin/red_recruit_walk.png" id="4_afwb0"]
 [ext_resource type="Script" uid="uid://bfrbgax5e2n1y" path="res://objects/redmerc.gd" id="5_wxhtm"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_l2s5v"]
+shader = ExtResource("1_pdytq")
+shader_parameter/lines = 100
+shader_parameter/color1 = Color(0, 0, 1, 1)
+shader_parameter/color2 = Color(1, 0, 0, 1)
+shader_parameter/speed = 0.0999999977648
+shader_parameter/alpha = 0.5999999865888
+shader_parameter/noise_amount = 0.05
+shader_parameter/effect_factor = 0.1999999955296
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_2fq0f"]
 animations = [{
@@ -43,6 +54,7 @@ animations = [{
 }]
 
 [node name="RedMerc" type="AnimatedSprite2D"]
+material = SubResource("ShaderMaterial_l2s5v")
 sprite_frames = SubResource("SpriteFrames_2fq0f")
 animation = &"attack"
 autoplay = "default"
