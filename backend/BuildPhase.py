@@ -41,6 +41,10 @@ def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -
     money = game_state.money_r if is_red_player else game_state.money_b
     
     # Validate placement
+    if game_state.is_out_of_bounds(x,y):
+        log_msg(f"{player_name} player tried to build out-of-bounds at ({x}, {y})")
+        return
+
     if game_state.floor_tiles[y][x] != territory_marker:
         log_msg(f"{player_name} player tried to build outside their territory at ({x}, {y})")
         return
@@ -80,6 +84,10 @@ def _destroy_tower(game_state: GameState, action: AIAction, is_red_player: bool)
     player_name = "Red" if is_red_player else "Blue"
     
     # Validate destruction
+    if game_state.is_out_of_bounds(x,y):
+        log_msg(f"{player_name} player tried to destroy out-of-bounds at ({x}, {y})")
+        return
+
     if game_state.floor_tiles[y][x] != territory_marker:
         log_msg(f"{player_name} player tried to destroy tower outside their territory at ({x}, {y})")
         return
