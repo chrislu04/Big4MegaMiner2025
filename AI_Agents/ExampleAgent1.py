@@ -71,8 +71,8 @@ def get_available_queue_directions(game_state: dict, team_color: str) -> list:
     offsets = {
         (0, -1): "N",
         (0, 1): "S",
-        (1, 0): "E",
-        (-1, 0): "W"
+        (1, 0): "W",
+        (-1, 0): "E"
     }
 
     for offset in offsets.keys():
