@@ -36,7 +36,7 @@ class Game:
     # Perform updates to GameState based on two AI Actions
     def run_turn(self, action_r: AIAction, action_b: AIAction):
         
-        log_msg(f"-- TURN: {Constants.MAX_TURNS - self.game_state.turns_remaining}, REMAINING TURNS: {self.game_state.turns_remaining}--")
+        log_msg(f"-- TURN: {Constants.MAX_TURNS - self.game_state.turns_remaining}, REMAINING TURNS: {self.game_state.turns_remaining}, BLUE: ${self.game_state.money_b}, RED: {self.game_state.money_r} $--")
         buy_mercenary_phase(self.game_state, action_r, action_b)
         build_tower_phase(self.game_state, action_r, action_b)
         world_update_phase(self.game_state)
