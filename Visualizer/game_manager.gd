@@ -1,6 +1,7 @@
 extends Node2D
 
 
+const BLOOD_SPLATTER_FX = preload("res://objects/big_blood_splatter.tscn")
 
 const GRASS_RED_TEX = preload("res://Assets/HD_Skin/grass_red.png")
 const GRASS_BLUE_TEX = preload("res://Assets/HD_Skin/grass_blue.png")
@@ -217,6 +218,9 @@ func _draw_mercenaries(mercs : Array):
 				child._update_values(merc["Name"], merc["Health"])
 			
 			if merc["State"] == "dead":
+				var blood_splatter_effect = BLOOD_SPLATTER_FX.instantiate()
+				blood_splatter_effect.position = child.global_position
+				add_child(blood_splatter_effect)
 				child.free()
 				count -= 1
 			elif merc["State"] == "moving":

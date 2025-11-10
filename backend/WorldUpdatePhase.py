@@ -81,7 +81,7 @@ def check_wincon(game_state: GameState):
         b_towers = []
 
         for tower in towers:
-            current_team = tower.team_color
+            current_team = tower.team
             if current_team == 'r':
                 r_towers.append(tower)
             else:
@@ -99,7 +99,7 @@ def check_wincon(game_state: GameState):
             b_total_cost = 0
 
             for tower in r_towers:
-                current_team = tower.team_color
+                current_team = tower.team
 
                 if isinstance(tower, House):
                     if current_team == 'r':

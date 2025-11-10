@@ -12,12 +12,17 @@ class Crossbow(Tower):
             Constants.CROSSBOW_MAX_COOLDOWN,
             Constants.CROSSBOW_RANGE,
             Constants.CROSSBOW_DAMAGE,
-            game_state.minigun_price,
             game_state
         )
 
-        game_state.crossbow_price = get_increased_tower_price(game_state.crossbow_price, Constants.TOWER_PRICE_PERCENT_INCREASE_PER_BUY)
-
+    def get_price(self, game_state: GameState, team_color: str):
+        return (game_state.crossbow_price_r if team_color == "r" else game_state.crossbow_price_b)
+        
+    def increase_price(self, game_state: GameState, team_color: str):
+        if team_color == "r":
+            game_state.crossbow_price_r = get_increased_tower_price(game_state.crossbow_price_r, Constants.TOWER_PRICE_PERCENT_INCREASE_PER_BUY)
+        else:
+            game_state.crossbow_price_b = get_increased_tower_price(game_state.crossbow_price_b, Constants.TOWER_PRICE_PERCENT_INCREASE_PER_BUY)
         self.name = select_tower_name('CR', self.team)
     
     def tower_activation(self, game_state: GameState):

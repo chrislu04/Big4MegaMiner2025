@@ -12,14 +12,20 @@ class House(Tower):
             Constants.HOUSE_MAX_COOLDOWN,
             Constants.HOUSE_RANGE,
             Constants.MINIGUN_DAMAGE, # "I would be dangerous, I just don't FEEL like it!"
-            game_state.house_price,
             game_state
         )
 
-        game_state.house_price = get_increased_tower_price(game_state.house_price, Constants.TOWER_PRICE_PERCENT_INCREASE_PER_BUY)
-
         self.angle = 0
         self.name = select_tower_name('H', self.team)
+
+    def get_price(self, game_state: GameState, team_color: str):
+        return (game_state.house_price_r if team_color == "r" else game_state.house_price_b)
+
+    def increase_price(self, game_state: GameState, team_color: str):
+        if team_color == "r":
+            game_state.house_price_r = get_increased_tower_price(game_state.house_price_r, Constants.TOWER_PRICE_PERCENT_INCREASE_PER_BUY)
+        else:
+            game_state.house_price_b = get_increased_tower_price(game_state.house_price_b, Constants.TOWER_PRICE_PERCENT_INCREASE_PER_BUY)
     
     def update(self, game_state):
         if self.current_cooldown > 0:

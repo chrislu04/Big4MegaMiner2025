@@ -17,7 +17,6 @@ class Tower(Entity):
         cooldown: int,
         range : int,
         attack_pow : int,
-        price: int,
         game_state: GameState
     ):
         super().__init__(1,x,y)
@@ -25,7 +24,6 @@ class Tower(Entity):
         self.current_cooldown = self.cooldown_max
         self.tower_range = range
         self.attack_pow = attack_pow
-        self.price = price
         # self.angle = 0
 
         self.targets = [] ##Keep track of all the positions it's targeting, instead of the angle
@@ -45,6 +43,12 @@ class Tower(Entity):
             self.targets = []
         else:
             self.tower_activation(game_state)
+
+    def increase_price(self, game_state: GameState, team_color: str):
+        pass
+
+    def get_price(game_state: GameState):
+        pass
     
 
     def tower_activation(self, game_state: GameState):

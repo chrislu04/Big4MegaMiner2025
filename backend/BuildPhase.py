@@ -56,9 +56,9 @@ def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -
     # Create the tower
     tower = _create_tower(action.tower_type, x, y, territory_marker, game_state)
     if tower is None: return
-    
+
     # Check money
-    if money < tower.price:
+    if money < tower.get_price(game_state, territory_marker):
         log_msg(f"{player_name} player doesn't have enough money to build {action.tower_type} (costs {tower.price}, has {money})")
         return
     
@@ -68,9 +68,11 @@ def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -
     
     # Deduct money
     if is_red_player:
-        game_state.money_r -= tower.price
+        game_state.money_r -= tower.get_price(game_state, territory_marker)
     else:
-        game_state.money_b -= tower.price
+        game_state.money_b -= tower.get_price(game_state, territory_marker)
+
+    tower.increase_price(game_state, "r" if is_red_player else "b")
     
     log_msg(f"{player_name} built a {action.tower_type} tower at ({x},{y})")
 
