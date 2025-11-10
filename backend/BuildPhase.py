@@ -36,7 +36,7 @@ def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -
     x, y = action.x, action.y
     
     # Get player-specific data
-    territory_marker = "r" if is_red_player else "b"
+    current_team = "r" if is_red_player else "b"
     player_name = "Red" if is_red_player else "Blue"
     money = game_state.money_r if is_red_player else game_state.money_b
     
@@ -45,7 +45,7 @@ def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -
         log_msg(f"{player_name} player tried to build out-of-bounds at ({x}, {y})")
         return
 
-    if game_state.floor_tiles[y][x] != territory_marker:
+    if game_state.floor_tiles[y][x] != current_team:
         log_msg(f"{player_name} player tried to build outside their territory at ({x}, {y})")
         return
     
@@ -54,12 +54,12 @@ def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -
         return
     
     # Create the tower
-    tower = _create_tower(action.tower_type, x, y, territory_marker, game_state)
+    tower = _create_tower(action.tower_type, x, y, current_team, game_state)
     if tower is None: return
 
     # Check money
-    if money < tower.get_price(game_state, territory_marker):
-        log_msg(f"{player_name} player doesn't have enough money to build {action.tower_type} (costs {tower.price}, has {money})")
+    if money < tower.get_price(game_state, current_team):
+        log_msg(f"{player_name} player doesn't have enough money to build {action.tower_type} (costs {tower.get_price(game_state, current_team)}, has {money})")
         return
     
     # Build the tower
@@ -68,9 +68,9 @@ def _build_tower(game_state: GameState, action: AIAction, is_red_player: bool) -
     
     # Deduct money
     if is_red_player:
-        game_state.money_r -= tower.get_price(game_state, territory_marker)
+        game_state.money_r -= tower.get_price(game_state, current_team)
     else:
-        game_state.money_b -= tower.get_price(game_state, territory_marker)
+        game_state.money_b -= tower.get_price(game_state, current_team)
 
     tower.increase_price(game_state, "r" if is_red_player else "b")
     
@@ -82,7 +82,7 @@ def _destroy_tower(game_state: GameState, action: AIAction, is_red_player: bool)
     x, y = action.x, action.y
     
     # Get player-specific data
-    territory_marker = "r" if is_red_player else "b"
+    current_team = "r" if is_red_player else "b"
     player_name = "Red" if is_red_player else "Blue"
     
     # Validate destruction
@@ -90,7 +90,7 @@ def _destroy_tower(game_state: GameState, action: AIAction, is_red_player: bool)
         log_msg(f"{player_name} player tried to destroy out-of-bounds at ({x}, {y})")
         return
 
-    if game_state.floor_tiles[y][x] != territory_marker:
+    if game_state.floor_tiles[y][x] != current_team:
         log_msg(f"{player_name} player tried to destroy tower outside their territory at ({x}, {y})")
         return
     
@@ -104,7 +104,7 @@ def _destroy_tower(game_state: GameState, action: AIAction, is_red_player: bool)
         return
     
     # Destroy the tower
-    refund = tower.price // 2
+    refund = tower.get_price(game_state, current_team) // 2
     game_state.towers.remove(tower)
     game_state.entity_grid[y][x] = None
     
