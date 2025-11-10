@@ -1,10 +1,10 @@
 extends Control
 
 
-const CANNON : Texture = preload("uid://px2v73fj7qag")
-const HOUSE = preload("uid://bciq54f3p3yiw")
-const CROSSBOW_FIRE = preload("uid://b4dqo57cak8b5")
-const GATLING = preload("uid://2cfukvxbe1ah")
+const CANNON : Texture = preload("res://Assets/HD_Skin/cannon/cannon.png")
+const HOUSE = preload("res://Assets/HD_Skin/house/house.png")
+const CROSSBOW_FIRE = preload("res://Assets/HD_Skin/crossbow/crossbow.png")
+const GATLING = preload("res://Assets/HD_Skin/gatling/gatling.png")
 
 const GHOST = preload("res://Assets/shaders/ghost.gdshader")
 

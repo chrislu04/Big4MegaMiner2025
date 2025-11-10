@@ -19,9 +19,9 @@ const ENEMY = preload("res://objects/demon.tscn")
 
 const BASE = preload("res://Assets/Topdown skin/base.png")
 const CROSSBOW = preload("res://Assets/Topdown skin/crossbow.png")
-const CANNON = preload("uid://px2v73fj7qag")
+const CANNON = preload("res://Assets/HD_Skin/cannon/cannon.png")
 const GATLING = preload("uid://2cfukvxbe1ah")
-const HOUSE = preload("uid://bciq54f3p3yiw")
+const HOUSE = preload("res://Assets/HD_Skin/house/house.png")
 
 const RED_CASTLE : Texture = preload("res://Assets/HD_Skin/base.svg")
 
