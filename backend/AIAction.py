@@ -18,6 +18,7 @@ class AIAction:
         - "cannon"
         - "minigun"
         - "house"
+        - "church"
     
     Examples:
         AIAction("build", 5, 3, "cannon")

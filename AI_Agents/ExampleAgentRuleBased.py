@@ -23,6 +23,7 @@ class AIAction:
         - "cannon"
         - "minigun"
         - "house"
+        - "church"
     
     Examples:
         AIAction("build", 5, 3, "cannon")
@@ -151,6 +152,7 @@ class Agent:
                     'cannon',
                     'crossbow',
                     'minigun',
+                    'church',
                 ]
                 tower = random.choice(tower_choices)
                 tower_x, tower_y = random.choice(build_spaces)

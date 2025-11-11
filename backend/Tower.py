@@ -55,7 +55,7 @@ class Tower(Entity):
     def tower_activation(self, game_state: GameState):
         log_msg("Unimplemented tower_activation function!") # override in subclass
 
-    def buff_nearby_targets(self, dmg_buff, health_buff, game_state: GameState):
+    def buff_nearby_targets(self, game_state: GameState):
         buffed_targets = []
         health_buff = Constants.CHURCH_BUFF_HEALTH
         dmg_buff = Constants.CHURCH_BUFF_DAMAGE
@@ -73,11 +73,11 @@ class Tower(Entity):
 
                 buffed_targets.append((whats_on_path.x, whats_on_path.y))
                 log_msg(f'Tower {self.name} buffed {whats_on_path.name} for {health_buff} health and {dmg_buff} damage')
-            
-            self.current_cooldown = self.cooldown_max
         
         if len(buffed_targets) != 0:
             self.last_buffed_targets = buffed_targets
+            self.current_cooldown = self.cooldown_max
+
 
     def damage_adjacent_targets(self, attack_pow, team, target, game_state: GameState):
         ahead_pos = target.get_adjacent_path_tile(game_state, +1)
