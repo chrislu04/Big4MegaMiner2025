@@ -7,10 +7,10 @@ const GRASS_RED_TEX = preload("res://Assets/HD_Skin/grass_red.png")
 const GRASS_BLUE_TEX = preload("res://Assets/HD_Skin/grass_blue.png")
 const PATH_TEX = preload("res://Assets/HD_Skin/path.png")
 
-const ALT_GRASS = preload("res://Assets/Base_Skin/alt_grass.png")
-const ALT_PATH = preload("res://Assets/Base_Skin/alt_path.png")
-const GRASS = preload("res://Assets/Base_Skin/grass.png")
-const PATH = preload("res://Assets/Base_Skin/path.png")
+#const ALT_GRASS = preload("res://Assets/Base_Skin/alt_grass.png")
+#const ALT_PATH = preload("res://Assets/Base_Skin/alt_path.png")
+#const GRASS = preload("res://Assets/Base_Skin/grass.png")
+#const PATH = preload("res://Assets/Base_Skin/path.png")
 
 
 const BLUE_RECRUIT = preload("uid://drwant6008fgr")
@@ -18,7 +18,7 @@ const RED_RECRUIT = preload("uid://can1bceehb1qy")
 
 const ENEMY = preload("res://objects/demon.tscn")
 
-const BASE = preload("res://Assets/Topdown skin/base.png")
+#const BASE = preload("res://Assets/Topdown skin/base.png")
 const CROSSBOW = preload("uid://bnt0ip21bpu2p")
 const CANNON = preload("uid://px2v73fj7qag")
 
@@ -237,7 +237,6 @@ func _draw_mercenaries(mercs : Array):
 func _draw_towers(data_towers : Array):
 	print(data_towers)
 	
-	
 	var count = 0
 	for tower in data_towers:
 		if towers.get_child_count() - 1 < count:
@@ -276,8 +275,10 @@ func _draw_towers(data_towers : Array):
 			var tween = get_tree().create_tween()
 			for target in tower["Targets"]:
 				tween.tween_property(child, "rotation", 
-				Vector2(tower["x"],tower["y"]).angle_to(Vector2(target[0],target[1])), turn_interval_max / 2.0
+				Vector2(tower["x"],tower["y"]).angle_to(Vector2(target[0],target[1])) + deg_to_rad(90), turn_interval_max / 2.0
 				)
+				if child is Crossbow:
+					tween.tween_callback(child.shoot.bind(turn_interval_max / 2))
 		count += 1
 	
 	

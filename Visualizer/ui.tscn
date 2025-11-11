@@ -1,9 +1,21 @@
-[gd_scene load_steps=10 format=3 uid="uid://csts2io3jxnsy"]
+[gd_scene load_steps=23 format=3 uid="uid://csts2io3jxnsy"]
 
 [ext_resource type="Script" uid="uid://cqig607puff42" path="res://Scripts/UI/ui.gd" id="1_ibotj"]
 [ext_resource type="PackedScene" uid="uid://ce78d0fluy0rq" path="res://main_menu.tscn" id="2_ibotj"]
 [ext_resource type="PackedScene" uid="uid://brguepel0j1o4" path="res://human_ai_select.tscn" id="3_27fn8"]
+[ext_resource type="Texture2D" uid="uid://d4bbo73qm11li" path="res://Assets/UI/timer_rays.png" id="4_7rqds"]
 [ext_resource type="Script" uid="uid://uq0520028lh7" path="res://Scripts/right_side_states.gd" id="4_nltto"]
+[ext_resource type="FontFile" uid="uid://detd1i5on3er0" path="res://Assets/fonts/Deutsch.ttf" id="5_gs482"]
+[ext_resource type="Texture2D" uid="uid://1ha11mbduaej" path="res://Assets/UI/health_empty.png" id="5_irxef"]
+[ext_resource type="Texture2D" uid="uid://m22ia0wolt6" path="res://Assets/UI/money.png" id="5_n5rqp"]
+[ext_resource type="Script" uid="uid://cretchymjo67h" path="res://Scripts/UI/sun_spin.gd" id="5_nvb2n"]
+[ext_resource type="Texture2D" uid="uid://db1jhrdqw64es" path="res://Assets/UI/button_build.png" id="5_waa4j"]
+[ext_resource type="Texture2D" uid="uid://bcylyd5jykq4a" path="res://Assets/UI/health_fill.png" id="6_e2l4f"]
+[ext_resource type="Texture2D" uid="uid://ca10le8pj4jjx" path="res://Assets/UI/button_destroy.png" id="6_ok7cu"]
+[ext_resource type="Texture2D" uid="uid://du7u65g41ygo2" path="res://Assets/UI/timer_bg.png" id="6_os5c7"]
+[ext_resource type="Texture2D" uid="uid://bu2mjp1eaeewo" path="res://Assets/UI/timer_base.png" id="7_b2p7n"]
+[ext_resource type="Texture2D" uid="uid://c1qt6xchirphw" path="res://Assets/UI/button_pass.png" id="7_irxef"]
+[ext_resource type="Texture2D" uid="uid://bqnsnmj8r6608" path="res://Assets/UI/button_hire_red.png" id="8_e2l4f"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ibotj"]
 
@@ -94,6 +106,8 @@ _data = {
 &"blue side glow": SubResource("Animation_y4yjw"),
 &"red Side glow": SubResource("Animation_nltto")
 }
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_irxef"]
 
 [node name="UI" type="CanvasLayer"]
 script = ExtResource("1_ibotj")
@@ -189,6 +203,32 @@ text = "Red Player's Turn
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="PanelContainer" type="Control" parent="Game UI/Turns"]
+self_modulate = Color(1, 1, 1, 0)
+anchors_preset = 0
+offset_left = 16.0
+offset_top = 64.0
+offset_right = 528.0
+offset_bottom = 576.0
+scale = Vector2(0.25, 0.25)
+
+[node name="TextureRect" type="TextureRect" parent="Game UI/Turns/PanelContainer"]
+layout_mode = 0
+offset_right = 512.0
+offset_bottom = 512.0
+pivot_offset = Vector2(256, 256)
+texture = ExtResource("4_7rqds")
+script = ExtResource("5_nvb2n")
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="Game UI/Turns/PanelContainer"]
+layout_mode = 0
+offset_right = 512.0
+offset_bottom = 512.0
+value = 70.0
+fill_mode = 5
+texture_under = ExtResource("6_os5c7")
+texture_progress = ExtResource("7_b2p7n")
+
 [node name="LeftSideStates" type="Control" parent="Game UI" node_paths=PackedStringArray("build_button", "destroy_button", "queue_button", "skip_turn", "merc_up", "merc_down", "merc_left", "merc_right", "house", "cannon", "minigun", "cross", "house_options", "mercenary_options")]
 layout_mode = 1
 anchor_right = 0.5
@@ -214,44 +254,53 @@ mercenary_options = NodePath("Human Control/Mercenary Directions")
 
 [node name="Money" type="Panel" parent="Game UI/LeftSideStates"]
 layout_mode = 1
-offset_right = 104.0
+offset_right = 248.0
 offset_bottom = 64.0
 
 [node name="Money" type="Label" parent="Game UI/LeftSideStates/Money"]
+modulate = Color(0, 0.627451, 0.21176471, 1)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -21.0
-offset_top = -11.5
-offset_right = 21.0
-offset_bottom = 11.5
+offset_left = -52.0
+offset_top = -16.0
+offset_right = 85.0
+offset_bottom = 33.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "Money"
+theme_override_fonts/font = ExtResource("5_gs482")
+theme_override_font_sizes/font_size = 48
+text = "1004"
+
+[node name="TextureRect" type="TextureRect" parent="Game UI/LeftSideStates/Money"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+texture = ExtResource("5_n5rqp")
+expand_mode = 1
 
 [node name="Health" type="Panel" parent="Game UI/LeftSideStates"]
+self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 offset_left = 152.0
 offset_right = 256.0
 offset_bottom = 64.0
 
-[node name="Health" type="Label" parent="Game UI/LeftSideStates/Health"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -21.0
-offset_top = -11.5
-offset_right = 21.0
-offset_bottom = 11.5
-grow_horizontal = 2
-grow_vertical = 2
-text = "Base Health"
+[node name="TextureProgressBar" type="TextureProgressBar" parent="Game UI/LeftSideStates/Health"]
+material = SubResource("ShaderMaterial_irxef")
+layout_mode = 0
+offset_left = -96.0
+offset_top = 88.0
+offset_right = 1440.0
+offset_bottom = 344.0
+scale = Vector2(0.25, 0.25)
+value = 100.0
+texture_under = ExtResource("5_irxef")
+texture_progress = ExtResource("6_e2l4f")
+tint_progress = Color(1, 0.003921569, 0, 1)
 
 [node name="TeamName" type="Panel" parent="Game UI/LeftSideStates"]
 layout_mode = 1
@@ -275,7 +324,6 @@ grow_vertical = 2
 text = "Team: "
 
 [node name="Human Control" type="Control" parent="Game UI/LeftSideStates"]
-visible = false
 layout_mode = 1
 anchor_top = 0.79
 anchor_right = 0.986
@@ -289,30 +337,38 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -164.05597
+offset_left = -76.05597
 offset_top = 16.0
-offset_right = 183.94403
+offset_right = 99.94409
 offset_bottom = 56.0
 grow_horizontal = 2
+theme_override_constants/separation = 8
 
 [node name="Build" type="Button" parent="Game UI/LeftSideStates/Human Control/build or destroy"]
 layout_mode = 2
-text = "Build"
+theme_override_constants/icon_max_width = 32
+icon = ExtResource("5_waa4j")
+icon_alignment = 1
 
 [node name="Destroy" type="Button" parent="Game UI/LeftSideStates/Human Control/build or destroy"]
 layout_mode = 2
-text = "Destroy"
+theme_override_constants/icon_max_width = 32
+icon = ExtResource("6_ok7cu")
 
 [node name="Skip" type="Button" parent="Game UI/LeftSideStates/Human Control/build or destroy"]
 layout_mode = 2
 tooltip_text = "This only passes the build action. You can still summon mercenaries!"
-text = "Pass Turn
+theme_override_constants/icon_max_width = 32
+text = "
 "
+icon = ExtResource("7_irxef")
 
 [node name="Queue" type="Button" parent="Game UI/LeftSideStates/Human Control/build or destroy"]
 layout_mode = 2
-text = "Buy Mercenaries
-$20"
+theme_override_constants/icon_max_width = 32
+text = "$20"
+icon = ExtResource("8_e2l4f")
+icon_alignment = 1
 
 [node name="Build OPtions" type="HBoxContainer" parent="Game UI/LeftSideStates/Human Control"]
 layout_mode = 1
@@ -380,6 +436,7 @@ layout_mode = 2
 text = "East/Right"
 
 [node name="RightSideStates" type="Control" parent="Game UI" node_paths=PackedStringArray("build_button", "destroy_button", "queue_button", "skip_turn", "merc_up", "merc_down", "merc_left", "merc_right", "house", "cannon", "minigun", "cross", "house_options", "mercenary_options")]
+visible = false
 layout_mode = 1
 anchor_right = 0.5
 anchor_bottom = 0.988
