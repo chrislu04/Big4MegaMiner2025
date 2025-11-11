@@ -280,7 +280,7 @@ func _draw_towers(data_towers : Array):
 				child.free()
 				child = towers.get_child(count)
 			var tween = get_tree().create_tween()
-			for target in tower["Targets"]:
+			for target in tower["Targets"] and tower["Type"] != "Church":
 				tween.tween_property(child, "rotation", 
 				Vector2(tower["x"],tower["y"]).angle_to(Vector2(target[0],target[1])) + deg_to_rad(90), turn_interval_max / 2.0
 				)
