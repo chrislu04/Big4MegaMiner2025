@@ -1,23 +1,23 @@
 {
     "FloorTiles": [
-        "bbbbbbbbbbb           rrrrrrrrrrr",
-        "bbbbbbbbbbb           rrrrrrrrrrr",
-        "bbbbbOOOOOOOOOOOOOOOOOOOOOOOrrrrr",
-        "bbbbbObbbbb           rrrrrOrrrrr",
-        "bbbbbObbbbb           rrrrrOrrrrr",
-        "bbbbbOOOOOOOOOOOOOOOOOOOOOOOrrrrr",
-        "bbbbbObbbbb           rrrrrOrrrrr",
-        "bbbbbObbbbb           rrrrrOrrrrr",
-        "bbbbbOOOOOOOOOOOOOOOOOOOOOOOrrrrr",
-        "bbbbbbbbbbb           rrrrrrrrrrr",
-        "bbbbbbbbbbb           rrrrrrrrrrr"
+        "rrrrrrrrrrr           bbbbbbbbbbb",
+        "rrrrrrrrrrr           bbbbbbbbbbb",
+        "rrrrrOOOOOOOOOOOOOOOOOOOOOOObbbbb",
+        "rrrrrOrrrrr           bbbbbObbbbb",
+        "rrrrrOrrrrr           bbbbbObbbbb",
+        "rrrrrOOOOOOOOOOOOOOOOOOOOOOObbbbb",
+        "rrrrrOrrrrr           bbbbbObbbbb",
+        "rrrrrOrrrrr           bbbbbObbbbb",
+        "rrrrrOOOOOOOOOOOOOOOOOOOOOOObbbbb",
+        "rrrrrrrrrrr           bbbbbbbbbbb",
+        "rrrrrrrrrrr           bbbbbbbbbbb"
     ],
     "PlayerBaseR": {
-        "x": 27,
+        "x": 5,
         "y": 5
     },
     "PlayerBaseB": {
-        "x": 5,
+        "x": 27,
         "y": 5
     },
     "DemonSpawners": [
