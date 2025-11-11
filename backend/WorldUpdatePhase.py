@@ -9,6 +9,7 @@ from SpawnDemons import spawn_demons
 from House import House
 from Cannon import Cannon
 from Minigun import Minigun
+from Church import Church
 from Utils import log_msg
 import Constants
 from Entity import Entity
@@ -103,24 +104,29 @@ def check_wincon(game_state: GameState):
 
                 if isinstance(tower, House):
                     if current_team == 'r':
-                        r_total_cost += Constants.HOUSE_PRICE
+                        r_total_cost += Constants.HOUSE_BASE_PRICE
                     else:
-                        b_total_cost += Constants.HOUSE_PRICE
+                        b_total_cost += Constants.HOUSE_BASE_PRICE
                 elif isinstance(tower, Cannon):
                     if current_team == 'r':
-                        r_total_cost += Constants.CANNON_PRICE
+                        r_total_cost += Constants.CANNON_BASE_PRICE
                     else:
-                        b_total_cost += Constants.CANNON_PRICE
+                        b_total_cost += Constants.CANNON_BASE_PRICE
                 elif isinstance(tower, Minigun):
                     if current_team == 'r':
-                        r_total_cost += Constants.MINIGUN_PRICE
+                        r_total_cost += Constants.MINIGUN_BASE_PRICE
                     else:
-                        b_total_cost += Constants.MINIGUN_PRICE
+                        b_total_cost += Constants.MINIGUN_BASE_PRICE
+                elif isinstance(tower, Church):
+                    if current_team == 'r':
+                        r_total_cost += Constants.CHURCH_BASE_PRICE
+                    else:
+                        b_total_cost += Constants.CHURCH_BASE_PRICE
                 else:   # Crossbow
                     if current_team == 'r':
-                        r_total_cost += Constants.CROSSBOW_PRICE
+                        r_total_cost += Constants.CROSSBOW_BASE_PRICE
                     else:
-                        b_total_cost += Constants.CROSSBOW_PRICE
+                        b_total_cost += Constants.CROSSBOW_BASE_PRICE
             if r_total_cost != b_total_cost:
                 if r_total_cost > b_total_cost:
                     return 'r'
