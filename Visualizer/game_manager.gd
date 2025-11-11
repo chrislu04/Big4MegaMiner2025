@@ -20,6 +20,12 @@ const GATLING = preload("res://Assets/HD_Skin/gatling/gatling.png")
 const HOUSE = preload("res://Assets/HD_Skin/house/house.png")
 const CHURCH = preload("res://Assets/HD_Skin/church/church.png")
 
+const BLUE_CROSSBOW = preload("res://Assets/HD_Skin/crossbow/blue_crossbow.png")
+const BLUE_CANNON = preload("res://Assets/HD_Skin/cannon/blue_cannon.png")
+const BLUE_GATLING = preload("res://Assets/HD_Skin/gatling/blue_gatling.png")
+const BLUE_HOUSE = preload("res://Assets/HD_Skin/house/blue_house.png")
+const BLUE_CHURCH = preload("res://Assets/HD_Skin/church/blue_church.png")
+
 const RED_CASTLE : Texture = preload("res://Assets/HD_Skin/Red_base.png")
 const BLUE_CASTLE: Texture = preload("res://Assets/HD_Skin/Blue_base.png")
 
@@ -257,27 +263,27 @@ func _draw_towers(data_towers : Array):
 			match tower["Type"]:
 				"Crossbow":
 					sprite = Sprite2D.new()
-					sprite.texture = CROSSBOW
+					sprite.texture = CROSSBOW if tower["Team"] == "r" else BLUE_CROSSBOW
 					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
 					sprite.y_sort_enabled = true
 				"Cannon":
 					sprite = Sprite2D.new()
-					sprite.texture = CANNON
+					sprite.texture = CANNON if tower["Team"] == "r" else BLUE_CANNON
 					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
 					sprite.y_sort_enabled = true
 				"Minigun":
 					sprite = Sprite2D.new()
-					sprite.texture = GATLING
+					sprite.texture = GATLING if tower["Team"] == "r" else BLUE_GATLING
 					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
 					sprite.y_sort_enabled = true
 				"House":
 					sprite = Sprite2D.new()
-					sprite.texture = HOUSE
+					sprite.texture = HOUSE if tower["Team"] == "r" else BLUE_HOUSE
 					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
 					sprite.y_sort_enabled = true
 				"Church":
 					sprite = Sprite2D.new()
-					sprite.texture = CHURCH
+					sprite.texture = CHURCH if tower["Team"] == "r" else BLUE_CHURCH
 					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
 					sprite.y_sort_enabled = true
 			
