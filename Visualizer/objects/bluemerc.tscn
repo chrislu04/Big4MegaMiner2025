@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cnl127c04hhti" path="res://Assets/HD_Skin/blue_recruit_attack2.png" id="3_88mlc"]
 [ext_resource type="Texture2D" uid="uid://du04fdl6wqxli" path="res://Assets/HD_Skin/blue_recruit_walk.png" id="4_1pbvo"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_5tm6n"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_giles"]
 animations = [{
 "frames": [{
 "duration": 1.0,
@@ -20,7 +20,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"attack",
-"speed": 2.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -39,7 +39,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"walk",
-"speed": 2.0
+"speed": 6.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j4k6l"]
@@ -55,7 +55,7 @@ sprite_anim = NodePath("Sprite")
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -7)
 scale = Vector2(0.125, 0.125)
-sprite_frames = SubResource("SpriteFrames_5tm6n")
+sprite_frames = SubResource("SpriteFrames_giles")
 animation = &"walk"
 
 [node name="MouseDetect" type="Area2D" parent="."]
