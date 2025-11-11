@@ -4,3 +4,4 @@ __pycache__/
 /android/
 *.pkl
 log.txt
+*png.import
