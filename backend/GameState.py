@@ -22,11 +22,13 @@ class GameState:
         self.cannon_price_b = Constants.CANNON_BASE_PRICE
         self.house_price_b = Constants.HOUSE_BASE_PRICE
         self.minigun_price_b = Constants.MINIGUN_BASE_PRICE
+        self.church_price_b = Constants.CHURCH_BASE_PRICE
         
         self.crossbow_price_r = Constants.CROSSBOW_BASE_PRICE
         self.cannon_price_r = Constants.CANNON_BASE_PRICE
         self.house_price_r = Constants.HOUSE_BASE_PRICE
         self.minigun_price_r = Constants.MINIGUN_BASE_PRICE
+        self.church_price_r = Constants.CHURCH_BASE_PRICE
 
         # use this to increase demon health per spawn
         self.demon_spawner_activation_count = 0

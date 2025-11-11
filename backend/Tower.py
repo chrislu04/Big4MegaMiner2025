@@ -1,5 +1,6 @@
 import math
 import random
+import Constants
 
 from Entity import Entity
 from Mercenary import Mercenary
@@ -53,6 +54,30 @@ class Tower(Entity):
 
     def tower_activation(self, game_state: GameState):
         log_msg("Unimplemented tower_activation function!") # override in subclass
+
+    def buff_nearby_targets(self, dmg_buff, health_buff, game_state: GameState):
+        buffed_targets = []
+        health_buff = Constants.CHURCH_BUFF_HEALTH
+        dmg_buff = Constants.CHURCH_BUFF_DAMAGE
+
+        for path in self.path:
+            whats_on_path = game_state.entity_grid[path[1]][path[0]]
+
+            if whats_on_path is None: continue
+            if (isinstance(whats_on_path, Mercenary) and whats_on_path.team == self.team):
+
+                whats_on_path.health = Constants.MERCENARY_INITIAL_HEALTH + health_buff
+                whats_on_path.attack_pow = Constants.MERCENARY_ATTACK_POWER + dmg_buff
+                self.targets.append((whats_on_path.x, whats_on_path.y))
+                # self.angle = math.atan2(path[1] - self.y, path[0] - self.x)
+
+                buffed_targets.append((whats_on_path.x, whats_on_path.y))
+                log_msg(f'Tower {self.name} buffed {whats_on_path.name} for {health_buff} health and {dmg_buff} damage')
+            
+            self.current_cooldown = self.cooldown_max
+        
+        if len(buffed_targets) != 0:
+            self.last_buffed_targets = buffed_targets
 
     def damage_adjacent_targets(self, attack_pow, team, target, game_state: GameState):
         ahead_pos = target.get_adjacent_path_tile(game_state, +1)

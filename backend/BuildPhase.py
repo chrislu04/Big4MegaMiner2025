@@ -5,6 +5,7 @@ from Cannon import Cannon
 from Crossbow import Crossbow
 from House import House
 from Minigun import Minigun
+from Church import Church
 from Utils import log_msg
 
 # Phase 1: Build or Destroy Towers
@@ -129,6 +130,8 @@ def _create_tower(tower_type: str, x: int, y: int, team_color: str, game_state: 
         return Minigun(x, y, team_color, game_state)
     elif tower_type == "crossbow":
         return Crossbow(x, y, team_color, game_state)
+    elif tower_type == "church":
+        return Church(x, y, team_color, game_state)
     else:
         team_name = 'Red' if team_color == 'r' else 'Blue'
         log_msg(f"{team_name} team tried to build an invalid type of tower: {tower_type}")
