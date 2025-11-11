@@ -97,11 +97,13 @@ def do_demon_combat_single(game_state: GameState, demon: Demon):
     
     # if tile 1 space in front is empty, we are contesting space with enemy 2 spaces in front 
     if target1 != None:
+        b4_health = target1.health
         target1.health -= demon.attack_pow
-        log_msg(f'Demon {demon.name} attacked opponent {target1.name} at ({next_tile1[0]},{next_tile1[1]})')
+        log_msg(f'Demon {demon.name} attacked opponent {target1.name} at ({next_tile1[0]},{next_tile1[1]}). Target health went from {b4_health} to {target1.health}')
     elif target2 != None:
+        b4_health = target2.health
         target2.health -= demon.attack_pow
-        log_msg(f'Demon {demon.name} attacked opponent {target2.name} at ({next_tile2[0]},{next_tile2[1]})')
+        log_msg(f'Demon {demon.name} attacked opponent {target2.name} at ({next_tile2[0]},{next_tile2[1]}). Target health went from {b4_health} to {target1.health}')
     else:
         # attack the player base if we have reached the end of the path, and there is nobody else to fight
         attackable_base = demon.get_attackable_player_base(game_state)
