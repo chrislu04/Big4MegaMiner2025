@@ -24,7 +24,7 @@
             "switch_target": true
         },
         {
-            "x": 9,
+            "x": 10,
             "y": 2,
             "initial_target": "b",
             "switch_target": true

@@ -7,15 +7,15 @@ const GRASS_RED_TEX = preload("res://Assets/HD_Skin/grass_red.png")
 const GRASS_BLUE_TEX = preload("res://Assets/HD_Skin/grass_blue.png")
 const PATH_TEX = preload("res://Assets/HD_Skin/path.png")
 
-const BLUE_RECRUIT = preload("uid://drwant6008fgr")
-const RED_RECRUIT = preload("uid://can1bceehb1qy")
+const BLUE_RECRUIT = preload("res://objects/bluemerc.tscn")
+const RED_RECRUIT = preload("res://objects/redmerc.tscn")
 
 const ENEMY = preload("res://objects/demon.tscn")
 
-const CROSSBOW = preload("uid://bnt0ip21bpu2p")
+const CROSSBOW = preload("res://Assets/HD_Skin/crossbow/crossbow.png")
 const CANNON = preload("res://Assets/HD_Skin/cannon/cannon.png")
 
-const GATLING = preload("uid://2cfukvxbe1ah")
+const GATLING = preload("res://Assets/HD_Skin/gatling/gatling.png")
 const HOUSE = preload("res://Assets/HD_Skin/house/house.png")
 
 const RED_CASTLE : Texture = preload("res://Assets/HD_Skin/base.svg")
@@ -273,36 +273,6 @@ func _draw_towers(data_towers : Array):
 				if child is Crossbow:
 					tween.tween_callback(child.shoot.bind(turn_interval_max / 2))
 		count += 1
-	
-	
-	
-	
-	
-	
-	
-	
-	#for tower in data_towers:
-		#var base = Sprite2D.new()
-		#var current_tower = Sprite2D.new()
-		#var pos = Vector2(tower["x"] * 32, tower["y"] * 32)
-		#base.position = pos
-		#base.texture = BASE
-		#towers.add_child(base)
-		#
-		#
-		#match tower["Type"]:
-			#"Crossbow":
-				##current_tower = CROSSBOW.instantiate()
-				#current_tower.texture = CROSSBOW
-			#"Cannon":
-				#current_tower.texture = CANNON
-			#"Minigun":
-				#current_tower.texture = GATLING
-			#"House":
-				#current_tower.texture = HOUSE
-		#
-		#current_tower.scale = Vector2(32 / current_tower.texture.get_size().x, 32 / current_tower.texture.get_size().y)
-		#base.add_child(current_tower)
 
 
 func _draw_demons(dem_array : Array):
