@@ -1,7 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://dwhs1lsrq1ure"]
+[gd_scene load_steps=7 format=3 uid="uid://dwhs1lsrq1ure"]
 
 [ext_resource type="Texture2D" uid="uid://cyuwkfuyya6y3" path="res://Assets/HD_Skin/enemy.png" id="1_8k0bl"]
-[ext_resource type="Script" uid="uid://b2xcpnt71oo4p" path="res://demon.gd" id="1_v40ab"]
+[ext_resource type="Script" uid="uid://b2xcpnt71oo4p" path="res://objects/demon.gd" id="1_v40ab"]
 [ext_resource type="Texture2D" uid="uid://bwfsxsqlpvs0i" path="res://Assets/HD_Skin/enemy_attack.png" id="2_dqvf4"]
 [ext_resource type="Texture2D" uid="uid://cbfd761ntlv86" path="res://Assets/HD_Skin/enemy_walk.png" id="3_556me"]
 
@@ -38,11 +38,25 @@ animations = [{
 "speed": 2.0
 }]
 
-[node name="demon" type="AnimatedSprite2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j4k6l"]
+size = Vector2(24, 24)
+
+[node name="RedMerc" type="Node2D" node_paths=PackedStringArray("panel", "mouse_detect", "sprite_anim")]
+script = ExtResource("1_v40ab")
+panel = NodePath("Panel")
+mouse_detect = NodePath("MouseDetect")
+sprite_anim = NodePath("Sprite")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+position = Vector2(3, -11)
+scale = Vector2(0.125, 0.125)
 sprite_frames = SubResource("SpriteFrames_qh3hn")
 animation = &"walk"
-autoplay = "default"
-script = ExtResource("1_v40ab")
+
+[node name="MouseDetect" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MouseDetect"]
+shape = SubResource("RectangleShape2D_j4k6l")
 
 [node name="Panel" type="Panel" parent="."]
 visible = false
@@ -51,10 +65,10 @@ anchor_left = 0.551
 anchor_top = 0.29500002
 anchor_right = 0.551
 anchor_bottom = 0.29500002
-offset_left = -155.912
-offset_top = -252.04001
-offset_right = 4.0879974
-offset_bottom = -156.04001
+offset_left = 16.0
+offset_top = -160.0
+offset_right = 176.0
+offset_bottom = -64.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
 layout_mode = 0

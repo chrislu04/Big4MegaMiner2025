@@ -262,12 +262,14 @@ func _draw_demons(dem_array : Array):
 	for dem in dem_array:
 		if demons.get_child_count() - 1 < count:
 			var pos = Vector2(dem["x"] * 32, dem["y"] * 32)
-			var sprite : RedMerc = ENEMY.instantiate()
+			var demon_obj : RedMerc = ENEMY.instantiate()
 			if dem["Team"] == "b":
-				sprite.flip_h = false
+				demon_obj.sprite_anim.flip_h = false
+			else:
+				demon_obj.sprite_anim.flip_h = true
 			
-			sprite.position = pos
-			demons.add_child(sprite)
+			demon_obj.position = pos
+			demons.add_child(demon_obj)
 		else:
 			var child : RedMerc = demons.get_child(count)
 			if dem["State"] == "dead":
@@ -279,7 +281,7 @@ func _draw_demons(dem_array : Array):
 				count -= 1
 			elif dem["State"] == "moving":
 				var tween = get_tree().create_tween()
-				child.move(Vector2(1,0))
+				child.move(child.position - Vector2(dem["x"] * 32, dem["y"] * 32))
 				tween.tween_property(child, "position", Vector2(dem["x"] * 32, dem["y"] * 32), turn_interval_max)
 				tween.tween_callback(child.idle)
 			else:

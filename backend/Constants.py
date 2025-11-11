@@ -2,7 +2,7 @@
 # BALANCE: tweaking these numbers will make or break game balance
 
 INITIAL_MONEY: int = 30
-DEMON_INITIAL_HEALTH: int = 30
+DEMON_INITIAL_HEALTH: int = 10
 DEMON_ATTACK_POWER: int = 10
 MERCENARY_INITIAL_HEALTH: int = 20
 MERCENARY_ATTACK_POWER: int = 10
