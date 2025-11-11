@@ -133,6 +133,18 @@ class Game:
                 }
                 list_demons.append(dem_dict)
 
+        list_spawners = []
+        for spawner in self.game_state.demon_spawners:
+            if isinstance(spawner, DemonSpawner):
+                spawner_dict = {
+                    "x" : spawner.x,
+                    "y" : spawner.y,
+                    "Target" : spawner.target_team,
+                    "ReloadTime" : spawner.reload_time_left,
+                    "MaxReloadTime" : spawner.reload_time_max,
+                }
+            list_spawners.append(spawner_dict)
+
         data : dict = {
             "Victory" : self.game_state.victory,
             "TurnsRemaining" : self.game_state.turns_remaining,
@@ -147,7 +159,8 @@ class Game:
             "EntityGrid" : list_entity_grid,
             "Towers" : list_towers,
             "Mercenaries" : list_mercenary,
-            "Demons" : list_demons
+            "Demons" : list_demons,
+            "DemonSpawners" : list_spawners
         } 
 
         json_string : str = json.dumps(data)

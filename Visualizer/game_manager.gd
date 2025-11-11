@@ -11,6 +11,8 @@ const BLUE_RECRUIT = preload("res://objects/bluemerc.tscn")
 const RED_RECRUIT = preload("res://objects/redmerc.tscn")
 
 const ENEMY = preload("res://objects/demon.tscn")
+const ENEMY_SPAWNER = preload("res://Assets/HD_Skin/enemy_spawner.png")
+
 
 const CROSSBOW = preload("res://Assets/HD_Skin/crossbow/crossbow.png")
 const CANNON = preload("res://Assets/HD_Skin/cannon/cannon.png")
@@ -46,6 +48,7 @@ var path_to_game_state
 @onready var towers: Node2D = $World/Towers
 @onready var demons: Node2D = $World/Demons
 @onready var misc_entities: Node2D = $"World/Misc Entities"
+@onready var spawners: Node2D = $"World/Spawners"
 
 var processID
 var stdio : FileAccess
@@ -136,8 +139,17 @@ func _draw_game_from_gamestate(game_state : String):
 		castle_b.position = Vector2(game_state_json["PlayerBaseB"]["x"] * 32, game_state_json["PlayerBaseB"]["y"] * 32) + Vector2(0,-5)
 		castle_b.y_sort_enabled = true
 		misc_entities.add_child(castle_b)
-		
-		
+
+		## Setting up spawners
+		for spawner in game_state_json["DemonSpawners"]:
+			var sprite = Sprite2D.new() 
+			sprite.texture = ENEMY_SPAWNER
+			sprite.scale.x = 32 /  ENEMY_SPAWNER.get_size().x
+			sprite.scale.y = 32 / ENEMY_SPAWNER.get_size().y
+			sprite.position = Vector2(spawner.x * 32, spawner.y * 32)
+			sprite.z_index = 1
+			spawners.add_child(sprite)
+
 		initial = false
 	
 	

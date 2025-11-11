@@ -32,6 +32,7 @@ func move(direction : Vector2):
 	sprite_anim.play("walk")
 
 func attack(_direction : Vector2):
+	await get_tree().create_timer(randf() * 0.25).timeout # randomize animation timing
 	sprite_anim.play("attack")
 
 func idle():
