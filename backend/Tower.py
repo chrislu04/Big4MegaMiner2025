@@ -64,7 +64,7 @@ class Tower(Entity):
             whats_on_path = game_state.entity_grid[path[1]][path[0]]
 
             if whats_on_path is None: continue
-            if (isinstance(whats_on_path, Mercenary) and whats_on_path.team == self.team):
+            if (isinstance(whats_on_path, Mercenary) and whats_on_path.state != 'dead' and whats_on_path.team == self.team):
 
                 whats_on_path.health = Constants.MERCENARY_INITIAL_HEALTH + health_buff
                 whats_on_path.attack_pow = Constants.MERCENARY_ATTACK_POWER + dmg_buff

@@ -14,7 +14,7 @@ from Utils import log_msg
 import Constants
 from Entity import Entity
 
-def world_update_phase(game_state: GameState):
+def world_update_phase(game_state: GameState, provoke_demons: bool):
     # remove dead entities from respective lists
     game_state.mercs = [m for m in game_state.mercs if m.state != "dead"]
     game_state.demons = [d for d in game_state.demons if d.state != "dead"]
@@ -30,7 +30,7 @@ def world_update_phase(game_state: GameState):
     if game_state.victory != None: return
     
     spawn_mercenaries(game_state)
-    spawn_demons(game_state)
+    spawn_demons(game_state, provoke_demons)
 
     for tower in game_state.towers:
         tower.update(game_state)

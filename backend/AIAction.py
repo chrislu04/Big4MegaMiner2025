@@ -13,6 +13,10 @@ class AIAction:
     Phase 2 - Optional:
         - Buy mercenary: add merc_direction="N" (or "S", "E", "W")
     
+    Phase 3 - Optional:
+        - Provoke Demons: add provoke_demons=True
+        - To be used with caution!
+    
     Possible values of tower_type are:
         - "crossbow"
         - "cannon"
@@ -33,13 +37,15 @@ class AIAction:
         x: int,
         y: int,
         tower_type: str = "",
-        merc_direction: str = ""
+        merc_direction: str = "",
+        provoke_demons: bool = False
     ):
         self.action = action.lower().strip()  # "build", "destroy", or "nothing"
         self.x = x
         self.y = y
         self.tower_type = tower_type.strip()
         self.merc_direction = merc_direction.upper().strip()  # "N", "S", "E", "W", or ""
+        self.provoke_demons = provoke_demons
     
     def to_dict(self):
         """Convert to dictionary for saving/sending"""
@@ -48,7 +54,8 @@ class AIAction:
             'x': self.x,
             'y': self.y,
             'tower_type': self.tower_type,
-            'merc_direction': self.merc_direction
+            'merc_direction': self.merc_direction,
+            'provoke_demons': self.provoke_demons
         }
     
     @staticmethod
@@ -59,7 +66,8 @@ class AIAction:
             data['x'],
             data['y'],
             data.get('tower_type', ''),
-            data.get('merc_direction', '')
+            data.get('merc_direction', ''),
+            data.get('provoke_demons', False),
         )
     
     def to_json(self):

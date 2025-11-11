@@ -3,12 +3,12 @@ from Demon import Demon
 from GameState import GameState
 from Utils import log_msg
 
-def spawn_demons(game_state: GameState):
+def spawn_demons(game_state: GameState, provoke_demons: bool):
     for demon_spawner in game_state.demon_spawners:
         spawner : DemonSpawner = demon_spawner
         at_target_space = game_state.entity_grid[spawner.y][spawner.x]
         
-        if spawner.reload_time_left > 0:
+        if spawner.reload_time_left > 0 and not provoke_demons:
             spawner.reload_time_left -= 1
         # Wait to spawn until space is clear
         elif at_target_space == None:

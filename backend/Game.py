@@ -19,6 +19,7 @@ from AIAction import AIAction
 from BuildPhase import build_tower_phase
 from BuyMercenaryPhase import buy_mercenary_phase
 from WorldUpdatePhase import world_update_phase
+from ProvokeDemonsPhase import provoke_demons_phase
 
 
 # Contain the GameState, and run logic for progressing turns
@@ -39,7 +40,8 @@ class Game:
         log_msg(f"-- TURN: {Constants.MAX_TURNS - self.game_state.turns_remaining}, REMAINING TURNS: {self.game_state.turns_remaining}, BLUE: ${self.game_state.money_b}, RED: {self.game_state.money_r} $--")
         buy_mercenary_phase(self.game_state, action_r, action_b)
         build_tower_phase(self.game_state, action_r, action_b)
-        world_update_phase(self.game_state)
+        provoked_demons = provoke_demons_phase(self.game_state, action_r, action_b)
+        world_update_phase(self.game_state, provoked_demons)
         self.game_state.turns_remaining -= 1
         log_msg("")
 

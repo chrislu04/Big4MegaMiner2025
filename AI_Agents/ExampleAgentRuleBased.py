@@ -6,6 +6,9 @@ import json
 # Any imports from the standard library are allowed
 import random
 
+from typing import Optional
+import json
+
 class AIAction:
     """
     Represents one turn of actions in the game.
@@ -18,6 +21,10 @@ class AIAction:
     Phase 2 - Optional:
         - Buy mercenary: add merc_direction="N" (or "S", "E", "W")
     
+    Phase 3 - Optional:
+        - Provoke Demons: add provoke_demons=True
+        - To be used with caution!
+    
     Possible values of tower_type are:
         - "crossbow"
         - "cannon"
@@ -29,7 +36,7 @@ class AIAction:
         AIAction("build", 5, 3, "cannon")
         AIAction("build", 5, 3, "crossbow", merc_direction="N")
         AIAction("destroy", 2, 4)
-        AIAction("nothing", 0, 0, merc_direction="S")
+        AIAction("nothing", 0, 0, merc_direction="S", provoke_demons=True)
     """
     
     def __init__(
@@ -38,13 +45,15 @@ class AIAction:
         x: int,
         y: int,
         tower_type: str = "",
-        merc_direction: str = ""
+        merc_direction: str = "",
+        provoke_demons: bool = False
     ):
         self.action = action.lower().strip()  # "build", "destroy", or "nothing"
         self.x = x
         self.y = y
         self.tower_type = tower_type.strip()
         self.merc_direction = merc_direction.upper().strip()  # "N", "S", "E", "W", or ""
+        self.provoke_demons = provoke_demons
     
     def to_dict(self):
         """Convert to dictionary for saving/sending"""
@@ -53,12 +62,14 @@ class AIAction:
             'x': self.x,
             'y': self.y,
             'tower_type': self.tower_type,
-            'merc_direction': self.merc_direction
+            'merc_direction': self.merc_direction,
+            'provoke_demons': self.provoke_demons
         }
     
     def to_json(self):
         """Convert to JSON string"""
         return json.dumps(self.to_dict())
+
 
 # -- HELPER FUNCTIONS --
 def is_out_of_bounds(game_state: dict, x: int, y: int) -> bool:
@@ -131,21 +142,24 @@ class Agent:
 
         turn = game_state["CurrentTurn"]
 
+        # If everybody uses this agent, there will be a nice reset on turn 38
+        do_provoke = (turn == 30 and self.team_color == 'r') or (turn == 31 and self.team_color == 'b') or (turn == 38)
+
         # Always build a house on the first turn
         if turn == 0:
             house_x, house_y = random.choice(build_spaces)
             self.num_houses += 1
-            return AIAction("build", house_x, house_y, 'house')
+            return AIAction("build", house_x, house_y, 'house', provoke_demons=do_provoke)
         else:
             # Build house or mercenary in the early-game
             if turn < 10:
                 probability_merc = (turn + 50) / 100.0
 
                 if random.random() < probability_merc:
-                    return AIAction("nothing", 0, 0, merc_direction=random.choice(q_directions))
+                    return AIAction("nothing", 0, 0, merc_direction=random.choice(q_directions), provoke_demons=do_provoke)
                 else:
                     house_x, house_y = random.choice(build_spaces)
-                    return AIAction("build", house_x, house_y, 'house')
+                    return AIAction("build", house_x, house_y, 'house', provoke_demons=do_provoke)
             # Build towers later
             elif len(build_spaces) > 0:
                 tower_choices = [
@@ -156,9 +170,9 @@ class Agent:
                 ]
                 tower = random.choice(tower_choices)
                 tower_x, tower_y = random.choice(build_spaces)
-                return AIAction("build", tower_x, tower_y, tower, merc_direction=random.choice(q_directions))
+                return AIAction("build", tower_x, tower_y, tower, merc_direction=random.choice(q_directions), provoke_demons=do_provoke)
             else:
-                return AIAction("nothing",0,0,merc_direction=random.choice(q_directions))
+                return AIAction("nothing",0,0,merc_direction=random.choice(q_directions), provoke_demons=do_provoke)
 
         # -- YOUR CODE ENDS HERE --
 
