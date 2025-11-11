@@ -66,13 +66,13 @@ class Tower(Entity):
             if whats_on_path is None: continue
             if (isinstance(whats_on_path, Mercenary) and whats_on_path.team == self.team):
 
-                whats_on_path.health = Constants.MERCENARY_INITIAL_HEALTH + health_buff
-                whats_on_path.attack_pow = Constants.MERCENARY_ATTACK_POWER + dmg_buff
+                whats_on_path.health += health_buff
+                whats_on_path.attack_pow += dmg_buff
                 self.targets.append((whats_on_path.x, whats_on_path.y))
                 # self.angle = math.atan2(path[1] - self.y, path[0] - self.x)
 
                 buffed_targets.append((whats_on_path.x, whats_on_path.y))
-                log_msg(f'Tower {self.name} buffed {whats_on_path.name} for {health_buff} health and {dmg_buff} damage')
+                log_msg(f'Tower {self.name} buffed {whats_on_path.name} to {whats_on_path.health} health and {whats_on_path.attack_pow} damage')
         
         if len(buffed_targets) != 0:
             self.last_buffed_targets = buffed_targets
