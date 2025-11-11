@@ -221,6 +221,7 @@ func _draw_mercenaries(mercs : Array):
 				var blood_splatter_effect = BLOOD_SPLATTER_FX.instantiate()
 				blood_splatter_effect.position = child.global_position
 				add_child(blood_splatter_effect)
+				(blood_splatter_effect as GPUParticles2D).emitting = true
 				child.free()
 				count -= 1
 			elif merc["State"] == "moving":
@@ -324,6 +325,10 @@ func _draw_demons(dem_array : Array):
 		else:
 			var child : RedMerc = demons.get_child(count)
 			if dem["State"] == "dead":
+				var blood_splatter_effect = BLOOD_SPLATTER_FX.instantiate()
+				blood_splatter_effect.position = child.global_position
+				add_child(blood_splatter_effect)
+				(blood_splatter_effect as GPUParticles2D).emitting = true
 				child.free()
 				count -= 1
 			elif dem["State"] == "moving":

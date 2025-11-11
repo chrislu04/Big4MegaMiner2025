@@ -25,13 +25,13 @@ lifetime_randomness = 1.0
 particle_flag_align_y = true
 particle_flag_disable_z = true
 emission_shape = 3
-emission_box_extents = Vector3(48, 64, 1)
+emission_box_extents = Vector3(4, 4, 1)
 spread = 180.0
 flatness = 1.0
-initial_velocity_max = 433.33
-gravity = Vector3(0, 50, 0)
-scale_min = 0.5
-scale_max = 1.5
+initial_velocity_max = 50.0
+gravity = Vector3(0, 15, 0)
+scale_min = 0.19999999
+scale_max = 0.29999998
 scale_curve = SubResource("CurveXYZTexture_u5u2o")
 
 [node name="BloodSplatter" type="GPUParticles2D"]
@@ -39,6 +39,7 @@ z_index = 1
 emitting = false
 amount = 1000
 texture = ExtResource("1_u7ps2")
+lifetime = 2.0
 one_shot = true
 speed_scale = 5.0
 explosiveness = 1.0
