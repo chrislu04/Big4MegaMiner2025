@@ -1,11 +1,12 @@
 [gd_scene load_steps=7 format=3 uid="uid://bnt0ip21bpu2p"]
 
-[ext_resource type="Script" path="res://objects/crossbow.gd" id="1_4b6kr"]
+[ext_resource type="Script" uid="uid://fobom11eiont" path="res://objects/crossbow.gd" id="1_4b6kr"]
 [ext_resource type="Texture2D" uid="uid://nva7iv4iyhdi" path="res://Assets/HD_Skin/crossbow/crossbow.png" id="1_ekdeq"]
 [ext_resource type="Texture2D" uid="uid://b4dqo57cak8b5" path="res://Assets/HD_Skin/crossbow/crossbow_fire.png" id="3_go2n5"]
 
 [sub_resource type="Animation" id="Animation_qjqky"]
-length = 0.001
+length = 0.1
+step = 0.01
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -13,10 +14,10 @@ tracks/0/path = NodePath(".:texture")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.05, 0.099999994),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [ExtResource("1_ekdeq")]
+"values": [ExtResource("1_ekdeq"), ExtResource("3_go2n5"), ExtResource("1_ekdeq")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -25,10 +26,10 @@ tracks/1/path = NodePath(".:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(),
+"transitions": PackedFloat32Array(),
 "update": 0,
-"values": [Vector2(0, 0)]
+"values": []
 }
 
 [sub_resource type="Animation" id="Animation_gp6vw"]
@@ -53,10 +54,10 @@ tracks/1/path = NodePath(".:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.20159669, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(),
+"transitions": PackedFloat32Array(),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(0, 64), Vector2(0, 0), Vector2(0, -40), Vector2(0, 0)]
+"values": []
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_t21bi"]
@@ -66,6 +67,7 @@ _data = {
 }
 
 [node name="Crossbow" type="Sprite2D"]
+scale = Vector2(0.062499996, 0.06250001)
 texture = ExtResource("1_ekdeq")
 script = ExtResource("1_4b6kr")
 

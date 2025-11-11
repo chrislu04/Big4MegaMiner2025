@@ -37,7 +37,8 @@ func _update_money_values(left_value, right_value):
 
 func _update_base_health(is_left : bool, new_value):
 	if is_left:
-		$"Game UI/LeftSideStates/Health/Health".text = "Base Health\n" + str(new_value) + "/200"
+		var tween = get_tree().create_tween()
+		tween.tween_property($"Game UI/LeftSideStates/Health/TextureProgressBar", "value", (new_value / 300) * 100, 1.5)
 	else:
 		$"Game UI/RightSideStates/Health/Health".text = "Base Health\n" + str(new_value) + "/200"
 

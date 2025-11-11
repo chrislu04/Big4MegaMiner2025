@@ -7,10 +7,10 @@ const GRASS_RED_TEX = preload("res://Assets/HD_Skin/grass_red.png")
 const GRASS_BLUE_TEX = preload("res://Assets/HD_Skin/grass_blue.png")
 const PATH_TEX = preload("res://Assets/HD_Skin/path.png")
 
-const ALT_GRASS = preload("res://Assets/Base_Skin/alt_grass.png")
-const ALT_PATH = preload("res://Assets/Base_Skin/alt_path.png")
-const GRASS = preload("res://Assets/Base_Skin/grass.png")
-const PATH = preload("res://Assets/Base_Skin/path.png")
+#const ALT_GRASS = preload("res://Assets/Base_Skin/alt_grass.png")
+#const ALT_PATH = preload("res://Assets/Base_Skin/alt_path.png")
+#const GRASS = preload("res://Assets/Base_Skin/grass.png")
+#const PATH = preload("res://Assets/Base_Skin/path.png")
 
 
 const BLUE_RECRUIT = preload("uid://drwant6008fgr")
@@ -18,9 +18,10 @@ const RED_RECRUIT = preload("uid://can1bceehb1qy")
 
 const ENEMY = preload("res://objects/demon.tscn")
 
-const BASE = preload("res://Assets/Topdown skin/base.png")
-const CROSSBOW = preload("res://Assets/Topdown skin/crossbow.png")
-const CANNON = preload("res://Assets/HD_Skin/cannon/cannon.png")
+#const BASE = preload("res://Assets/Topdown skin/base.png")
+const CROSSBOW = preload("uid://bnt0ip21bpu2p")
+const CANNON = preload("uid://px2v73fj7qag")
+
 const GATLING = preload("uid://2cfukvxbe1ah")
 const HOUSE = preload("res://Assets/HD_Skin/house/house.png")
 
@@ -235,26 +236,80 @@ func _draw_mercenaries(mercs : Array):
 
 func _draw_towers(data_towers : Array):
 	print(data_towers)
+	
+	var count = 0
 	for tower in data_towers:
-		var base = Sprite2D.new()
-		var current_tower = Sprite2D.new()
-		var pos = Vector2(tower["x"] * 32, tower["y"] * 32)
-		base.position = pos
-		base.texture = BASE
-		towers.add_child(base)
-		
-		match tower["Type"]:
-			"Crossbow":
-				current_tower.texture = CROSSBOW
-			"Cannon":
-				current_tower.texture = CANNON
-			"Minigun":
-				current_tower.texture = GATLING
-			"House":
-				current_tower.texture = HOUSE
-		
-		current_tower.scale = Vector2(32 / current_tower.texture.get_size().x, 32 / current_tower.texture.get_size().y)
-		base.add_child(current_tower)
+		if towers.get_child_count() - 1 < count:
+			var pos = Vector2(tower["x"] * 32, tower["y"] * 32)
+			var sprite
+			#if tower["Team"] == "b":
+				#sprite = BLUE_RECRUIT.instantiate()
+			#else:
+				#sprite = RED_RECRUIT.instantiate()
+			match tower["Type"]:
+				"Crossbow":
+					sprite = CROSSBOW.instantiate()
+				"Cannon":
+					sprite = Sprite2D.new()
+					sprite.texture = CANNON
+					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
+				"Minigun":
+					sprite = Sprite2D.new()
+					sprite.texture = GATLING
+					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
+				"House":
+					sprite = Sprite2D.new()
+					sprite.texture = HOUSE
+					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
+			
+			##sprite = CROSSBOW.instantiate()
+			sprite.name = tower["Name"]
+			sprite.position = pos
+			towers.add_child(sprite)
+		else:
+			var child = towers.get_child(count)
+			
+			while (child.name != tower["Name"]):
+				child.free()
+				child = towers.get_child(count)
+			var tween = get_tree().create_tween()
+			for target in tower["Targets"]:
+				tween.tween_property(child, "rotation", 
+				Vector2(tower["x"],tower["y"]).angle_to(Vector2(target[0],target[1])) + deg_to_rad(90), turn_interval_max / 2.0
+				)
+				if child is Crossbow:
+					tween.tween_callback(child.shoot.bind(turn_interval_max / 2))
+		count += 1
+	
+	
+	
+	
+	
+	
+	
+	
+	#for tower in data_towers:
+		#var base = Sprite2D.new()
+		#var current_tower = Sprite2D.new()
+		#var pos = Vector2(tower["x"] * 32, tower["y"] * 32)
+		#base.position = pos
+		#base.texture = BASE
+		#towers.add_child(base)
+		#
+		#
+		#match tower["Type"]:
+			#"Crossbow":
+				##current_tower = CROSSBOW.instantiate()
+				#current_tower.texture = CROSSBOW
+			#"Cannon":
+				#current_tower.texture = CANNON
+			#"Minigun":
+				#current_tower.texture = GATLING
+			#"House":
+				#current_tower.texture = HOUSE
+		#
+		#current_tower.scale = Vector2(32 / current_tower.texture.get_size().x, 32 / current_tower.texture.get_size().y)
+		#base.add_child(current_tower)
 
 
 func _draw_demons(dem_array : Array):

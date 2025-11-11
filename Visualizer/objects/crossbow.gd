@@ -7,10 +7,10 @@ var targets : Array
 
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
-func shoot(target_array):
-	for target in targets:
-		animation_player.queue("shoot")
-		
+func shoot(speed : float):
+	
+	animation_player.play("shoot", 0, speed)
+	
 
 
 func _on_animation_player_animation_changed(old_name: StringName, new_name: StringName) -> void:
