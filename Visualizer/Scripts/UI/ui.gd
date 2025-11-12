@@ -27,7 +27,8 @@ func _process(_delta: float) -> void:
 	pass
 
 func _update_turns_progressed(new_value):
-	$"Game UI/Turns/Turns Progressed".text = "Turns Left\n" + str(int(new_value))
+	$"Game UI/Turns/PanelContainer/Turns Progressed".text = str(int(new_value))
+	$"Game UI/Turns/PanelContainer/TextureProgressBar".value = int(new_value)
 
 func _update_money_values(left_value, right_value):
 	$"Game UI/LeftSideStates/Money/Money".text = str(int(left_value))
