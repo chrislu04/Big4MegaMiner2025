@@ -467,7 +467,7 @@ house = NodePath("Human Control/Build OPtions/House")
 cannon = NodePath("Human Control/Build OPtions/Cannon")
 minigun = NodePath("Human Control/Build OPtions/Minigun")
 cross = NodePath("Human Control/Build OPtions/Crossbow")
-church = NodePath("../LeftSideStates/Human Control/Build OPtions/Church")
+church = NodePath("Human Control/Build OPtions/Church")
 house_options = NodePath("Human Control/Build OPtions")
 mercenary_options = NodePath("Human Control/Mercenary Directions")
 
