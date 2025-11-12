@@ -57,7 +57,6 @@ var path_to_game_state
 @onready var tiles = $World/Tiles
 @onready var mercenaries: Node2D = $World/Mercenaries
 @onready var towers: Node2D = $World/Towers
-@onready var towerStands: Node2D = $World/TowerStands
 @onready var demons: Node2D = $World/Demons
 @onready var misc_entities: Node2D = $"World/Misc Entities"
 @onready var spawners: Node2D = $"World/Spawners"
@@ -274,7 +273,7 @@ func _draw_towers(data_towers : Array):
 	
 	var count = 0
 	for tower in data_towers:
-		if towers.get_child_count() - 1 < count:
+		if towers.get_child_count() - 1 != count:
 			var pos = Vector2(tower["x"] * 32, tower["y"] * 32)
 			var sprite : Sprite2D
 			var makeStruts : bool = false
@@ -318,7 +317,8 @@ func _draw_towers(data_towers : Array):
 				var strut1 = Sprite2D.new()
 				strut1.texture = STRUTS if tower["Team"] == "r" else BLUE_STRUTS
 				sprite.add_child(strut1)
-				strut1.reparent(towerStands)
+				#strut1.reparent(towerStands)
+				strut1.z_index = -1
 				strut1.global_position = sprite.global_position
 		else:
 			var child = towers.get_child(count)
@@ -338,9 +338,8 @@ func _draw_towers(data_towers : Array):
 				tween.set_trans(Tween.TRANS_QUAD)
 				for target in tower["Targets"]:
 					var theta = atan2((target[1] - tower["y"]), (target[0] - tower["x"])) + (PI * 0.5)
-					tween.tween_property(child, "rotation", 
-					theta, turn_interval_max / 2.0
-					)
+					tween.tween_property(child, "rotation", theta, turn_interval_max / 2.0)
+					tween.tween_property(child.get_child(0), "rotation", -theta, turn_interval_max / 2.0)
 					if child is Crossbow:
 						tween.tween_callback(child.shoot.bind(turn_interval_max / 2))
 		count += 1

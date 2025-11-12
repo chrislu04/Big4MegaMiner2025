@@ -25,9 +25,6 @@ z_index = -1
 
 [node name="Towers" type="Node2D" parent="World"]
 
-[node name="TowerStands" type="Node2D" parent="World"]
-z_index = -1
-
 [node name="Demons" type="Node2D" parent="World"]
 
 [node name="Misc Entities" type="Node2D" parent="World"]
