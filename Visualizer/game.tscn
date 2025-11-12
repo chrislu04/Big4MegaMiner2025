@@ -15,6 +15,7 @@ UI = NodePath("UI")
 script = ExtResource("3_feb5d")
 
 [node name="Tiles" type="Node2D" parent="World"]
+z_index = -2
 
 [node name="Spawners" type="Node2D" parent="World"]
 modulate = Color(1, 1, 1, 0.752941)
@@ -24,12 +25,15 @@ z_index = -1
 
 [node name="Towers" type="Node2D" parent="World"]
 
+[node name="TowerStands" type="Node2D" parent="World"]
+z_index = -1
+
 [node name="Demons" type="Node2D" parent="World"]
 
 [node name="Misc Entities" type="Node2D" parent="World"]
 
 [node name="Background" type="Sprite2D" parent="."]
-z_index = -2
+z_index = -99
 texture_repeat = 2
 position = Vector2(624, 287)
 scale = Vector2(0.5, 0.5)

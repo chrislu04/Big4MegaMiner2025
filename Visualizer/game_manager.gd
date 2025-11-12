@@ -27,6 +27,7 @@ const BLUE_HOUSE = preload("res://Assets/HD_Skin/house/blue_house.png")
 const BLUE_CHURCH = preload("res://Assets/HD_Skin/church/blue_church.png")
 
 const STRUTS = preload("res://Assets/HD_Skin/stand.png")
+const BLUE_STRUTS = preload("res://Assets/HD_Skin/blue_stand.png")
 
 const RED_CASTLE : Texture = preload("res://Assets/HD_Skin/Red_base.png")
 const BLUE_CASTLE: Texture = preload("res://Assets/HD_Skin/Blue_base.png")
@@ -56,6 +57,7 @@ var path_to_game_state
 @onready var tiles = $World/Tiles
 @onready var mercenaries: Node2D = $World/Mercenaries
 @onready var towers: Node2D = $World/Towers
+@onready var towerStands: Node2D = $World/TowerStands
 @onready var demons: Node2D = $World/Demons
 @onready var misc_entities: Node2D = $"World/Misc Entities"
 @onready var spawners: Node2D = $"World/Spawners"
@@ -274,7 +276,8 @@ func _draw_towers(data_towers : Array):
 	for tower in data_towers:
 		if towers.get_child_count() - 1 < count:
 			var pos = Vector2(tower["x"] * 32, tower["y"] * 32)
-			var sprite
+			var sprite : Sprite2D
+			var makeStruts : bool = false
 			
 			match tower["Type"]:
 				"Crossbow":
@@ -282,16 +285,19 @@ func _draw_towers(data_towers : Array):
 					sprite.texture = CROSSBOW if tower["Team"] == "r" else BLUE_CROSSBOW
 					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
 					sprite.y_sort_enabled = true
+					makeStruts = true;
 				"Cannon":
 					sprite = Sprite2D.new()
 					sprite.texture = CANNON if tower["Team"] == "r" else BLUE_CANNON
 					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
 					sprite.y_sort_enabled = true
+					makeStruts = true;
 				"Minigun":
 					sprite = Sprite2D.new()
 					sprite.texture = GATLING if tower["Team"] == "r" else BLUE_GATLING
 					sprite.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
 					sprite.y_sort_enabled = true
+					makeStruts = true;
 				"House":
 					sprite = Sprite2D.new()
 					sprite.texture = HOUSE if tower["Team"] == "r" else BLUE_HOUSE
@@ -307,6 +313,13 @@ func _draw_towers(data_towers : Array):
 			sprite.name = tower["Name"]
 			sprite.position = pos + Vector2(0,-5)
 			towers.add_child(sprite)
+			
+			if (makeStruts):
+				var strut1 = Sprite2D.new()
+				strut1.texture = STRUTS if tower["Team"] == "r" else BLUE_STRUTS
+				sprite.add_child(strut1)
+				strut1.reparent(towerStands)
+				strut1.global_position = sprite.global_position
 		else:
 			var child = towers.get_child(count)
 			
