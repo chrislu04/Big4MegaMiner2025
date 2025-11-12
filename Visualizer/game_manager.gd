@@ -238,7 +238,13 @@ func _draw_mercenaries(mercs : Array, prev_mercs: Array):
 			sprite.position = pos
 			mercenaries.add_child(sprite)
 		else:
-			var prev_merc = prev_mercs[count]
+			# find previous state of this merc
+			var prev_merc = null
+			for _merc in prev_mercs:
+				if (_merc["Name"] == merc["Name"]):
+					prev_merc = _merc
+					break
+			
 			var child : RedMerc = mercenaries.get_child(count)
 			
 			if merc["Team"] == 'r':
@@ -260,7 +266,7 @@ func _draw_mercenaries(mercs : Array, prev_mercs: Array):
 			else:
 					child.attack(Vector2(1,0))
 					
-			if (merc["Health"] < prev_merc["Health"] && is_instance_valid(child)):
+			if (prev_merc && merc["Health"] < prev_merc["Health"] && is_instance_valid(child)):
 				child.hurt()
 		
 		count += 1
@@ -345,7 +351,13 @@ func _draw_demons(dem_array : Array, prev_array : Array):
 			demon_obj.position = pos
 			demons.add_child(demon_obj)
 		else:
-			var prev_dem = prev_array[count]
+			# find previous state of this dem
+			var prev_dem = null
+			for _dem in prev_array:
+				if (_dem["Name"] == dem["Name"]):
+					prev_dem = _dem
+					break
+					
 			var child : RedMerc = demons.get_child(count)
 			if dem["State"] == "dead":
 				var blood_splatter_effect = BLOOD_SPLATTER_FX.instantiate()
@@ -363,8 +375,9 @@ func _draw_demons(dem_array : Array, prev_array : Array):
 			else:
 				child.attack(Vector2(1,0))
 				
-			if (dem["Health"] < prev_dem["Health"] && is_instance_valid(child)):
+			if (prev_dem && dem["Health"] < prev_dem["Health"] && is_instance_valid(child)):
 				child.hurt()
+				
 		count += 1
 
 func _process(delta):
