@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://ce78d0fluy0rq"]
+[gd_scene load_steps=7 format=3 uid="uid://ce78d0fluy0rq"]
 
 [ext_resource type="Theme" uid="uid://b2cu144l1almb" path="res://Button_Theem.tres" id="1_06t4h"]
 [ext_resource type="Script" uid="uid://beyo8py2phky5" path="res://main_menu.gd" id="1_7vrkn"]
-[ext_resource type="Texture2D" uid="uid://bivtx0yee5fet" path="res://Assets/UI/logo.png" id="3_fu7sn"]
+[ext_resource type="Texture2D" uid="uid://cnq55jai20f0b" path="res://Assets/UI/logo.png" id="3_fu7sn"]
+[ext_resource type="FontFile" uid="uid://detd1i5on3er0" path="res://Assets/fonts/Deutsch.ttf" id="3_jix8l"]
 
 [sub_resource type="Gradient" id="Gradient_fu7sn"]
 offsets = PackedFloat32Array(0, 0.383117, 1)
@@ -35,21 +36,21 @@ alignment = 1
 [node name="Play Game" type="Button" parent="HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_06t4h")
+theme_override_colors/font_color = Color(0.9411765, 0.8784314, 0.6117647, 1)
+theme_override_colors/font_hover_color = Color(0.8980392, 0.88235295, 0.7411765, 1)
+theme_override_colors/font_outline_color = Color(0.5176471, 0.3529412, 0.1254902, 1)
+theme_override_constants/outline_size = 14
+theme_override_fonts/font = ExtResource("3_jix8l")
 text = "Play Game"
-
-[node name="Watch Replay" type="Button" parent="HBoxContainer"]
-layout_mode = 2
-theme = ExtResource("1_06t4h")
-text = "Watch Replay"
-
-[node name="Settings" type="Button" parent="HBoxContainer"]
-layout_mode = 2
-theme = ExtResource("1_06t4h")
-text = "Settings"
 
 [node name="Quit" type="Button" parent="HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_06t4h")
+theme_override_colors/font_color = Color(0.9411765, 0.8784314, 0.6117647, 1)
+theme_override_colors/font_hover_color = Color(1, 0.27058825, 0.38039216, 1)
+theme_override_colors/font_outline_color = Color(0.5176471, 0.3529412, 0.1254902, 1)
+theme_override_constants/outline_size = 14
+theme_override_fonts/font = ExtResource("3_jix8l")
 text = "Quit"
 
 [node name="Panel" type="Panel" parent="."]
@@ -59,7 +60,7 @@ offset_right = 384.0
 offset_bottom = 256.0
 
 [node name="Path to Backend" type="Label" parent="Panel"]
-layout_mode = 2
+layout_mode = 0
 offset_left = 8.0
 offset_right = 135.0
 offset_bottom = 32.0
@@ -90,7 +91,7 @@ offset_bottom = 31.0
 text = "..."
 
 [node name="Path to Backend2" type="Label" parent="Panel"]
-layout_mode = 2
+layout_mode = 0
 offset_left = 8.0
 offset_top = 32.0
 offset_right = 137.0
