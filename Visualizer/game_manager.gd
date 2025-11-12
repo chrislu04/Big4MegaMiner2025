@@ -356,7 +356,6 @@ func _draw_demons(dem_array : Array):
 				child.attack(Vector2(1,0))
 		count += 1
 
-# Make this when the game backend is done
 func _process(delta):
 	if backend_running:
 		if is_player1_ai and is_player2_ai: ## If both players are AI
@@ -417,6 +416,7 @@ func _update_ui(gamestate):
 	UI._update_base_health(true, gamestate["PlayerBaseR"]["Health"])
 	UI._update_base_health(false, gamestate["PlayerBaseB"]["Health"])
 	UI._update_building_prices(gamestate)
+	UI._update_postgame_popup(gamestate["Victory"])
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:

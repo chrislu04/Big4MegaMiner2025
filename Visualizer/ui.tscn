@@ -1,22 +1,23 @@
-[gd_scene load_steps=24 format=3 uid="uid://csts2io3jxnsy"]
+[gd_scene load_steps=26 format=3 uid="uid://csts2io3jxnsy"]
 
 [ext_resource type="Script" uid="uid://cqig607puff42" path="res://Scripts/UI/ui.gd" id="1_ibotj"]
 [ext_resource type="PackedScene" uid="uid://ce78d0fluy0rq" path="res://main_menu.tscn" id="2_ibotj"]
 [ext_resource type="PackedScene" uid="uid://brguepel0j1o4" path="res://human_ai_select.tscn" id="3_27fn8"]
-[ext_resource type="Texture2D" uid="uid://d4bbo73qm11li" path="res://Assets/UI/timer_rays.png" id="4_7rqds"]
+[ext_resource type="Texture2D" uid="uid://61cmr7k078yx" path="res://Assets/UI/timer_rays.png" id="4_7rqds"]
 [ext_resource type="Script" uid="uid://uq0520028lh7" path="res://Scripts/right_side_states.gd" id="4_nltto"]
 [ext_resource type="FontFile" uid="uid://detd1i5on3er0" path="res://Assets/fonts/Deutsch.ttf" id="5_gs482"]
 [ext_resource type="Texture2D" uid="uid://1ha11mbduaej" path="res://Assets/UI/health_empty.png" id="5_irxef"]
 [ext_resource type="Texture2D" uid="uid://m22ia0wolt6" path="res://Assets/UI/money.png" id="5_n5rqp"]
-[ext_resource type="Script" uid="uid://cretchymjo67h" path="res://Scripts/UI/sun_spin.gd" id="5_nvb2n"]
+[ext_resource type="Script" path="res://Scripts/UI/sun_spin.gd" id="5_nvb2n"]
 [ext_resource type="Texture2D" uid="uid://db1jhrdqw64es" path="res://Assets/UI/button_build.png" id="5_waa4j"]
 [ext_resource type="Texture2D" uid="uid://bcylyd5jykq4a" path="res://Assets/UI/health_fill.png" id="6_e2l4f"]
 [ext_resource type="Texture2D" uid="uid://ca10le8pj4jjx" path="res://Assets/UI/button_destroy.png" id="6_ok7cu"]
-[ext_resource type="Texture2D" uid="uid://du7u65g41ygo2" path="res://Assets/UI/timer_bg.png" id="6_os5c7"]
-[ext_resource type="Texture2D" uid="uid://bu2mjp1eaeewo" path="res://Assets/UI/timer_base.png" id="7_b2p7n"]
+[ext_resource type="Texture2D" uid="uid://cckhrhfc83cog" path="res://Assets/UI/timer_bg.png" id="6_os5c7"]
+[ext_resource type="Texture2D" uid="uid://y5654nl4bsnr" path="res://Assets/UI/timer_base.png" id="7_b2p7n"]
 [ext_resource type="Texture2D" uid="uid://c1qt6xchirphw" path="res://Assets/UI/button_pass.png" id="7_irxef"]
 [ext_resource type="Texture2D" uid="uid://bqnsnmj8r6608" path="res://Assets/UI/button_hire_red.png" id="8_e2l4f"]
 [ext_resource type="Texture2D" uid="uid://dj77bl6upquwm" path="res://Assets/UI/button_hire_blue.png" id="17_nvb2n"]
+[ext_resource type="Texture2D" uid="uid://cdhuagmf177m0" path="res://Assets/UI/scroll.png" id="18_os5c7"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ibotj"]
 
@@ -109,6 +110,11 @@ _data = {
 }
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_irxef"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_b2p7n"]
+font = ExtResource("5_gs482")
+font_size = 96
+font_color = Color(0.337255, 0.203922, 0.0745098, 1)
 
 [node name="UI" type="CanvasLayer"]
 script = ExtResource("1_ibotj")
@@ -338,9 +344,9 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -162.05595
+offset_left = -162.056
 offset_top = 16.0
-offset_right = 185.94403
+offset_right = 185.944
 offset_bottom = 88.0
 grow_horizontal = 2
 theme_override_constants/separation = 8
@@ -544,9 +550,9 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.514
 anchor_right = 0.514
-offset_left = -173.95355
+offset_left = -173.954
 offset_top = 16.0
-offset_right = 174.04645
+offset_right = 174.046
 offset_bottom = 88.0
 grow_horizontal = 2
 theme_override_constants/separation = 8
@@ -637,6 +643,23 @@ text = "West/Left"
 [node name="E" type="Button" parent="Game UI/RightSideStates/Human Control/Mercenary Directions"]
 layout_mode = 2
 text = "East/Right"
+
+[node name="Scroll" type="Sprite2D" parent="Game UI"]
+position = Vector2(600, -200)
+scale = Vector2(0.742188, 0.742188)
+texture = ExtResource("18_os5c7")
+
+[node name="Label" type="Label" parent="Game UI/Scroll"]
+offset_left = -363.789
+offset_top = -169.768
+offset_right = 354.211
+offset_bottom = 170.232
+text = "PLAYER WINS!
+"
+label_settings = SubResource("LabelSettings_b2p7n")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [connection signal="PlayGame" from="Main Menu" to="." method="_on_main_menu_play_game"]
 [connection signal="Back" from="Human AI select" to="." method="_on_human_ai_select_back"]

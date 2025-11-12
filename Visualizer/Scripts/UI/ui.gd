@@ -47,10 +47,34 @@ func _update_building_prices(game_state):
 		get_node("Game UI/LeftSideStates/Human Control/Build OPtions/" + bldg).text = bldg + "\n$" + str(game_state["TowerPricesR"][bldg]).pad_decimals(0)
 		get_node("Game UI/RightSideStates/Human Control/Build OPtions/" + bldg).text = bldg + "\n$" + str(game_state["TowerPricesB"][bldg]).pad_decimals(0)
 
+func _update_postgame_popup(victory):
+	match victory:
+		'r':   
+			$"Game UI/Scroll/Label".text = "RED WINS!"
+			_scroll_popup($"Game UI/Scroll")
+		'b':   
+			$"Game UI/Scroll/Label".text = "BLUE WINS!"
+			_scroll_popup($"Game UI/Scroll")
+		'tie': 
+			$"Game UI/Scroll/Label".text = "TIE?!?!??!?!?!"
+			_scroll_popup($"Game UI/Scroll")
+		_: # no winner
+			pass
+
+# Make scroll appear after game ends
+func _scroll_popup(scroll: Node2D):
+	await get_tree().create_timer(0.5).timeout
+	scroll.position.y = -200
+	scroll.visible = true;
+	var tween = get_tree().create_tween()
+	tween.set_trans(Tween.TRANS_ELASTIC)
+	tween.tween_property(scroll, "position", Vector2(600, 300), 2)
+
+
 func _on_main_menu_play_game() -> void:
 	human_ai_select.visible = true
 	main_menu.visible = false
-
+	
 func _on_human_ai_select_go(is_ai: bool, is_ai2: bool) -> void:
 	ai1 = is_ai
 	ai2 = is_ai2

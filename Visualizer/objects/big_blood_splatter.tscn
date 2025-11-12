@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://pyk1awhppjf3"]
 
 [ext_resource type="Texture2D" uid="uid://s6x4733jg4hw" path="res://Assets/HD_Skin/Blood.png" id="1_u7ps2"]
-[ext_resource type="Script" uid="uid://dkainynk4nboa" path="res://Scripts/delete_signal.gd" id="2_1i6yu"]
+[ext_resource type="Script" path="res://Scripts/delete_signal.gd" id="2_1i6yu"]
 
 [sub_resource type="Curve" id="Curve_4luaf"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.177442), 0.0, 0.0, 0, 0]
@@ -30,8 +30,8 @@ spread = 180.0
 flatness = 1.0
 initial_velocity_max = 50.0
 gravity = Vector3(0, 15, 0)
-scale_min = 0.19999999
-scale_max = 0.29999998
+scale_min = 0.2
+scale_max = 0.3
 scale_curve = SubResource("CurveXYZTexture_u5u2o")
 
 [node name="BloodSplatter" type="GPUParticles2D"]
