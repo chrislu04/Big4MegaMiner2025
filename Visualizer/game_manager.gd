@@ -244,9 +244,10 @@ func _draw_mercenaries(mercs : Array, prev_mercs: Array):
 			if merc["Team"] == 'r':
 				child._update_values(merc["Name"], merc["Health"])
 			
-			if prev_merc["State"] == "dead":
+			if merc["State"] == "dead":
 				var blood_splatter_effect = BLOOD_SPLATTER_FX.instantiate()
 				blood_splatter_effect.position = child.global_position
+				#await get_tree().create_timer(0.35).timeout # wait for attack anims to play
 				add_child(blood_splatter_effect)
 				(blood_splatter_effect as GPUParticles2D).emitting = true
 				child.free()
@@ -346,9 +347,10 @@ func _draw_demons(dem_array : Array, prev_array : Array):
 		else:
 			var prev_dem = prev_array[count]
 			var child : RedMerc = demons.get_child(count)
-			if prev_dem["State"] == "dead":
+			if dem["State"] == "dead":
 				var blood_splatter_effect = BLOOD_SPLATTER_FX.instantiate()
 				blood_splatter_effect.position = child.global_position
+				#await get_tree().create_timer(0.25).timeout # wait for attack anims to play
 				add_child(blood_splatter_effect)
 				(blood_splatter_effect as GPUParticles2D).emitting = true
 				child.free()
