@@ -39,7 +39,8 @@ func _update_base_health(is_left : bool, new_value):
 		var tween = get_tree().create_tween()
 		tween.tween_property($"Game UI/LeftSideStates/Health/TextureProgressBar", "value", (new_value / 200) * 100, 1.5)
 	else:
-		$"Game UI/RightSideStates/Health/Health".text = "Base Health\n" + str(new_value) + "/200"
+		var tween = get_tree().create_tween()
+		tween.tween_property($"Game UI/RightSideStates/Health/TextureProgressBar", "value", (new_value / 200) * 100, 1.5)
 		
 func _update_building_prices(game_state):
 	for bldg: String in ["House", "Crossbow", "Minigun", "Cannon"]:
