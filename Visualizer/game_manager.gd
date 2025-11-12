@@ -127,6 +127,7 @@ func _draw_game_from_gamestate(game_state : String):
 	current_game_state = game_state_json
 	next_turn.emit()
 	if initial:
+		previous_game_state = current_game_state
 		_draw_grid(game_state_json["FloorTiles"])
 		
 		## Setting up castles
@@ -163,9 +164,9 @@ func _draw_game_from_gamestate(game_state : String):
 		initial = false
 	
 	
-	_draw_mercenaries(game_state_json["Mercenaries"])
+	_draw_mercenaries(game_state_json["Mercenaries"], previous_game_state["Mercenaries"])
 	_draw_towers(game_state_json["Towers"])
-	_draw_demons(game_state_json["Demons"])
+	_draw_demons(game_state_json["Demons"], previous_game_state["Demons"])
 	_update_ui(game_state_json)
 
 
@@ -221,7 +222,7 @@ func _draw_grid(tile_grid : Array):
 		#i.queue_free()
 
 # Draws the mercanaries
-func _draw_mercenaries(mercs : Array):
+func _draw_mercenaries(mercs : Array, prev_mercs: Array):
 	#print(mercs)
 	var count = 0
 	for merc in mercs:
@@ -237,12 +238,13 @@ func _draw_mercenaries(mercs : Array):
 			sprite.position = pos
 			mercenaries.add_child(sprite)
 		else:
+			var prev_merc = prev_mercs[count]
 			var child : RedMerc = mercenaries.get_child(count)
 			
 			if merc["Team"] == 'r':
 				child._update_values(merc["Name"], merc["Health"])
 			
-			if merc["State"] == "dead":
+			if prev_merc["State"] == "dead":
 				var blood_splatter_effect = BLOOD_SPLATTER_FX.instantiate()
 				blood_splatter_effect.position = child.global_position
 				add_child(blood_splatter_effect)
@@ -256,6 +258,9 @@ func _draw_mercenaries(mercs : Array):
 				tween.tween_callback(child.idle)
 			else:
 					child.attack(Vector2(1,0))
+					
+			if (merc["Health"] < prev_merc["Health"] && is_instance_valid(child)):
+				child.hurt()
 		
 		count += 1
 
@@ -325,7 +330,7 @@ func _draw_towers(data_towers : Array):
 		count += 1
 
 
-func _draw_demons(dem_array : Array):
+func _draw_demons(dem_array : Array, prev_array : Array):
 	var count = 0
 	for dem in dem_array:
 		if demons.get_child_count() - 1 < count:
@@ -339,8 +344,9 @@ func _draw_demons(dem_array : Array):
 			demon_obj.position = pos
 			demons.add_child(demon_obj)
 		else:
+			var prev_dem = prev_array[count]
 			var child : RedMerc = demons.get_child(count)
-			if dem["State"] == "dead":
+			if prev_dem["State"] == "dead":
 				var blood_splatter_effect = BLOOD_SPLATTER_FX.instantiate()
 				blood_splatter_effect.position = child.global_position
 				add_child(blood_splatter_effect)
@@ -354,6 +360,9 @@ func _draw_demons(dem_array : Array):
 				tween.tween_callback(child.idle)
 			else:
 				child.attack(Vector2(1,0))
+				
+			if (dem["Health"] < prev_dem["Health"] && is_instance_valid(child)):
+				child.hurt()
 		count += 1
 
 func _process(delta):
