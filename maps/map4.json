@@ -31,13 +31,13 @@
         },
         {
             "x": 9,
-            "y": 4,
+            "y": 3,
             "initial_target": "b",
             "switch_target": false
         },
         {
             "x": 7,
-            "y": 4,
+            "y": 3,
             "initial_target": "r",
             "switch_target": false
         }

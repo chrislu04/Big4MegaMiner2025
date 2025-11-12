@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://brguepel0j1o4"]
+[gd_scene load_steps=6 format=3 uid="uid://brguepel0j1o4"]
 
 [ext_resource type="Script" uid="uid://cubaa0k5uj4y5" path="res://Scripts/UI/left_side_pick.gd" id="1_apbam"]
 [ext_resource type="Script" uid="uid://btro5hl2gm58b" path="res://human_ai_select.gd" id="1_xxbwn"]
 [ext_resource type="Texture2D" uid="uid://bfnrc17sopmbw" path="res://Assets/UI/Human_Icon.png" id="2_xxbwn"]
 [ext_resource type="Texture2D" uid="uid://d2m7eeuovq7fl" path="res://Assets/UI/Robot_Icon.png" id="3_bkusi"]
+[ext_resource type="Script" uid="uid://55va4sgltti8" path="res://Scripts/map_selector.gd" id="5_bkusi"]
 
 [node name="Human AI select" type="Control" node_paths=PackedStringArray("player_select_one", "player_select_two")]
 layout_mode = 3
@@ -192,6 +193,14 @@ offset_top = 512.0
 offset_right = 640.0
 offset_bottom = 576.0
 text = "Go"
+
+[node name="MapPicker" type="OptionButton" parent="."]
+layout_mode = 0
+offset_left = 672.0
+offset_top = 512.0
+offset_right = 902.0
+offset_bottom = 575.0
+script = ExtResource("5_bkusi")
 
 [connection signal="pressed" from="Left Side Pick/VBoxContainer/HBoxContainer2/file_picker" to="Left Side Pick" method="_on_file_picker_pressed"]
 [connection signal="pressed" from="Left Side Pick/VBoxContainer/HBoxContainer/Human" to="Left Side Pick" method="_on_human_pressed"]

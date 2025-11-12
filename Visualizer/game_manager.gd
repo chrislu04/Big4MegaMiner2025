@@ -79,23 +79,23 @@ func _on_ui_start_game(is_ai1, is_ai2):
 	
 	if is_ai1 and is_ai2:
 		process_info = OS.execute_with_pipe("python", 
-			[GlobalPaths.backendPath, GameSettings.default_map, "-a1", GlobalPaths.AI_agent1_file_path, "-a2",GlobalPaths.AI_agent2_file_path, "-v"], 
+			[GlobalPaths.backendPath, GameSettings.selected_map, "-a1", GlobalPaths.AI_agent1_file_path, "-a2",GlobalPaths.AI_agent2_file_path, "-v"], 
 			true)
 		
 	elif not is_ai1 and is_ai2:
 		
 		process_info = OS.execute_with_pipe("python", 
-			[GlobalPaths.backendPath, GameSettings.default_map, "-h1" , "-a2",GlobalPaths.AI_agent2_file_path, "-v"], 
+			[GlobalPaths.backendPath, GameSettings.selected_map, "-h1" , "-a2",GlobalPaths.AI_agent2_file_path, "-v"], 
 			true)
 		play2ready = true
 	elif is_ai1 and not is_ai2:
 		process_info = OS.execute_with_pipe("python", 
-			[GlobalPaths.backendPath, GameSettings.default_map, "-a1", GlobalPaths.AI_agent1_file_path, "-h2", "-v"], 
+			[GlobalPaths.backendPath, GameSettings.selected_map, "-a1", GlobalPaths.AI_agent1_file_path, "-h2", "-v"], 
 			true)
 		play1ready = true
 	else:
 		process_info = OS.execute_with_pipe("python", 
-			[GlobalPaths.backendPath, GameSettings.default_map, "-h1", "-h2", "-v"], 
+			[GlobalPaths.backendPath, GameSettings.selected_map, "-h1", "-h2", "-v"], 
 			true)
 	
 	processID = process_info["pid"]

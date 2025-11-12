@@ -4,6 +4,7 @@ var backend_path : String = "main.py"
 var AI_folder : String = "AI Agents"
 
 var default_map : String = "../maps/map2.json"
+var selected_map : String = default_map;
 
 var AI_agent1_file_path : String = ""
 var AI_agent2_file_path : String = ""

@@ -18,14 +18,14 @@
     },
     "DemonSpawners": [
         {
-            "x": 8,
-            "y": 1,
+            "x": 9,
+            "y": 0,
             "initial_target": "r",
             "switch_target": true
         },
         {
-            "x": 8,
-            "y": 5,
+            "x": 9,
+            "y": 6,
             "initial_target": "b",
             "switch_target": true
         }
