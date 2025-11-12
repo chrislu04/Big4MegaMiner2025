@@ -34,6 +34,9 @@ class Game:
         map_json_data = json.load(open(map_json_file_path, 'r'))
         self.game_state = GameState(map_json_data)
 
+    # set from main.py
+    team_name_r = ""
+    team_name_b = ""
 
     # Perform updates to GameState based on two AI Actions
     def run_turn(self, action_r: AIAction, action_b: AIAction):
@@ -162,6 +165,8 @@ class Game:
             list_spawners.append(spawner_dict)
 
         data : dict = {
+            "TeamNameR": self.team_name_r,
+            "TeamNameB": self.team_name_b,
             "Victory" : self.game_state.victory,
             "TurnsRemaining" : self.game_state.turns_remaining,
             "CurrentTurn" : Constants.MAX_TURNS - self.game_state.turns_remaining,

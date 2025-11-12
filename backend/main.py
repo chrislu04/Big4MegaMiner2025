@@ -189,6 +189,8 @@ if __name__ == '__main__':
         team_name_b = "Human Player (Blue)"
 
     # Send initial game state and team names to the visualizer (or other parent process)
+    game.team_name_r = team_name_r
+    game.team_name_b = team_name_b
     print("--BEGIN INITIAL GAME STATE--")
     print(game.game_state_to_json())
     print("--END INITIAL GAME STATE--")

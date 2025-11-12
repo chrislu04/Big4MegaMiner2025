@@ -298,14 +298,15 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -52.0
-offset_top = -16.0
+offset_top = -25.0
 offset_right = 85.0
-offset_bottom = 33.0
+offset_bottom = 27.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("5_gs482")
 theme_override_font_sizes/font_size = 48
 text = "1004"
+vertical_alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="Game UI/LeftSideStates/Money"]
 layout_mode = 0
@@ -342,24 +343,21 @@ tint_progress = Color(1, 0.00392157, 0, 1)
 
 [node name="TeamName" type="Panel" parent="Game UI/LeftSideStates"]
 layout_mode = 1
-offset_left = 312.0
-offset_right = 416.0
+offset_left = 262.0
+offset_right = 418.0
 offset_bottom = 64.0
 
 [node name="Name" type="Label" parent="Game UI/LeftSideStates/TeamName"]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -21.0
-offset_top = -11.5
-offset_right = 21.0
-offset_bottom = 11.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Team: "
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="Human Control" type="Control" parent="Game UI/LeftSideStates"]
 layout_mode = 1
@@ -516,14 +514,15 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -52.0
-offset_top = -17.5
+offset_top = -25.0
 offset_right = 85.0
-offset_bottom = 34.5
+offset_bottom = 27.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("5_gs482")
 theme_override_font_sizes/font_size = 48
 text = "1004"
+vertical_alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="Game UI/RightSideStates/Money"]
 layout_mode = 0
@@ -564,24 +563,21 @@ tint_progress = Color(0, 0.00392157, 1, 1)
 
 [node name="TeamName" type="Panel" parent="Game UI/RightSideStates"]
 layout_mode = 1
-offset_left = 440.0
-offset_right = 544.0
+offset_left = 390.0
+offset_right = 546.0
 offset_bottom = 64.0
 
 [node name="Name" type="Label" parent="Game UI/RightSideStates/TeamName"]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -21.0
-offset_top = -11.5
-offset_right = 21.0
-offset_bottom = 11.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Team: "
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="Human Control" type="Control" parent="Game UI/RightSideStates"]
 layout_mode = 1

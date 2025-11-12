@@ -132,6 +132,8 @@ func _draw_game_from_gamestate(game_state : String):
 		previous_game_state = current_game_state
 		_draw_grid(game_state_json["FloorTiles"])
 		
+		UI._update_team_names(current_game_state["TeamNameR"], current_game_state["TeamNameB"])
+		
 		## Setting up castles
 		var castle = Sprite2D.new()
 		
@@ -336,14 +338,19 @@ func _draw_towers(data_towers : Array):
 					sprite.y_sort_enabled = true
 			
 			##sprite = CROSSBOW.instantiate()
-			sprite.name = tower["Name"]
-			sprite.position = pos + Vector2(0,-5)
-			towers.add_child(sprite)
+			var parentNode: Node2D = Node2D.new();
+			parentNode.name = tower["Name"]
+			parentNode.position = pos + Vector2(0, -5)
+			sprite.name = tower["Name"] + "Sprite"
+			#sprite.position = pos + Vector2(0,-5)
+			parentNode.add_child(sprite)
+			towers.add_child(parentNode)
 			
 			if (makeStruts):
 				var strut1 = Sprite2D.new()
+				strut1.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
 				strut1.texture = STRUTS if tower["Team"] == "r" else BLUE_STRUTS
-				sprite.add_child(strut1)
+				parentNode.add_child(strut1)
 				#strut1.reparent(towerStands)
 				strut1.z_index = -1
 				strut1.global_position = sprite.global_position
@@ -365,8 +372,8 @@ func _draw_towers(data_towers : Array):
 				tween.set_trans(Tween.TRANS_QUAD)
 				for target in tower["Targets"]:
 					var theta = atan2((target[1] - tower["y"]), (target[0] - tower["x"])) + (PI * 0.5)
-					tween.tween_property(child, "rotation", theta, turn_interval_max / 2.0)
-					tween.tween_property(child.get_child(0), "rotation", -theta, turn_interval_max / 2.0)
+					tween.tween_property(child.get_child(0), "rotation", theta, turn_interval_max / 2.0)
+					#tween.tween_property(child.get_child(0), "rotation", -theta, turn_interval_max / 2.0)
 					if child is Crossbow:
 						tween.tween_callback(child.shoot.bind(turn_interval_max / 2))
 		count += 1

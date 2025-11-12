@@ -1,8 +1,6 @@
 class_name GameUI
 extends CanvasLayer
 
-
-
 @onready var main_menu : Control = $"Main Menu"
 
 @onready var human_ai_select : Control = $"Human AI select"
@@ -48,6 +46,10 @@ func _update_building_prices(game_state):
 		get_node("Game UI/LeftSideStates/Human Control/Build OPtions/" + bldg).text = bldg + "\n$" + str(game_state["TowerPricesR"][bldg]).pad_decimals(0)
 		get_node("Game UI/RightSideStates/Human Control/Build OPtions/" + bldg).text = bldg + "\n$" + str(game_state["TowerPricesB"][bldg]).pad_decimals(0)
 
+func _update_team_names(rName: String, bName: String):
+	$"Game UI/LeftSideStates/TeamName/Name".text = rName
+	$"Game UI/RightSideStates/TeamName/Name".text = bName
+
 func _update_postgame_popup(victory):
 	match victory:
 		'r':   
@@ -57,7 +59,7 @@ func _update_postgame_popup(victory):
 			$"Game UI/Scroll/Label".text = "BLUE WINS!"
 			_scroll_popup($"Game UI/Scroll")
 		'tie': 
-			$"Game UI/Scroll/Label".text = "TIE?!?!??!?!?!"
+			$"Game UI/Scroll/Label".text = "TIE?!?!??!?"
 			_scroll_popup($"Game UI/Scroll")
 		_: # no winner
 			pass
