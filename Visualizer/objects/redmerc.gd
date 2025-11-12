@@ -34,6 +34,15 @@ func move(direction : Vector2):
 func attack(_direction : Vector2):
 	await get_tree().create_timer(randf() * 0.25).timeout # randomize animation timing
 	sprite_anim.play("attack")
+	
+func hurt():
+	await get_tree().create_timer(0.35).timeout # wait for attack anims to play
+	self.rotation_degrees = randf() * 30 - 15
+	self.modulate = Color.RED
+	var tween = get_tree().create_tween()
+	tween.set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(self, "rotation_degrees", 0, 0.15)
+	tween.tween_property(self, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.15)
 
 func idle():
 	sprite_anim.play("default")
