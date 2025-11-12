@@ -317,21 +317,27 @@ expand_mode = 1
 [node name="Health" type="Panel" parent="Game UI/LeftSideStates"]
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
-offset_left = 152.0
-offset_right = 256.0
-offset_bottom = 64.0
+offset_left = 64.0
+offset_top = 64.0
+offset_right = 232.0
+offset_bottom = 128.0
 
 [node name="TextureProgressBar" type="TextureProgressBar" parent="Game UI/LeftSideStates/Health"]
 material = SubResource("ShaderMaterial_irxef")
-layout_mode = 0
-offset_left = -96.0
-offset_top = 88.0
-offset_right = 1440.0
-offset_bottom = 344.0
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -52.0
+offset_right = 1484.0
+offset_bottom = 256.0
+grow_horizontal = 2
 scale = Vector2(0.25, 0.25)
-value = 100.0
+max_value = 200.0
+value = 200.0
 texture_under = ExtResource("5_irxef")
 texture_progress = ExtResource("6_e2l4f")
+tint_under = Color(1, 0.768627, 0.752941, 1)
 tint_progress = Color(1, 0.00392157, 0, 1)
 
 [node name="TeamName" type="Panel" parent="Game UI/LeftSideStates"]
@@ -529,22 +535,32 @@ expand_mode = 1
 [node name="Health" type="Panel" parent="Game UI/RightSideStates"]
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
-offset_left = 280.0
-offset_right = 384.0
-offset_bottom = 64.0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -104.0
+offset_top = 64.0
+offset_bottom = 128.0
+grow_horizontal = 0
+scale = Vector2(-1, 1)
 
 [node name="TextureProgressBar" type="TextureProgressBar" parent="Game UI/RightSideStates/Health"]
 material = SubResource("ShaderMaterial_irxef")
-layout_mode = 0
-offset_left = -96.0
-offset_top = 88.0
-offset_right = 1440.0
-offset_bottom = 344.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1432.0
+offset_bottom = 192.0
+grow_horizontal = 2
+grow_vertical = 2
 scale = Vector2(0.25, 0.25)
-value = 100.0
+max_value = 200.0
+value = 200.0
 texture_under = ExtResource("5_irxef")
 texture_progress = ExtResource("6_e2l4f")
-tint_progress = Color(1, 0.00392157, 0, 1)
+tint_under = Color(0.768627, 0.768627, 1, 1)
+tint_progress = Color(0, 0.00392157, 1, 1)
 
 [node name="TeamName" type="Panel" parent="Game UI/RightSideStates"]
 layout_mode = 1

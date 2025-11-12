@@ -38,10 +38,10 @@ func _update_money_values(left_value, right_value):
 func _update_base_health(is_left : bool, new_value):
 	if is_left:
 		var tween = get_tree().create_tween()
-		tween.tween_property($"Game UI/LeftSideStates/Health/TextureProgressBar", "value", (new_value / 200) * 100, 1.5)
+		tween.tween_property($"Game UI/LeftSideStates/Health/TextureProgressBar", "value", new_value, 1.5)
 	else:
 		var tween = get_tree().create_tween()
-		tween.tween_property($"Game UI/RightSideStates/Health/TextureProgressBar", "value", (new_value / 200) * 100, 1.5)
+		tween.tween_property($"Game UI/RightSideStates/Health/TextureProgressBar", "value", new_value, 1.5)
 		
 func _update_building_prices(game_state):
 	for bldg: String in ["House", "Crossbow", "Minigun", "Cannon", "Church"]:
