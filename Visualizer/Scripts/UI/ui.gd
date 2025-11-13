@@ -110,9 +110,10 @@ func _on_human_ai_select_back() -> void:
 
 
 func _on_right_side_states_action(is_player1: bool, build: String, x: int, y: int, tower_to_build: String, merc_direction: String) -> void:
-	if tower_to_build == "skip":
-		action.emit(true, build, x, y, tower_to_build, merc_direction)
-		action.emit(false, build, x, y, tower_to_build, merc_direction)
+	if tower_to_build == "skip" and is_player1:
+		action.emit(is_player1, build, x, y, tower_to_build, merc_direction)
+		action.emit(!is_player1, build, x, y, tower_to_build, merc_direction)
+	
 	elif is_player1 == red_turn:
 		action.emit(is_player1, build, x, y, tower_to_build, merc_direction)
 		
