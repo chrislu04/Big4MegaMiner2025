@@ -55,7 +55,24 @@ When either player destroys a Tower, they must specify where the tower they want
 
 ### Provoking the Demons
 
+### Mercenary Turn
+After both players decide their action, all mercenaries on the board will do one of three actions: move, fight, or wait. 
+A mercenary will choose to move if the two path tiles in front of it are empty. The mercenary will then move forward one path tile.
+A mercenary will chose to fight if a demon, rival mercenary, or player base blocks either of the next two path tiles. The mercenary will then deal damage to entity blocking its path.
+If a mercenary's path is blocked by a friendly mercenary, it will choose to wait, not performing any action.
+
+After all merceneraries have acted, all mercenaries and demons on the board with 0 or less Health will be removed from the game.
+
+### Demon Turn
+After the Mercenary Turn, all demons on the board will choose to either move forward or attack. A demon chooses to move forward if the two path tiles in front of it are empty. If a mercenary, player base, or another demon block the path, the demon will deal damage to them.
+
+After all demons have acted, all mercenaries and demons on the board with 0 or less Health will be removed from the game.
+
 ## Towers
+
+After the Demon Turn, each tower placed on the board will perform an update. 
+If a tower updates when its cooldown is equal to 0, it will "activate" and reset its cooldown; The effect that occurs when the tower activates depends on the type of tower (see below). 
+If the tower updates when its cooldown is greater than 0, it will reduce the cooldown by 1 and do nothing else.
 
 ### House
 - Cooldown: 5 turns
