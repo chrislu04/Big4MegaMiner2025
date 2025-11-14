@@ -260,6 +260,13 @@ func _draw_mercenaries(mercs : Array, prev_mercs: Array):
 	#print(mercs)
 	var count = 0
 	for merc in mercs:
+		# find previous state of this merc
+		var prev_merc = null
+		for _merc in prev_mercs:
+			if (_merc["Name"] == merc["Name"]):
+				prev_merc = _merc
+				break
+				
 		if mercenaries.get_child_count() - 1 < count:
 			var pos = Vector2(merc["x"] * 32, merc["y"] * 32)
 			var sprite : RedMerc
@@ -272,13 +279,6 @@ func _draw_mercenaries(mercs : Array, prev_mercs: Array):
 			sprite.position = pos
 			mercenaries.add_child(sprite)
 		else:
-			# find previous state of this merc
-			var prev_merc = null
-			for _merc in prev_mercs:
-				if (_merc["Name"] == merc["Name"]):
-					prev_merc = _merc
-					break
-			
 			var child : RedMerc = mercenaries.get_child(count)
 			
 			if merc["Team"] == 'r':
@@ -360,7 +360,9 @@ func _draw_towers(data_towers : Array):
 				strut1.global_position = sprite.global_position
 		else:
 			var child = towers.get_child(count)
-			var prev_tower = previous_game_state["Towers"][count]
+			var prev_tower = null
+			if len(previous_game_state["Towers"]) > 0:
+				prev_tower = previous_game_state["Towers"][count]
 			
 			while (child.name != tower["Name"]):
 				child.free()
@@ -388,7 +390,7 @@ func _draw_towers(data_towers : Array):
 			child.modulate.a = 1
 			
 			# animate towers being "activated" based on cooldown
-			if (prev_tower["Cooldown"] == 0 && tower["Cooldown"] != 0):
+			if (prev_tower && prev_tower["Cooldown"] == 0 && tower["Cooldown"] != 0):
 				var sprite = child.get_child(0)
 				var tween = get_tree().create_tween()
 				tween.set_trans(Tween.TRANS_BOUNCE)
@@ -401,7 +403,14 @@ func _draw_towers(data_towers : Array):
 func _draw_demons(dem_array : Array, prev_array : Array):
 	var count = 0
 	for dem in dem_array:
-		if demons.get_child_count() - 1 < count:
+		# find previous state of this dem
+		var prev_dem = null
+		for _dem in prev_array:
+			if (_dem["Name"] == dem["Name"]):
+				prev_dem = _dem
+				break
+				
+		if demons.get_child_count() - 1 < count || prev_dem == null:
 			var pos = Vector2(dem["x"] * 32, dem["y"] * 32)
 			var demon_obj : RedMerc = ENEMY.instantiate()
 			if dem["Team"] == "b":
@@ -412,12 +421,6 @@ func _draw_demons(dem_array : Array, prev_array : Array):
 			demon_obj.position = pos
 			demons.add_child(demon_obj)
 		else:
-			# find previous state of this dem
-			var prev_dem = null
-			for _dem in prev_array:
-				if (_dem["Name"] == dem["Name"]):
-					prev_dem = _dem
-					break
 					
 			var child : RedMerc = demons.get_child(count)
 			if dem["State"] == "dead":
