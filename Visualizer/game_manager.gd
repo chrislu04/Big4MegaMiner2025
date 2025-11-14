@@ -350,6 +350,14 @@ func _draw_towers(data_towers : Array):
 			parentNode.add_child(sprite)
 			towers.add_child(parentNode)
 			
+			var cooldownLabel: Label = Label.new()
+			cooldownLabel.text = str(int(tower["Cooldown"]))
+			cooldownLabel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			cooldownLabel.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			#cooldownLabel.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
+			parentNode.add_child(cooldownLabel)
+			cooldownLabel.global_position = parentNode.global_position
+						
 			if (makeStruts):
 				var strut1 = Sprite2D.new()
 				strut1.scale = Vector2(32 / sprite.texture.get_size().x, 32 / sprite.texture.get_size().y)
@@ -374,20 +382,23 @@ func _draw_towers(data_towers : Array):
 			if child == null:
 				continue
 			
+			(child.get_child(1) as Label).text = str(int(tower["Cooldown"]))
 			if tower["Type"] != "Church":
 				var tween = get_tree().create_tween()
 				tween.set_trans(Tween.TRANS_QUAD)
 				for target in tower["Targets"]:
 					var theta = atan2((target[1] - tower["y"]), (target[0] - tower["x"])) + (PI * 0.5)
-					tween.tween_property(child.get_child(0), "rotation", theta, turn_interval_max / 2.0)
+					tween.tween_property(child.get_child(1), "rotation", theta, turn_interval_max / 2.0)
 					#tween.tween_property(child.get_child(0), "rotation", -theta, turn_interval_max / 2.0)
 					if child is Crossbow:
 						tween.tween_callback(child.shoot.bind(turn_interval_max / 2))
+						
+			
 			
 			# darken tower based on cooldown
 			var c : float = max (2.718 ** (-tower["Cooldown"] * 0.3), 0.4)
-			child.modulate = Color(c, c, c, 1.0)
-			child.modulate.a = 1
+			child.get_child(0).self_modulate = Color(c, c, c, 1.0)
+			child.get_child(0).self_modulate.a = 1
 			
 			# animate towers being "activated" based on cooldown
 			if (prev_tower && prev_tower["Cooldown"] == 0 && tower["Cooldown"] != 0):
