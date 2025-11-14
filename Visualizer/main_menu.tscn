@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://b2cu144l1almb" path="res://Button_Theem.tres" id="1_06t4h"]
 [ext_resource type="Script" uid="uid://beyo8py2phky5" path="res://main_menu.gd" id="1_7vrkn"]
-[ext_resource type="Texture2D" uid="uid://cnq55jai20f0b" path="res://Assets/UI/logo.png" id="3_fu7sn"]
+[ext_resource type="Texture2D" uid="uid://bivtx0yee5fet" path="res://Assets/UI/logo.png" id="3_fu7sn"]
 [ext_resource type="FontFile" uid="uid://detd1i5on3er0" path="res://Assets/fonts/Deutsch.ttf" id="3_jix8l"]
 
 [sub_resource type="Gradient" id="Gradient_fu7sn"]
@@ -27,31 +27,32 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -120.0
+offset_top = -152.0
+offset_bottom = -32.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 16
+theme_override_constants/separation = 96
 alignment = 1
 
 [node name="Play Game" type="Button" parent="HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_06t4h")
-theme_override_colors/font_color = Color(0.9411765, 0.8784314, 0.6117647, 1)
-theme_override_colors/font_hover_color = Color(0.8980392, 0.88235295, 0.7411765, 1)
-theme_override_colors/font_outline_color = Color(0.5176471, 0.3529412, 0.1254902, 1)
+theme_override_colors/font_hover_color = Color(0.898039, 0.882353, 0.741176, 1)
+theme_override_colors/font_outline_color = Color(0.517647, 0.352941, 0.12549, 1)
+theme_override_colors/font_color = Color(0.941176, 0.878431, 0.611765, 1)
 theme_override_constants/outline_size = 14
 theme_override_fonts/font = ExtResource("3_jix8l")
-text = "Play Game"
+text = " Play "
 
 [node name="Quit" type="Button" parent="HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_06t4h")
-theme_override_colors/font_color = Color(0.9411765, 0.8784314, 0.6117647, 1)
-theme_override_colors/font_hover_color = Color(1, 0.27058825, 0.38039216, 1)
-theme_override_colors/font_outline_color = Color(0.5176471, 0.3529412, 0.1254902, 1)
+theme_override_colors/font_hover_color = Color(1, 0.270588, 0.380392, 1)
+theme_override_colors/font_outline_color = Color(0.517647, 0.352941, 0.12549, 1)
+theme_override_colors/font_color = Color(0.941176, 0.878431, 0.611765, 1)
 theme_override_constants/outline_size = 14
 theme_override_fonts/font = ExtResource("3_jix8l")
-text = "Quit"
+text = " Quit "
 
 [node name="Panel" type="Panel" parent="."]
 visible = false

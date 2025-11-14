@@ -61,9 +61,11 @@ def check_wincon(game_state: GameState):
         if not (team_b_health <= 0 and team_r_health <= 0):
             if team_b_health <= 0:
                 log_msg("The Blue Player's base has been destroyed. The Red Nation survives!")
+                game_state.victory_reason = "Blue base destroyed!"
                 return 'r'
             elif team_r_health <= 0:
                 log_msg("The Red Player's base has been destroyed. The Blue Nation survives!")
+                game_state.victory_reason = "Red base destroyed!"
                 return 'b'
     else:
         # If no base has been destroyed, nobody has won yet
@@ -72,8 +74,10 @@ def check_wincon(game_state: GameState):
     # If both players' bases are Destroyed, break the tie based on who has the most Money.
     if team_b_money != team_r_money:
         if team_b_money > team_r_money:
+            game_state.victory_reason = "Tie broken: Blue has more money."
             return 'b'
         elif team_r_money > team_b_money:
+            game_state.victory_reason = "Tie broken: Red has more money."
             return 'r'
     else:
         # Then, if both players have the same amount of Money, break the tie based on who has built the most towers.
@@ -90,8 +94,10 @@ def check_wincon(game_state: GameState):
         
         if len(r_towers) != len(b_towers):
             if len(r_towers) > len(b_towers):
+                game_state.victory_reason = "Tie broken: Red has more towers."
                 return 'r'
             else:
+                game_state.victory_reason = "Tie broken: Blue has more towers."
                 return 'b'
         else:
             # Then, if both players have built the same number of towers, break the tie based on the sum of prices of those towers.
@@ -129,8 +135,10 @@ def check_wincon(game_state: GameState):
                         b_total_cost += Constants.CROSSBOW_BASE_PRICE
             if r_total_cost != b_total_cost:
                 if r_total_cost > b_total_cost:
+                    game_state.victory_reason = "Tie broken: Red has spent more."
                     return 'r'
                 else:
+                    game_state.victory_reason = "Tie broken: Blue has spent more."
                     return 'b'
             else:
                 # Then, if both sums are equal, break the tie based on the number of Mercenaries each player has.
@@ -147,8 +155,10 @@ def check_wincon(game_state: GameState):
                 
                 if r_mercs != b_mercs:
                     if r_mercs > b_mercs:
+                        game_state.victory_reason = "Tie broken: Red has more mercenaries."
                         return 'r'
                     else:
+                        game_state.victory_reason = "Tie broken: Blue has more mercenaries."
                         return 'b'
                 else:
                     # Then, if both have the same number of Mercenaries, break the tie based on the sum of health of mercenaries.
@@ -163,8 +173,10 @@ def check_wincon(game_state: GameState):
                     
                     if r_mercs_health != b_mercs_health:
                         if r_mercs_health > b_mercs_health:
+                            game_state.victory_reason = "Tie broken: Red mercenaries have more health."
                             return 'r'
                         else:
+                            game_state.victory_reason = "Tie broken: Blue mercenaries have more health."
                             return 'b'
                     else:
                         return 'tie'

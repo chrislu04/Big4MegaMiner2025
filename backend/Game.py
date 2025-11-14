@@ -170,6 +170,7 @@ class Game:
             "TeamNameR": self.team_name_r,
             "TeamNameB": self.team_name_b,
             "Victory" : self.game_state.victory,
+            "VictoryReason" : self.game_state.victory_reason,
             "TurnsRemaining" : self.game_state.turns_remaining,
             "CurrentTurn" : Constants.MAX_TURNS - self.game_state.turns_remaining,
 
