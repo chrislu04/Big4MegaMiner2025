@@ -11,7 +11,6 @@ Defenses and Mercenaries don't come cheap, though. You will need to make money b
 ApocaWarlords uses *simultaneous turns*. This means that each turn, both players select their actions at the same time, without communication. After both players select their actions, the game world is updated. This repeats until the game ends.
 
 ## Players
-
 There are two players, the Red player, and the Blue player. Each player has corresponding:
 - Towers
 - Mercenaries
@@ -28,18 +27,17 @@ Every turn, each player can decide to do any combination of the following, assum
 An invalid action will cause the player who made it to lose their turn ( they will do nothing ).
 
 ### Buying Mercenaries
-When either player buys a Mercenary, they must decide which direction the Mercenary starts out from. Mercenaries cost $20.
+When either player buys a Mercenary, they must decide which direction the Mercenary starts out from. Mercenaries cost $10.
 
 Depending on the map, different directions will be available. For all maps, there will be at least 2 Mercenary starting directions available per player, and at most 4. Maps are symmetric as to make them fair, so both players will always have the same amount of directions to choose from.
 
 A purchase is valid if the following two conditions hold:
 1. There is a Path Tile 1 unit away from the purchasing player's base in the direction which was selected. ( Mercenaries can only walk on path tiles )
-2. The purchasing player has $20.
+2. The purchasing player has $10.
 
-A valid Mercenary purchase will cause $20 to be subtracted from the purchasing player's total money and cause a Mercenary to immediately spawn in the direction selected. Buying Mercenaries happens before buying Towers and before provoking the Demons, so it is possible for a Mercenary purchase to make a player too poor to finish everything they decided to do in a single turn.
+A valid Mercenary purchase will cause $10 to be subtracted from the purchasing player's total money and cause a Mercenary to immediately spawn in the direction selected. Buying Mercenaries happens before buying Towers and before provoking the Demons, so it is possible for a Mercenary purchase to make a player too poor to finish everything they decided to do in a single turn.
 
 ### Building/Destroying Towers
-
 When either player builds a Tower, they must decide what type of tower to build and where to build it. Each Tower type has a base price, and **the price of each type of Tower increases by 25% for each one purchased, rounded down, per player**. So, for example, the first House purchased by the Red player will cost $10, then the second will cost $12. This price increase from $10 to $12 would only effect the Red player, since it was Red who did the buying.
 
 Players must build towers on Territory Tiles corresponding to their own team. The layout of Territory Tiles will be different per map. The layout of Territory Tiles is symmetric as to make the game fair. However, there is no restriction as to where on the map these tiles need to be ( expect some crazy maps ).
@@ -54,6 +52,13 @@ A valid Tower build action will cause the price of the tower to be subtracted fr
 When either player destroys a Tower, they must specify where the tower they want to destroy is. **the base price of the Tower will be refunded**. Destroying a tower does not decrease its price.
 
 ### Provoking the Demons
+Each turn, both players have the chance to provoke the demons. This costs $5, processed after buying mercenaries.
+
+If both players provoke, all Demons are immediately destroyed.
+
+If only one player provokes, all demon spawners will spawn an extra demon (added to their spawn queue).
+
+## World Update
 
 ### Mercenary Turn
 After both players decide their action, all mercenaries on the board will do one of three actions: move, fight, or wait. 
@@ -63,13 +68,20 @@ If a mercenary's path is blocked by a friendly mercenary, it will choose to wait
 
 After all merceneraries have acted, all mercenaries and demons on the board with 0 or less Health will be removed from the game.
 
+By default, mercenaries deal 20 damage and have 25 health.
+
 ### Demon Turn
 After the Mercenary Turn, all demons on the board will choose to either move forward or attack. A demon chooses to move forward if the two path tiles in front of it are empty. If a mercenary, player base, or another demon block the path, the demon will deal damage to them.
 
 After all demons have acted, all mercenaries and demons on the board with 0 or less Health will be removed from the game.
 
-## Towers
+### Mercenary Spawning
+Queued mercenaries spawn after the Mercenaries and Demons have their turn.
 
+### Demon Spawning
+Every 10 rounds, all demon spawners on the map add a Demon to their spawn queue. Demons leave the spawn queue immediately if there is no Mercenary or Demon blocking the spawner. Otherwise, they bide their time... 
+
+## Towers
 After the Demon Turn, each tower placed on the board will perform an update. 
 If a tower updates when its cooldown is equal to 0, it will "activate" and reset its cooldown; The effect that occurs when the tower activates depends on the type of tower (see below). 
 If the tower updates when its cooldown is greater than 0, it will reduce the cooldown by 1 and do nothing else.
