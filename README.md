@@ -113,3 +113,25 @@ The visualizer provides a UI which allows the user to manually play the game as 
 During the game, all buttons in the UI have tooltips which can be seen by hovering over them with the mouse. It is recommended to view all these tooltips to understand what UI buttons correspond to which game action.
 
 *NOTE: While playing as a human, the `S` key acts as a hotkey for the Pass Turn button. If both players are humans, this will pass both player's turns.*
+
+## Map Selection in the Tournament
+
+AI agents will compete in a tournament bracket. Each head-to-head matchup consists of three different maps, and the agent that wins best 2 out of 3 advances.
+
+Map Selection by Tournament Tier
+
+Round 1 uses preselected, public maps for each tier:
+
+Tier 1 – Round 1: map1.json
+
+Tier 2 – Round 1: map4.json
+
+Tier 3 – Round 1: map5.json
+
+Tier 4 – Round 1: map6.json
+
+Round 2 maps are also preselected but kept secret.
+However, they are guaranteed to be drawn from the existing maps in the repository.
+
+Round 3 maps are preselected as well, but completely hidden.
+These maps do not appear in the repository at all.
