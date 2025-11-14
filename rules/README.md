@@ -117,3 +117,14 @@ Special: On hit, does 5 splash damage to Mercenaries/Demons adjacent.
 - Range (Circular): 3
 
 Buffs all Mercenaries in range on activation. Buffed Mercs get an extra 10 health and deal an extra 10 damage. Buffs stack.
+
+
+## Win Conditions
+The most standard way to win the game is by one players dealing 200 damage to the rival players's base, thereby destroying it. However, if both players's bases are still standing by turn 300, the game ends via timeout and the winner is determined by the following series of checks, in order of priority:
+
+1. If no base has been destroyed, the player with the most money wins.
+2. If both players have the same amount of money, the player with the most towers wins.
+3. If both players have the same amount of towers, the player who spent the most on towers wins.
+4. If both players have spent the same amount, the player with the most mercenaries wins.
+5. If both players have the same amount of mercenaries, the player with the highest sum of mercenary health wins.
+6. If both players have the same sum of mercenary health, the game is declared a tie.
