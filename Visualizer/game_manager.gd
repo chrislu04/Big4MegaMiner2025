@@ -384,7 +384,7 @@ func _draw_towers(data_towers : Array):
 			child.modulate.a = 1
 			
 			# animate towers being "activated" based on cooldown
-			if (prev_tower["Cooldown"] == 0):
+			if (prev_tower["Cooldown"] == 0 && tower["Cooldown"] != 0):
 				var sprite = child.get_child(0)
 				var tween = get_tree().create_tween()
 				tween.set_trans(Tween.TRANS_BOUNCE)
