@@ -105,6 +105,7 @@ class Game:
                 "x" : merc.x,
                 "y" : merc.y,
                 "Health" : merc.health,
+                "Damage" : merc.attack_pow,
                 "State" : merc.state
             }
             list_mercenary.append(merc_dict)
@@ -148,6 +149,7 @@ class Game:
                     "x" : dem.x,
                     "y" : dem.y,
                     "Health" : dem.health,
+                    "Damage" : dem.attack_pow,
                     "State" : dem.state
                 }
                 list_demons.append(dem_dict)
