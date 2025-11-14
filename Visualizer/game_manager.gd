@@ -421,7 +421,7 @@ func _draw_demons(dem_array : Array, prev_array : Array):
 				prev_dem = _dem
 				break
 				
-		if demons.get_child_count() - 1 < count || prev_dem == null:
+		if prev_dem == null:
 			var pos = Vector2(dem["x"] * 32, dem["y"] * 32)
 			var demon_obj : RedMerc = ENEMY.instantiate()
 			if dem["Team"] == "b":
@@ -430,11 +430,16 @@ func _draw_demons(dem_array : Array, prev_array : Array):
 				demon_obj.sprite_anim.flip_h = true
 			
 			demon_obj.position = pos
+			demon_obj.str_name = dem["Name"]
 			demons.add_child(demon_obj)
 		else:
 					
-			var child : RedMerc = demons.get_child(count)
-			if dem["State"] == "dead":
+			var child = null
+			for n: RedMerc in demons.get_children():
+				if (n.str_name == dem["Name"]):
+					child = n
+					break
+			if dem["State"] == "dead" || prev_dem["State"] == "dead":
 				child.reparent(world)
 				child.die(turn_interval_max, BLOOD_SPLATTER_FX)
 				count -= 1		
