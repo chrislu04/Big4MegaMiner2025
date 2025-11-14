@@ -1,5 +1,5 @@
 # MegaMiner 2025
-MegaMiner is a yearly competition held by Computer Science students at Missouri S&T. Teams of up to 4 people create AI agents to compete in a video game tournament. This year, the game is ApocaWarlords. If you want to make an AI agent, the first thing you need to do is to understand the rules/mechanics of the game. To learn the rules of the game, read the [README.md file in the rules directory of this repository](https://github.com/EliotTexK/MegaMiner2025/tree/main/rules). Then, once you've done that, see the instructions below for creating/testing your agent.
+MegaMiner is a yearly competition held by Computer Science students at Missouri S&T. Teams of up to 4 people create AI agents to compete in a video game tournament. This year, the game is ApocaWarlords, a competitive 2-player turn-based tower defense game. If you want to make an AI agent, the first thing you need to do is to understand the rules/mechanics of the game. To learn the rules of the game, read the [README.md file in the rules directory of this repository](https://github.com/EliotTexK/MegaMiner2025/tree/main/rules). Then, once you've done that, see the instructions below for creating/testing your agent.
 
 ## Installation
 1. Clone this repository to get access to maps and the example AI Agents.
@@ -31,13 +31,76 @@ Take a look at `ExampleAgentRuleBased.py` and/or `AgentTemplate.py`. You will be
 If you want your agent to import libraries or custom python files, or have access to data files (like model weights for deep RL), just let the event organizers know.
 
 ## Game State Format
-The functions you will be writing for your `Agent` will recieve the state of the game as a big python dictionary. If you *really want to* understand the technical details of how this is created, you can read the driver code at the bottom of `AgentTemplate.py`, and then read through `backend/Game.py` and `backend/GameState.py`. However, knowing these technical details is not necessary.
+The functions you will be writing for your `Agent` will recieve the state of the game as a big python dictionary. If you *really want to* understand the technical details of how this dictionary created, you can read the code, but doing that is not necessary for creating an agent. However, it *is* necessary to understand the [rules of the game](https://github.com/EliotTexK/MegaMiner2025/tree/main/rules). So, read those or the description below might confuse you!
 
-1. **Team Names** - `game_state[""]`
+1. **Team Names** - `game_state["TeamNameR"]` and `game_state["TeamNameB"]`
 
 2. **Victory Condition** - `game_state["Victory"]` - Will be the string `'r'` if the Red player has won, `'b'` if the Blue player has won, `'tie'` if the result of the game is a tie, or the empty string `''` if the game is not over yet.
 
-3. ****
+3. **Remaining Turns and Current Turn** - `game_state["TurnsRemaining"]` and `game_state["CurrentTurn"]`
+
+4. **Player Bases**
+    - `game_state["PlayerBaseR"]["Health"]`, `game_state["PlayerBaseB"]["Health"]`
+    - `game_state["PlayerBaseR"]["Money"]`, `game_state["PlayerBaseB"]["Money"]`
+    - `game_state["PlayerBaseR"]["x"]`, `game_state["PlayerBaseB"]["x"]`
+    - `game_state["PlayerBaseR"]["y"]`, `game_state["PlayerBaseB"]["y"]`
+
+5. **Amount Of Money Each Player Has** - `game_state["RedTeamMoney"]` and `game_state["BlueTeamMoney"]`
+
+6. **Floor Tiles** - `game_state["FloorTiles"]` - a 2d array (list of python strings) representing the floor tiles at each position. `'r'` represents Red territory, `'b'` represents Blue territory, `'O'` represents path tiles, and `' '` represents an empty space. For example:
+```python
+game_state["FloorTiles"] = [
+    "rrrrrr     bbbbbb",
+    "rrOOOOOOOOOOOOObb",
+    "rrOrrr     bbbObb",
+    "rrOOOOOOOOOOOOObb",
+    "rrOrrr     bbbObb",
+    "rrOOOOOOOOOOOOObb",
+    "rrrrrr     bbbbbb"
+]
+```
+You should index this list like: `game_state["FloorTiles"][y][x]`.
+
+In the above example, `game_state["FloorTiles"][2][15] = 'b'`
+
+7. **Towers** - a python list of all towers
+    - `game_state["Towers"][i]["Name"]` - unique id for the Tower
+    - `game_state["Towers"][i]["Type"]` - One of the following: `"Crossbow"`, `"House"`, `"Cannon"`, `"Minigun"`, or `"Church"`
+    - `game_state["Towers"][i]["Team"]`
+    - `game_state["Towers"][i]["x"]`
+    - `game_state["Towers"][i]["y"]`
+    - `game_state["Towers"][i]["Cooldown"]`
+
+8. **Mecenaries** - a python list of all mercenaries
+    - `game_state["Mercenaries"][i]["Name"]` - unique id for the Mercenary 
+    - `game_state["Mercenaries"][i]["Team"]`
+    - `game_state["Mercenaries"][i]["x"]`
+    - `game_state["Mercenaries"][i]["y"]`
+    - `game_state["Mercenaries"][i]["Health"]`
+    - `game_state["Mercenaries"][i]["State"]` - will be `"waiting"`, `"fighting"`, or `"moving"`
+
+9. **Demons** - a python list of all demons
+    - `game_state["Demons"][i]["Name"]` - unique id for the Demon
+    - `game_state["Demons"][i]["Team"]` - **the team the Demon is targeting**
+    - `game_state["Demons"][i]["x"]`
+    - `game_state["Demons"][i]["y"]`
+    - `game_state["Demons"][i]["Health"]`
+    - `game_state["Demons"][i]["State"]` - will be `"fighting"` or `"moving"`
+
+10. **Positions of Entities (Demons, Towers, Mercenaries)** - `game_state["EntityGrid"]` - A 2d array ( list of python lists ) representing Demons, Towers, and Mercenaries at each position. This is technically redundant, but exists for your convenience. Sometimes you might want to know what object is at some position, without having to look through and check the Mercenary, Demon, and Tower lists. Index this list the same way as you index the FloorTiles array ( index like `game_state["EntityGrid"][y][x]` ).
+
+11. **Current Prices of Towers For Both Teams** - `game_state["TowerPricesR"]` and `game_state["TowerPricesB"]`, both are python dictionaries.
+
+For example, the following would represent Red's tower prices before they bought any towers:
+```python
+game_state["TowerPricesR"] = {
+    "House" :    10,
+    "Crossbow" :  8,
+    "Cannon" :   10,
+    "Minigun" :  20,
+    "Church" :   15
+}
+```
 
 ## AIAction Format
 
