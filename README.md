@@ -1,10 +1,10 @@
 # MegaMiner 2025
-MegaMiner is a yearly competition held by Computer Science students at Missouri S&T. Teams of up to 4 people create AI agents to compete in a video game tournament. This year, the game is ApocaWarlords, a competitive 2-player turn-based tower defense game. If you want to make an AI agent, the first thing you need to do is to understand the rules/mechanics of the game. To learn the rules of the game, read the [README.md file in the rules directory of this repository](https://github.com/EliotTexK/MegaMiner2025/tree/main/rules). Then, once you've done that, see the instructions below for creating/testing your agent.
+MegaMiner is a yearly competition held by Computer Science students at Missouri S&T. Teams of up to 4 people create AI agents to compete in a video game tournament. This year, the game is ApocaWarlords, a competitive 2-player turn-based tower defense game. If you want to make an AI agent, the first thing you need to do is to understand the rules/mechanics of the game. To learn the rules of the game, read the [rules document](https://github.com/EliotTexK/MegaMiner2025/tree/main/rules). Then, once you've done that, see the instructions below for creating/testing your agent.
 
 ## Installation
 1. Clone this repository to get access to maps and the example AI Agents.
 2. Install the latest version of Python. The game has been tested on the most recent version, and the tournament itself will also use it.
-3. Get the Visualizer executable from our [Releases](https://github.com/EliotTexK/MegaMiner2025/releases). Put it in the Visualizer folder of the repository you just cloned.
+3. Get the Visualizer executable from our [Releases](https://github.com/EliotTexK/MegaMiner2025/releases). If you are on Windows, download the .exe file and the .pck file. If you are on Linux, download the .x86-64 file and the .pck file. Put both files in the Visualizer folder of the repository you just cloned.
 
 ## How The Software Works
 When it comes to running MegaMiner 2025, whether you are testing your AI, or hosting a competition, there are 4 programs/processes involved:
@@ -103,5 +103,7 @@ game_state["TowerPricesR"] = {
 ```
 
 ## AIAction Format
+
+See the `AIAction` class at the top of `ExampleAgentRuleBased.py`.
 
 ## How to Play as a Human

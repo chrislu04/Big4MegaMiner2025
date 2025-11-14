@@ -10,4 +10,5 @@ Defenses and **Mercenaries** don't come cheap, though. You will need to make mon
 
 ## How to Play
 
-As 
+ApocaWarlords uses *simultaneous turns*. This means that each turn, both players select their actions at the same time, without communication. After both players select their actions, the game world is updated. This repeats until the game ends.
+
