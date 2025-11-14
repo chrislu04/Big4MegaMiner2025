@@ -384,11 +384,13 @@ theme_override_constants/separation = 8
 
 [node name="Build" type="Button" parent="Game UI/LeftSideStates/Human Control/build or destroy"]
 layout_mode = 2
+tooltip_text = "Build a tower on the field."
 theme_override_constants/icon_max_width = 64
 icon = ExtResource("5_waa4j")
 
 [node name="Destroy" type="Button" parent="Game UI/LeftSideStates/Human Control/build or destroy"]
 layout_mode = 2
+tooltip_text = "Refund one of your towers."
 theme_override_constants/icon_max_width = 64
 icon = ExtResource("6_ok7cu")
 
@@ -402,6 +404,7 @@ icon = ExtResource("7_irxef")
 
 [node name="Queue" type="Button" parent="Game UI/LeftSideStates/Human Control/build or destroy"]
 layout_mode = 2
+tooltip_text = "Queue up a Mercenary to be sent next turn!"
 theme_override_constants/icon_max_width = 64
 text = "$20"
 icon = ExtResource("8_e2l4f")
@@ -422,26 +425,42 @@ grow_vertical = 2
 
 [node name="House" type="Button" parent="Game UI/LeftSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: 5 Turns
+Gives you 12$ per activation"
 text = "House
 $10"
 
 [node name="Cannon" type="Button" parent="Game UI/LeftSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: 5 Turns
+Range: 3 Tiles
+Damage: 5
+Does splash damage!"
 text = "Cannon
 $10"
 
 [node name="Crossbow" type="Button" parent="Game UI/LeftSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: 4 Turns
+Range: 5 Tiles
+Damage: 5"
 text = "Crossbow
 $8"
 
 [node name="Minigun" type="Button" parent="Game UI/LeftSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: None!
+Range: 3 Tiles
+Damage: 1
+Shoots ALL targets in its range."
 text = "Minigun
 $25"
 
 [node name="Church" type="Button" parent="Game UI/LeftSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: 5 Turns
+Range: 3 Tiles
+Gives Mercs in-range +10 Health and +10 Damage."
 text = "Church
 $20"
 
@@ -604,11 +623,13 @@ theme_override_constants/separation = 8
 
 [node name="Build" type="Button" parent="Game UI/RightSideStates/Human Control/build or destroy"]
 layout_mode = 2
+tooltip_text = "Build a tower on the field."
 theme_override_constants/icon_max_width = 64
 icon = ExtResource("5_waa4j")
 
 [node name="Destroy" type="Button" parent="Game UI/RightSideStates/Human Control/build or destroy"]
 layout_mode = 2
+tooltip_text = "Refund one of your towers."
 theme_override_constants/icon_max_width = 64
 icon = ExtResource("6_ok7cu")
 
@@ -620,6 +641,7 @@ icon = ExtResource("7_irxef")
 
 [node name="Queue" type="Button" parent="Game UI/RightSideStates/Human Control/build or destroy"]
 layout_mode = 2
+tooltip_text = "Queue up a Mercenary to be sent next turn!"
 theme_override_constants/icon_max_width = 64
 text = "$20"
 icon = ExtResource("17_nvb2n")
@@ -640,26 +662,42 @@ grow_vertical = 2
 
 [node name="House" type="Button" parent="Game UI/RightSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: 5 Turns
+Gives you 12$ per activation"
 text = "House
 $10"
 
 [node name="Cannon" type="Button" parent="Game UI/RightSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: 5 Turns
+Range: 3 Tiles
+Damage: 5
+Does splash damage!"
 text = "Cannon
 $10"
 
 [node name="Crossbow" type="Button" parent="Game UI/RightSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: 4 Turns
+Range: 5 Tiles
+Damage: 5"
 text = "Crossbow
 $8"
 
 [node name="Minigun" type="Button" parent="Game UI/RightSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: None!
+Range: 3 Tiles
+Damage: 1
+Shoots ALL targets in its range."
 text = "Minigun
 $25"
 
 [node name="Church" type="Button" parent="Game UI/RightSideStates/Human Control/Build OPtions"]
 layout_mode = 2
+tooltip_text = "Cooldown: 5 Turns
+Range: 3 Tiles
+Gives Mercs in-range +10 Health and +10 Damage."
 text = "Church
 $20"
 
