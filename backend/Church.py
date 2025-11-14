@@ -40,4 +40,3 @@ class Church(Tower):
         elif self.team == "b":
             super().buff_nearby_targets(game_state)
             log_msg(f'Church {self.name} buffed mercs for the Blue team.')
-        self.current_cooldown = Constants.CHURCH_MAX_COOLDOWN
