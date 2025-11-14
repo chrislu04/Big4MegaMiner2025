@@ -1,16 +1,22 @@
+# This script defines the PPO (Proximal Policy Optimization) agent that plays the MegaMiner game.
+# It loads a pre-trained PPO model and uses it to decide on actions during the game.
+# This script is designed to be run as a separate process by the game engine.
+
 import json
 import numpy as np
 import sys
 from pathlib import Path
 
-# Add the backend directory to the Python path to import Constants
+# Add the backend directory to the Python path to import game constants.
+# This is necessary for the observation conversion function.
 sys.path.append(str(Path(__file__).resolve().parent.parent / 'backend'))
 import Constants
 
 class AIAction:
     """
     Represents one turn of actions in the game.
-    This class is copied from the environment/backend to make the agent self-contained.
+    This class is a simplified copy from the game's backend to make the agent self-contained.
+    It allows the agent to structure its chosen action in a way the game engine understands.
     """
     def __init__(
         self,
@@ -27,21 +33,28 @@ class AIAction:
         self.merc_direction = merc_direction.upper().strip()
 
     def to_dict(self):
+        """Converts the action to a dictionary."""
         return {
             'action': self.action, 'x': self.x, 'y': self.y,
             'tower_type': self.tower_type, 'merc_direction': self.merc_direction
         }
 
     def to_json(self):
+        """Serializes the action to a JSON string, which is sent to the game engine."""
         return json.dumps(self.to_dict())
 
 def _convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
     """
-    Converts the JSON game state from the game engine into the flattened
-    observation vector that the MLP PPO model was trained on.
+    Converts the JSON game state received from the game engine into the flattened
+    observation vector that the PPO model was trained on.
+    
+    This function is critical and must exactly match the observation generation
+    logic in the training environment (MegaMinerEnv.py). Any mismatch will lead
+    to poor performance as the agent will misinterpret the game state.
     """
     map_size = (len(game_state['FloorTiles'][0]), len(game_state['FloorTiles']))
     
+    # These must match the values in the training environment.
     MAX_MAP_WIDTH = 50
     MAX_MAP_HEIGHT = 50
 
@@ -49,10 +62,10 @@ def _convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
     map_h, map_w = map_size[1], map_size[0]
 
     # --- Map Representation (Multi-channel) ---
+    # Initialize a padded map with zeros.
     obs_map = np.zeros((MAX_MAP_HEIGHT, MAX_MAP_WIDTH, 7), dtype=np.float32)
     map_view = obs_map[:map_h, :map_w, :]
 
-    # ... (rest of the map population logic is the same) ...
     # Channel 0: Terrain
     my_territory_char = 'R' if is_red_agent else 'B'
     opp_territory_char = 'B' if is_red_agent else 'R'
@@ -101,10 +114,10 @@ def _convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
     my_base = base_r if is_red_agent else base_b
     opp_base = base_b if is_red_agent else base_r
     map_view[my_base['y'], my_base['x'], 1] = 4
-    map_view[my_base['y'], my_base['x'], 2] = my_base['Health'] / Constants.PLAYER_BASE_INITIAL_health if Constants.PLAYER_BASE_INITIAL_health > 0 else 0
+    map_view[my_base['y'], my_base['x'], 2] = my_base['Health'] / Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 0
     map_view[my_base['y'], my_base['x'], 3] = 1
     map_view[opp_base['y'], opp_base['x'], 1] = 4
-    map_view[opp_base['y'], opp_base['x'], 2] = opp_base['Health'] / Constants.PLAYER_BASE_INITIAL_health if Constants.PLAYER_BASE_INITIAL_health > 0 else 0
+    map_view[opp_base['y'], opp_base['x'], 2] = opp_base['Health'] / Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 0
     map_view[opp_base['y'], opp_base['x'], 3] = -1
 
     # --- Vector Features ---
@@ -118,11 +131,11 @@ def _convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
         my_money, my_base_health, opp_money, opp_base_health, turns_remaining
     ], dtype=np.float32)
 
-    # Normalize vector features
+    # Normalize vector features, same as in the training environment.
     vector_features[0] /= 1000
-    vector_features[1] /= Constants.PLAYER_BASE_INITIAL_health if Constants.PLAYER_BASE_INITIAL_health > 0 else 1
+    vector_features[1] /= Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 1
     vector_features[2] /= 1000
-    vector_features[3] /= Constants.PLAYER_BASE_INITIAL_health if Constants.PLAYER_BASE_INITIAL_health > 0 else 1
+    vector_features[3] /= Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 1
     vector_features[4] /= Constants.MAX_TURNS if Constants.MAX_TURNS > 0 else 1
     
     # --- Flatten and Concatenate ---
@@ -131,13 +144,21 @@ def _convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
 
 
 class Agent:
+    """
+    The main agent class that the game engine interacts with.
+    """
     def initialize_and_set_name(self, initial_game_state: dict, team_color: str) -> str:
+        """
+        This method is called once at the beginning of the game.
+        It's used to initialize the agent, load the model, and set the agent's name.
+        """
         self.team_color = team_color
         
-        # We need to load the PPO model from stable-baselines3
+        # We need to import the PPO class from stable-baselines3.
+        # This is done inside the method to avoid loading the library if the agent is not used.
         from stable_baselines3 import PPO
 
-        # Load the trained PPO model.
+        # Load the trained PPO model. The path points to the best model saved during training.
         model_path = Path(__file__).resolve().parent.parent / "training" / "models" / "best_model" / "best_model.zip"
         print(f"DEBUG: Attempting to load model from: {model_path}", file=sys.stderr)
         try:
@@ -145,37 +166,46 @@ class Agent:
             print("DEBUG: Model loaded successfully.", file=sys.stderr)
         except Exception as e:
             print(f"ERROR: Failed to load PPO model: {e}", file=sys.stderr)
-            raise # Re-raise the exception to crash the agent process
+            raise # Re-raise the exception to crash the agent process if the model can't be loaded.
         
+        # Return the name of the agent.
         return "PPO_Agent"
     
     def do_turn(self, game_state: dict) -> AIAction:
+        """
+        This method is called once per turn.
+        It receives the current game state and must return an AIAction object.
+        """
         print("DEBUG: do_turn called.", file=sys.stderr)
-        # 1. Convert game state to the observation vector
+        
+        # 1. Convert the game state dictionary into the numpy array observation format.
         observation = _convert_state_to_obs(game_state, self.team_color)
         print(f"DEBUG: Observation created, shape: {observation.shape}", file=sys.stderr)
         
-        # Reshape observation to (1, observation_size) for the model
+        # Reshape the observation to have a batch dimension of 1, as the model expects.
         observation = observation.reshape(1, -1)
         print(f"DEBUG: Observation reshaped, new shape: {observation.shape}", file=sys.stderr)
         
-        # 2. Use the model to predict the action
+        # 2. Use the loaded model to predict the action based on the observation.
+        # `deterministic=True` means the model will always choose the action with the highest probability.
         print("DEBUG: Calling model.predict...", file=sys.stderr)
         try:
             action_vector, _states = self.model.predict(observation, deterministic=True)
             print(f"DEBUG: model.predict returned action_vector: {action_vector}", file=sys.stderr)
         except Exception as e:
             print(f"ERROR: Failed to predict action: {e}", file=sys.stderr)
-            raise # Re-raise the exception to crash the agent process
+            raise
         
-        # 3. Decode the action vector back into an AIAction object
+        # 3. Decode the action vector from the model back into an AIAction object.
+        # The action_vector is a numpy array, e.g., [1, 10, 15, 0, 0].
         action_type_map = {0: "nothing", 1: "build", 2: "destroy"}
         tower_type_map = {0: "crossbow", 1: "cannon", 2: "minigun", 3: "house"}
         merc_dir_map = {0: "", 1: "N", 2: "S", 3: "E", 4: "W"}
 
+        # Extract the discrete action choices from the vector.
         act_type, x, y, tower_type, merc_dir = np.int64(action_vector[0]).tolist()
 
-        # Convert numpy types to standard python types for JSON serialization
+        # Create the AIAction object.
         ai_action = AIAction(
             action=action_type_map[act_type],
             x=x,
@@ -185,11 +215,17 @@ class Agent:
         )
         print(f"DEBUG: AIAction object created: {ai_action.to_dict()}", file=sys.stderr)
         
+        # Return the action to the game engine.
         return ai_action
 
 # -- DRIVER CODE (DO NOT ALTER) --
+# This part of the script handles the communication with the game engine.
+# It reads the game state from standard input and writes the agent's actions to standard output.
 if __name__ == '__main__':
+    # Determine team color from the first line of input.
     team_color = 'r' if input() == "--YOU ARE RED--" else 'b'
+    
+    # Read the initial game state.
     initial_state_json = ""
     while True:
         line = input()
@@ -198,11 +234,16 @@ if __name__ == '__main__':
         initial_state_json += line
     game_state_init = json.loads(initial_state_json)
 
+    # Initialize the agent.
     agent = Agent()
+    # The first output must be the agent's name.
     print(agent.initialize_and_set_name(game_state_init, team_color))
+    # The second output is the action for the first turn.
     print(agent.do_turn(game_state_init).to_json())
 
+    # Main game loop.
     while True:
+        # Read the game state for the current turn.
         turn_state_json = ""
         while True:
             line = input()
@@ -210,4 +251,5 @@ if __name__ == '__main__':
                 break
             turn_state_json += line
         game_state_this_turn = json.loads(turn_state_json)
+        # Output the agent's action for this turn.
         print(agent.do_turn(game_state_this_turn).to_json())
