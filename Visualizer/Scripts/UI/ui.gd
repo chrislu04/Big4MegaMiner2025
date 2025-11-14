@@ -50,7 +50,8 @@ func _update_team_names(rName: String, bName: String):
 	$"Game UI/LeftSideStates/TeamName/Name".text = rName
 	$"Game UI/RightSideStates/TeamName/Name".text = bName
 
-func _update_postgame_popup(victory):
+func _update_postgame_popup(victory, reason):
+	$"Game UI/Scroll/ReasonLabel".text = reason
 	match victory:
 		'r':   
 			$"Game UI/Scroll/Label".text = "RED WINS!"

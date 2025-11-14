@@ -12,6 +12,8 @@ class GameState:
         # Initialization which is independent of the map JSON
         self.turns_remaining = Constants.MAX_TURNS
         self.victory = None
+        # Human-readable reason why a team won
+        self.victory_reason = ""
         self.money_r = Constants.INITIAL_MONEY
         self.money_b = Constants.INITIAL_MONEY
         self.mercs = []

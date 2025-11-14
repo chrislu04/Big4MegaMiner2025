@@ -493,7 +493,7 @@ func _update_ui(gamestate):
 	UI._update_base_health(true, gamestate["PlayerBaseR"]["Health"])
 	UI._update_base_health(false, gamestate["PlayerBaseB"]["Health"])
 	UI._update_building_prices(gamestate)
-	UI._update_postgame_popup(gamestate["Victory"])
+	UI._update_postgame_popup(gamestate["Victory"], gamestate["VictoryReason"])
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
