@@ -113,9 +113,9 @@ class raw_env(AECEnv):
         A CNN (Convolutional Neural Network) could also be used if the map representation is kept as a 3D tensor.
         """
         # The map is represented as a 3D tensor (Height, Width, Channels).
-        map_shape = (self.MAX_MAP_HEIGHT, self.MAX_MAP_WIDTH, 7)
+        map_shape = (self.MAX_MAP_HEIGHT, self.MAX_MAP_WIDTH, 9)
         # The vector part contains additional global game state information.
-        vector_size = 5
+        vector_size = 10
         
         # The total observation size is the flattened map plus the vector features.
         total_obs_size = np.prod(map_shape) + vector_size
@@ -134,7 +134,7 @@ class raw_env(AECEnv):
 
         # --- Map Representation (Multi-channel) ---
         # Multi-channel map to represent spatial information. Each channel represents a different aspect of the game state.
-        obs_map = np.zeros((self.MAX_MAP_HEIGHT, self.MAX_MAP_WIDTH, 7), dtype=np.float32)
+        obs_map = np.zeros((self.MAX_MAP_HEIGHT, self.MAX_MAP_WIDTH, 9), dtype=np.float32)
         map_view = obs_map[:map_h, :map_w, :]  # view for easier indexing into non-padded area
 
         # --- Channel 0: Terrain Type ---
@@ -204,6 +204,12 @@ class raw_env(AECEnv):
                             else:
                                 opp_dpt_map[ny, nx] += damage_per_turn
 
+        # my_dpt_flat = my_dpt_map.flatten()
+        # opp_dpt_flat = opp_dpt_map.flatten()
+
+        map_view[:, :, 7] = my_dpt_map
+        map_view[:, :, 8] = opp_dpt_map
+
         # --- Mercenaries ---
         merc_state_map = {"walking": 1, "attacking": 2}
         for m in self.game.game_state.mercs:
@@ -242,20 +248,17 @@ class raw_env(AECEnv):
         opp_base_health = opp_base.health
         turns_remaining = self.game.game_state.turns_remaining
 
-        House_Cost = self.game_state.house_price_r if is_red_agent else self.game_state.house_price_b 
-        Crossbow_Cost = self.game_state.crossbow_price_r if is_red_agent else self.game_state.crossbow_price_b 
-        Cannon_Cost = self.game_state.cannon_cost_r if is_red_agent else self.game_state.cannon_cost_b 
-        Minigun_Cost = self.game_state.minigun_cost_r if is_red_agent else self.game_state.minigun_cost_b 
-        Church_Cost = self.game_state.church_cost_r if is_red_agent else self.game_state.church_cost_b 
+        House_Cost = self.game.game_state.house_price_r if is_red_agent else self.game.game_state.house_price_b 
+        Crossbow_Cost = self.game.game_state.crossbow_price_r if is_red_agent else self.game.game_state.crossbow_price_b 
+        Cannon_Cost = self.game.game_state.cannon_price_r if is_red_agent else self.game.game_state.cannon_price_b 
+        Minigun_Cost = self.game.game_state.minigun_price_r if is_red_agent else self.game.game_state.minigun_price_b 
+        Church_Cost = self.game.game_state.church_price_r if is_red_agent else self.game.game_state.church_price_b 
 
-        # Flatten damage-per-tile heatmaps and append to vector features
-        my_dpt_flat = my_dpt_map.flatten()
-        opp_dpt_flat = opp_dpt_map.flatten()
+
 
         vector_features = np.array([
             my_money, my_base_health, opp_money, opp_base_health, turns_remaining,
-            House_Cost, Crossbow_Cost, Cannon_Cost, Minigun_Cost, Church_Cost,
-            *my_dpt_flat, *opp_dpt_flat
+            House_Cost, Crossbow_Cost, Cannon_Cost, Minigun_Cost, Church_Cost
         ], dtype=np.float32)
 
         # Normalize vector features (same as in training environment)
@@ -270,7 +273,6 @@ class raw_env(AECEnv):
         # Flatten the map and concatenate it with vector features to form the full observation
         flat_map = obs_map.flatten()
         return np.concatenate([flat_map, vector_features])
-
 
     def observe(self, agent):
         """
@@ -393,8 +395,8 @@ class raw_env(AECEnv):
             # --- Total Reward ---
             # The final reward is a weighted sum of the components.
             # Tuning these weights is a key part of training a successful agent.
-            w_health = 1.0  # Health is the most important factor.
-            w_econ = 0.05   # Economy is a secondary concern.
+            w_health = 0.8  # Health is the most important factor.
+            w_econ = 1.0   # Economy is a secondary concern.
 
             reward_r = (w_health * health_delta_r) + (w_econ * income_r) + time_penalty
             reward_b = (w_health * health_delta_b) + (w_econ * income_b) + time_penalty
