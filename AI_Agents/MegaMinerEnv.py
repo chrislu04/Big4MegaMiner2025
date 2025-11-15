@@ -133,13 +133,12 @@ class raw_env(AECEnv):
         map_h, map_w = self.map_size[1], self.map_size[0]
 
         # --- Map Representation (Multi-channel) ---
-        # We use a multi-channel map to represent spatial information. Each channel represents a different aspect of the game state.
-        # This is a common technique in RL for games with a spatial component.
+        # Multi-channel map to represent spatial information. Each channel represents a different aspect of the game state.
         obs_map = np.zeros((self.MAX_MAP_HEIGHT, self.MAX_MAP_WIDTH, 7), dtype=np.float32)
-        map_view = obs_map[:map_h, :map_w, :] # A view for easier indexing into the non-padded area.
+        map_view = obs_map[:map_h, :map_w, :]  # view for easier indexing into non-padded area
 
-        # Channel 0: Terrain Type
-        # Encodes the type of each tile: 1 for Path, 2 for My Territory, 3 for Opponent's Territory.
+        # --- Channel 0: Terrain Type ---
+        # Encodes the type of each tile: 1=Path, 2=My Territory, 3=Opponent's Territory
         my_territory_char = 'R' if is_red_agent else 'B'
         opp_territory_char = 'B' if is_red_agent else 'R'
         for r_idx, row in enumerate(self.game.game_state.floor_tiles):
@@ -157,19 +156,55 @@ class raw_env(AECEnv):
         # Channel 6: Unit State (1: walking, 2: attacking)
         
         tower_type_map = {"crossbow": 1, "cannon": 2, "minigun": 3, "house": 4}
+        tower_cooldown_map = {
+            "HOUSE": Constants.HOUSE_MAX_COOLDOWN,
+            "CANNON": Constants.CANNON_MAX_COOLDOWN,
+            "MINIGUN": Constants.MINIGUN_MAX_COOLDOWN,
+            "CROSSBOW": Constants.CROSSBOW_MAX_COOLDOWN,
+        }
+
+        # --- Initialize Damage-Per-Tile Heatmaps ---
+        my_dpt_map = np.zeros((map_h, map_w), dtype=np.float32)
+        opp_dpt_map = np.zeros((map_h, map_w), dtype=np.float32)
+
+        # Tower stats maps (damage and range) excluding House/Church
+        tower_damage_map = {
+            "CANNON": Constants.CANNON_DAMAGE,
+            "MINIGUN": Constants.MINIGUN_DAMAGE,
+            "CROSSBOW": Constants.CROSSBOW_DAMAGE,
+        }
+        tower_range_map = {
+            "CANNON": Constants.CANNON_RANGE,
+            "MINIGUN": Constants.MINIGUN_RANGE,
+            "CROSSBOW": Constants.CROSSBOW_RANGE,
+        }
+
         for t in self.game.game_state.towers:
             my_team = (is_red_agent and t.team == 'r') or (not is_red_agent and t.team == 'b')
             map_view[t.y, t.x, 1] = 1
             map_view[t.y, t.x, 2] = t.health
             map_view[t.y, t.x, 3] = 1 if my_team else -1
             map_view[t.y, t.x, 4] = tower_type_map.get(t.name.lower(), 0)
-            tower_cooldown_map = {
-                "HOUSE": Constants.HOUSE_MAX_COOLDOWN, "CANNON": Constants.CANNON_MAX_COOLDOWN,
-                "MINIGUN": Constants.MINIGUN_MAX_COOLDOWN, "CROSSBOW": Constants.CROSSBOW_MAX_COOLDOWN,
-            }
             max_cd = tower_cooldown_map.get(t.name.upper(), 1)
             map_view[t.y, t.x, 5] = t.current_cooldown / max_cd if max_cd > 0 else 0
 
+            # --- Apply Damage-Per-Tile heatmap for offensive towers ---
+            t_type_upper = t.name.upper()
+            if t_type_upper in tower_damage_map:
+                damage = tower_damage_map[t_type_upper]
+                rng = tower_range_map[t_type_upper]
+                damage_per_turn = damage / max_cd if max_cd > 0 else damage
+
+                for dy in range(-rng, rng + 1):
+                    for dx in range(-rng, rng + 1):
+                        ny, nx = t.y + dy, t.x + dx
+                        if 0 <= ny < map_h and 0 <= nx < map_w:
+                            if my_team:
+                                my_dpt_map[ny, nx] += damage_per_turn
+                            else:
+                                opp_dpt_map[ny, nx] += damage_per_turn
+
+        # --- Mercenaries ---
         merc_state_map = {"walking": 1, "attacking": 2}
         for m in self.game.game_state.mercs:
             my_team = (is_red_agent and m.team == 'r') or (not is_red_agent and m.team == 'b')
@@ -179,6 +214,7 @@ class raw_env(AECEnv):
             map_view[y, x, 3] = 1 if my_team else -1
             map_view[y, x, 6] = merc_state_map.get(m.state, 0)
 
+        # --- Demons ---
         demon_state_map = {"walking": 1, "attacking": 2}
         for d in self.game.game_state.demons:
             y, x = int(d.y), int(d.x)
@@ -187,6 +223,7 @@ class raw_env(AECEnv):
             map_view[y, x, 3] = 0
             map_view[y, x, 6] = demon_state_map.get(d.state, 0)
 
+        # --- Bases ---
         base_r = self.game.game_state.player_base_r
         base_b = self.game.game_state.player_base_b
         my_base = base_r if is_red_agent else base_b
@@ -198,12 +235,11 @@ class raw_env(AECEnv):
         map_view[opp_base.y, opp_base.x, 2] = opp_base.health / Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 0
         map_view[opp_base.y, opp_base.x, 3] = -1
 
-        # --- Vector Features ---
-        # These are global, non-spatial game state variables.
+        # --- Vector Features (Global game state) ---
         my_money = self.game.game_state.money_r if is_red_agent else self.game.game_state.money_b
-        my_base_health = self.game.game_state.player_base_r.health if is_red_agent else self.game.game_state.player_base_b.health
+        my_base_health = my_base.health
         opp_money = self.game.game_state.money_b if is_red_agent else self.game.game_state.money_r
-        opp_base_health = self.game.game_state.player_base_b.health if is_red_agent else self.game.game_state.player_base_r.health
+        opp_base_health = opp_base.health
         turns_remaining = self.game.game_state.turns_remaining
 
         House_Cost = self.game_state.house_price_r if is_red_agent else self.game_state.house_price_b 
@@ -212,25 +248,29 @@ class raw_env(AECEnv):
         Minigun_Cost = self.game_state.minigun_cost_r if is_red_agent else self.game_state.minigun_cost_b 
         Church_Cost = self.game_state.church_cost_r if is_red_agent else self.game_state.church_cost_b 
 
+        # Flatten damage-per-tile heatmaps and append to vector features
+        my_dpt_flat = my_dpt_map.flatten()
+        opp_dpt_flat = opp_dpt_map.flatten()
+
         vector_features = np.array([
-            my_money, my_base_health, opp_money, opp_base_health, turns_remaining, House_Cost, Crossbow_Cost, Cannon_Cost, Minigun_Cost, Church_Cost
+            my_money, my_base_health, opp_money, opp_base_health, turns_remaining,
+            House_Cost, Crossbow_Cost, Cannon_Cost, Minigun_Cost, Church_Cost,
+            *my_dpt_flat, *opp_dpt_flat
         ], dtype=np.float32)
 
-        # Normalize vector features, same as in the training environment.
+        # Normalize vector features (same as in training environment)
         vector_features[0] /= 1000
         vector_features[1] /= Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 1
         vector_features[2] /= 1000
         vector_features[3] /= Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 1
         vector_features[4] /= Constants.MAX_TURNS if Constants.MAX_TURNS > 0 else 1
-        vector_features[5] /= 1000
-        vector_features[6] /= 1000
-        vector_features[7] /= 1000
-        vector_features[8] /= 1000
-        vector_features[9] /= 1000
+        vector_features[5:10] /= 1000  # tower costs
+
         # --- Flatten and Concatenate ---
-        # Flatten the map and concatenate it with the vector features to create a single, long observation vector.
+        # Flatten the map and concatenate it with vector features to form the full observation
         flat_map = obs_map.flatten()
         return np.concatenate([flat_map, vector_features])
+
 
     def observe(self, agent):
         """
