@@ -206,17 +206,27 @@ class raw_env(AECEnv):
         opp_base_health = self.game.game_state.player_base_b.health if is_red_agent else self.game.game_state.player_base_r.health
         turns_remaining = self.game.game_state.turns_remaining
 
+        House_Cost = self.game_state.house_price_r if is_red_agent else self.game_state.house_price_b 
+        Crossbow_Cost = self.game_state.crossbow_price_r if is_red_agent else self.game_state.crossbow_price_b 
+        Cannon_Cost = self.game_state.cannon_cost_r if is_red_agent else self.game_state.cannon_cost_b 
+        Minigun_Cost = self.game_state.minigun_cost_r if is_red_agent else self.game_state.minigun_cost_b 
+        Church_Cost = self.game_state.church_cost_r if is_red_agent else self.game_state.church_cost_b 
+
         vector_features = np.array([
-            my_money, my_base_health, opp_money, opp_base_health, turns_remaining
+            my_money, my_base_health, opp_money, opp_base_health, turns_remaining, House_Cost, Crossbow_Cost, Cannon_Cost, Minigun_Cost, Church_Cost
         ], dtype=np.float32)
 
-        # Normalize vector features to be roughly in the range [0, 1]. This helps with model training.
+        # Normalize vector features, same as in the training environment.
         vector_features[0] /= 1000
         vector_features[1] /= Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 1
         vector_features[2] /= 1000
         vector_features[3] /= Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 1
         vector_features[4] /= Constants.MAX_TURNS if Constants.MAX_TURNS > 0 else 1
-        
+        vector_features[5] /= 1000
+        vector_features[6] /= 1000
+        vector_features[7] /= 1000
+        vector_features[8] /= 1000
+        vector_features[9] /= 1000
         # --- Flatten and Concatenate ---
         # Flatten the map and concatenate it with the vector features to create a single, long observation vector.
         flat_map = obs_map.flatten()

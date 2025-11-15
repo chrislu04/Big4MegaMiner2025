@@ -127,8 +127,14 @@ def _convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
     opp_base_health = game_state['PlayerBaseB']['Health'] if is_red_agent else game_state['PlayerBaseR']['Health']
     turns_remaining = game_state['TurnsRemaining']
 
+    House_Cost = game_state['TowerPricesR']["House"] if is_red_agent else game_state['TowerPricesB']["House"]
+    Crossbow_Cost = game_state['TowerPricesR']["Crossbow"] if is_red_agent else game_state['TowerPricesB']["Crossbow"]
+    Cannon_Cost = game_state['TowerPricesR']["Cannon"] if is_red_agent else game_state['TowerPricesB']["Cannon"]
+    Minigun_Cost = game_state['TowerPricesR']["Minigun"] if is_red_agent else game_state['TowerPricesB']["Minigun"]
+    Church_Cost = game_state['TowerPricesR']["Church"] if is_red_agent else game_state['TowerPricesB']["Church"]
+
     vector_features = np.array([
-        my_money, my_base_health, opp_money, opp_base_health, turns_remaining
+        my_money, my_base_health, opp_money, opp_base_health, turns_remaining, House_Cost, Crossbow_Cost, Cannon_Cost, Minigun_Cost, Church_Cost
     ], dtype=np.float32)
 
     # Normalize vector features, same as in the training environment.
@@ -137,6 +143,11 @@ def _convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
     vector_features[2] /= 1000
     vector_features[3] /= Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 1
     vector_features[4] /= Constants.MAX_TURNS if Constants.MAX_TURNS > 0 else 1
+    vector_features[5] /= 1000
+    vector_features[6] /= 1000
+    vector_features[7] /= 1000
+    vector_features[8] /= 1000
+    vector_features[9] /= 1000
     
     # --- Flatten and Concatenate ---
     flat_map = obs_map.flatten()
@@ -169,7 +180,7 @@ class Agent:
             raise # Re-raise the exception to crash the agent process if the model can't be loaded.
         
         # Return the name of the agent.
-        return "PPO_Agent"
+        return "Big Hero 4"
     
     def do_turn(self, game_state: dict) -> AIAction:
         """
