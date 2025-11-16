@@ -9,6 +9,7 @@ from pettingzoo import AECEnv
 from pettingzoo.utils import agent_selector, wrappers
 import sys
 from pathlib import Path
+import math
 
 # Add the backend directory to the Python path to import game components.
 sys.path.append(str(Path(__file__).resolve().parent.parent / 'backend'))
@@ -173,6 +174,7 @@ class raw_env(AECEnv):
             "MINIGUN": Constants.MINIGUN_DAMAGE,
             "CROSSBOW": Constants.CROSSBOW_DAMAGE,
         }
+
         tower_range_map = {
             "CANNON": Constants.CANNON_RANGE,
             "MINIGUN": Constants.MINIGUN_RANGE,
@@ -335,11 +337,24 @@ class raw_env(AECEnv):
         x = np.clip(original_x, 0, map_w - 1)
         y = np.clip(original_y, 0, map_h - 1)
 
-        # If the agent chose an action outside the map, penalize it and force a "nothing" action.
-        # This encourages the agent to learn the map boundaries.
-        if original_x >= map_w or original_y >= map_h:
-            self.rewards[agent] -= 0.1  # Small penalty for invalid action.
-            act_type = 0 # Force "nothing" action.
+        # Validate the action before executing it
+        is_out_of_bounds = original_x >= map_w or original_y >= map_h
+        
+        # Check if the tile is valid for building (only if attempting to build)
+        is_valid_build = False
+        if act_type == 1:  # "build" action
+            my_territory_char = 'R' if agent == "player_r" else 'B'
+            tile_char = self.game.game_state.floor_tiles[y][x] if not is_out_of_bounds else None
+            has_entity = self.game.game_state.entity_grid[y][x] is not None if not is_out_of_bounds else True
+            is_valid_build = (tile_char == my_territory_char and not has_entity)
+        
+        # Apply penalties for invalid actions
+        if is_out_of_bounds:
+            self.rewards[agent] -= 0.3  # Penalty for choosing out-of-bounds tile
+            act_type = 0  # Force "nothing" action
+        elif act_type == 1 and not is_valid_build:
+            self.rewards[agent] -= 0.5  # Stronger penalty for invalid build location
+            act_type = 0  # Force "nothing" action
 
         ai_action = AIAction(
             action=action_type_map[act_type], x=x, y=y,
@@ -362,6 +377,17 @@ class raw_env(AECEnv):
             old_health_b = self.game.game_state.player_base_b.health
             old_money_r = self.game.game_state.money_r
             old_money_b = self.game.game_state.money_b
+            old_house_cost_r = self.game.game_state.house_price_r
+            old_house_cost_b = self.game.game_state.house_price_b 
+            old_crossbow_cost_r = self.game.game_state.crossbow_price_r
+            old_crossbow_cost_b = self.game.game_state.crossbow_price_b 
+            old_cannon_cost_r = self.game.game_state.cannon_price_r
+            old_cannon_cost_b = self.game.game_state.cannon_price_b 
+            old_minigun_cost_r = self.game.game_state.minigun_price_r
+            old_minigun_cost_b = self.game.game_state.minigun_price_b 
+            old_church_cost_r = self.game.game_state.church_price_r
+            old_church_cost_b = self.game.game_state.church_price_b 
+
 
             # Run the game turn with the actions from both agents.
             self.game.run_turn(self.action_r, self.action_b)
@@ -377,6 +403,27 @@ class raw_env(AECEnv):
             health_b = self.game.game_state.player_base_b.health
             money_r = self.game.game_state.money_r
             money_b = self.game.game_state.money_b
+            house_cost_r = self.game.game_state.house_price_r
+            house_cost_b = self.game.game_state.house_price_b 
+            crossbow_cost_r = self.game.game_state.crossbow_price_r
+            crossbow_cost_b = self.game.game_state.crossbow_price_b 
+            cannon_cost_r = self.game.game_state.cannon_price_r
+            cannon_cost_b = self.game.game_state.cannon_price_b 
+            minigun_cost_r = self.game.game_state.minigun_price_r
+            minigun_cost_b = self.game.game_state.minigun_price_b 
+            church_cost_r = self.game.game_state.church_price_r
+            church_cost_b = self.game.game_state.church_price_b 
+
+            house_built_r = 0 if(old_house_cost_r == house_cost_r) else 1
+            house_built_b = 0 if(old_house_cost_b == house_cost_b) else 1
+            crossbow_built_r = 0 if(old_crossbow_cost_r == crossbow_cost_r) else 1
+            crossbow_built_b = 0 if(old_crossbow_cost_b == crossbow_cost_b) else 1
+            cannon_built_r = 0 if(old_cannon_cost_r == cannon_cost_r) else 1
+            cannon_built_b = 0 if(old_cannon_cost_b == cannon_cost_b) else 1
+            minigun_built_r = 0 if(old_minigun_cost_r == minigun_cost_r) else 1
+            minigun_built_b = 0 if(old_minigun_cost_b == minigun_cost_b) else 1
+            church_built_r = 0 if(old_church_cost_r == church_cost_r) else 1
+            church_built_b = 0 if(old_church_cost_b == church_cost_b) else 1
 
             # --- Reward Components ---
             # 1. Health Delta: A zero-sum reward for damaging the opponent's base vs. taking damage.
@@ -392,14 +439,49 @@ class raw_env(AECEnv):
             # 3. Time Penalty: A small negative reward each turn to encourage faster wins and prevent passive behavior.
             time_penalty = -0.01
 
+            # 4. Tower Placement:
+            BUILD_REWARDS = {
+                "house": 2.0,      # immediate bonus for building a house
+                "church": 0.8,     # support building (if it exists)
+                "cannon": 0.5,     # solid offensive tower
+                "minigun": 0.45,   # good DPS
+                "crossbow": 0.3    # weaker offensive tower
+            }
+
+            tower_place_r = (
+                house_built_r * BUILD_REWARDS["house"] +
+                church_built_r * BUILD_REWARDS["church"] +
+                cannon_built_r * BUILD_REWARDS["cannon"] +
+                minigun_built_r * BUILD_REWARDS["minigun"] +
+                crossbow_built_r * BUILD_REWARDS["crossbow"]
+            )
+            tower_place_b = (
+                house_built_b * BUILD_REWARDS["house"] +
+                church_built_b * BUILD_REWARDS["church"] +
+                cannon_built_b * BUILD_REWARDS["cannon"] +
+                minigun_built_b * BUILD_REWARDS["minigun"] +
+                crossbow_built_b * BUILD_REWARDS["crossbow"]
+            )
+
+            # Mercenary sending
+            num_merc_r = sum(1 for m in self.game.game_state.mercs if m.team == 'r' and m.state != 'dead')
+            merc_send_r = -0.5 if (self.game.game_state.turns_remaining > 280 and num_merc_r > 0) else 0
+
+            num_merc_b = sum(1 for m in self.game.game_state.mercs if m.team == 'b' and m.state != 'dead')
+            merc_send_b = -0.5 if (self.game.game_state.turns_remaining > 280 and num_merc_b > 0) else 0
+
+            # Income
+            house_income_r = 20 if int(round(math.log(self.game.game_state.house_price_r / Constants.HOUSE_BASE_PRICE, 1.25))) != 0 else 0
+            house_income_b = 20 if int(round(math.log(self.game.game_state.house_price_b / Constants.HOUSE_BASE_PRICE, 1.25))) != 0 else 0
+
             # --- Total Reward ---
             # The final reward is a weighted sum of the components.
             # Tuning these weights is a key part of training a successful agent.
-            w_health = 0.8  # Health is the most important factor.
-            w_econ = 1.0   # Economy is a secondary concern.
+            w_health = 1.0  # Health is the most important factor.
+            w_econ = 1 if(self.game.game_state.turns_remaining > 290) else 0.2   # Economy is a secondary concern.
 
-            reward_r = (w_health * health_delta_r) + (w_econ * income_r) + time_penalty
-            reward_b = (w_health * health_delta_b) + (w_econ * income_b) + time_penalty
+            reward_r = (w_health * health_delta_r) + (w_econ * income_r) + time_penalty + tower_place_r + merc_send_r + house_income_r
+            reward_b = (w_health * health_delta_b) + (w_econ * income_b) + time_penalty + tower_place_b + merc_send_b + house_income_b
             
             self.rewards["player_r"] += reward_r
             self.rewards["player_b"] += reward_b
@@ -408,11 +490,11 @@ class raw_env(AECEnv):
             if self.game.game_state.is_game_over():
                 # A large, sparse reward for winning and a penalty for losing.
                 if self.game.game_state.victory == 'r':
-                    self.rewards["player_r"] += 100
-                    self.rewards["player_b"] -= 100
+                    self.rewards["player_r"] += 10
+                    self.rewards["player_b"] -= 10
                 elif self.game.game_state.victory == 'b':
-                    self.rewards["player_b"] += 100
-                    self.rewards["player_r"] -= 100
+                    self.rewards["player_b"] += 10
+                    self.rewards["player_r"] -= 10
                 
                 self.terminations = {a: True for a in self.agents}
 

@@ -160,7 +160,7 @@ class Agent:
             return AIAction("destroy", to_destroy["x"], to_destroy["y"])
 
         # If everybody uses this agent, there will be a nice reset on turn 38
-        do_provoke = (turn == 30 and self.team_color == 'r') or (turn == 31 and self.team_color == 'b') or (turn == 38)
+        do_provoke = (turn == 0 and self.team_color == 'r') or (turn == 31 and self.team_color == 'b') or (turn == 38)
 
         # Always build a house on the first turn
         if turn == 0:
