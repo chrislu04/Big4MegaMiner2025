@@ -166,6 +166,8 @@ class raw_env(AECEnv):
         # Channel 4: Tower Type (1-4 for different tower types)
         # Channel 5: Tower Cooldown (normalized)
         # Channel 6: Unit State (1: walking, 2: attacking)
+        # Channel 7: Heat Map of Users Damage-to-Range
+        # Channel 8: Heat Map of Opponents Damage-to-Range
         
         tower_type_map = {"crossbow": 1, "cannon": 2, "minigun": 3, "house": 4}
         tower_cooldown_map = {
@@ -200,7 +202,7 @@ class raw_env(AECEnv):
             max_cd = tower_cooldown_map.get(t.name.upper(), 1)
             map_view[t.y, t.x, 5] = t.current_cooldown / max_cd if max_cd > 0 else 0
 
-            # --- Apply Damage-Per-Tile heatmap for offensive towers ---
+            # --- Apply Damage-Per-Tile heatmap for offensive towers (only on path tiles) ---
             t_type_upper = t.name.upper()
             if t_type_upper in tower_damage_map:
                 damage = tower_damage_map[t_type_upper]
@@ -211,10 +213,12 @@ class raw_env(AECEnv):
                     for dx in range(-rng, rng + 1):
                         ny, nx = t.y + dy, t.x + dx
                         if 0 <= ny < map_h and 0 <= nx < map_w:
-                            if my_team:
-                                my_dpt_map[ny, nx] += damage_per_turn
-                            else:
-                                opp_dpt_map[ny, nx] += damage_per_turn
+                            # Only add damage if the tile is a path (channel 0 == 1)
+                            if map_view[ny, nx, 0] == 1:
+                                if my_team:
+                                    my_dpt_map[ny, nx] += damage_per_turn
+                                else:
+                                    opp_dpt_map[ny, nx] += damage_per_turn
 
         # my_dpt_flat = my_dpt_map.flatten()
         # opp_dpt_flat = opp_dpt_map.flatten()
@@ -292,6 +296,9 @@ class raw_env(AECEnv):
         This is the public method called by the agent to get its observation.
         """
         return self._get_obs(agent)
+
+
+
 
     def _count_towers(self, team):
         """Count the number of towers built by a team."""
@@ -547,6 +554,7 @@ class raw_env(AECEnv):
         
         # If the agent chose an action outside the map, penalize it HEAVILY and force a "nothing" action.
         if original_x >= map_w or original_y >= map_h:
+            self.rewards[agent] -= 100
             act_type = 0  # Force "nothing" action.
             # Already penalized by invalid_penalty
 

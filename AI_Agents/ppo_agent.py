@@ -63,10 +63,12 @@ def convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
     MAX_MAP_HEIGHT = 50
     MAX_MAP_WIDTH = 50
 
-    obs_map = np.zeros((MAX_MAP_HEIGHT, MAX_MAP_WIDTH, 7), dtype=np.float32)
+    # --- Map Representation (Multi-channel) ---
+    obs_map = np.zeros((MAX_MAP_HEIGHT, MAX_MAP_WIDTH, 9), dtype=np.float32)
     map_view = obs_map[:map_h, :map_w, :]
 
-    # --- Terrain channel ---
+    # --- Channel 0: Terrain Type ---
+    # Encodes the type of each tile: 1=Path, 2=My Territory, 3=Opponent's Territory
     my_territory_char = 'R' if is_red_agent else 'B'
     opp_territory_char = 'B' if is_red_agent else 'R'
     for r_idx, row in enumerate(game_state['FloorTiles']):
@@ -78,7 +80,16 @@ def convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
             elif tile == opp_territory_char:
                 map_view[r_idx, c_idx, 0] = 3
 
-    # --- Entity channels ---
+    # --- Entity Channels ---
+    # Channel 1: Entity Type (1: Tower, 2: Merc, 3: Demon, 4: Base)
+    # Channel 2: Health (normalized for mercs, demons, bases)
+    # Channel 3: Team Affiliation (1: Mine, -1: Opponent's, 0: Neutral)
+    # Channel 4: Tower Type (1-4 for different tower types)
+    # Channel 5: Tower Cooldown (normalized)
+    # Channel 6: Unit State (1: walking, 2: attacking)
+    # Channel 7: Heat Map of Users Damage-to-Range
+    # Channel 8: Heat Map of Opponents Damage-to-Range
+    
     tower_type_map = {"crossbow": 1, "cannon": 2, "minigun": 3, "house": 4}
     tower_cooldown_map = {
         "HOUSE": Constants.HOUSE_MAX_COOLDOWN,
@@ -87,7 +98,7 @@ def convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
         "CROSSBOW": Constants.CROSSBOW_MAX_COOLDOWN,
     }
 
-    # Initialize damage-per-tile heatmaps
+    # --- Initialize Damage-Per-Tile Heatmaps ---
     my_dpt_map = np.zeros((map_h, map_w), dtype=np.float32)
     opp_dpt_map = np.zeros((map_h, map_w), dtype=np.float32)
 
@@ -104,26 +115,29 @@ def convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
         max_cd = tower_cooldown_map.get(t_type_upper, 1)
         map_view[y, x, 5] = t.get('Cooldown', 0) / max_cd if max_cd > 0 else 0
 
-        # Skip House and Church for damage heatmap
-        if t_type_upper not in tower_damage_map:
-            continue
+        # --- Apply Damage-Per-Tile heatmap for offensive towers (only on path tiles) ---
+        if t_type_upper in tower_damage_map:
+            damage = tower_damage_map[t_type_upper]
+            rng = tower_range_map[t_type_upper]
+            damage_per_turn = damage / max_cd if max_cd > 0 else damage
 
-        damage = tower_damage_map[t_type_upper]
-        rng = tower_range_map[t_type_upper]
-        cooldown = max_cd
-        damage_per_turn = damage / cooldown if cooldown > 0 else damage
+            # Apply damage per turn to tiles within range
+            for dy in range(-rng, rng + 1):
+                for dx in range(-rng, rng + 1):
+                    ny, nx = y + dy, x + dx
+                    if 0 <= ny < map_h and 0 <= nx < map_w:
+                        # Only add damage if the tile is a path (channel 0 == 1)
+                        if map_view[ny, nx, 0] == 1:
+                            if my_team:
+                                my_dpt_map[ny, nx] += damage_per_turn
+                            else:
+                                opp_dpt_map[ny, nx] += damage_per_turn
 
-        # Apply damage per turn to tiles within range
-        for dy in range(-rng, rng + 1):
-            for dx in range(-rng, rng + 1):
-                ny, nx = y + dy, x + dx
-                if 0 <= ny < map_h and 0 <= nx < map_w:
-                    if my_team:
-                        my_dpt_map[ny, nx] += damage_per_turn
-                    else:
-                        opp_dpt_map[ny, nx] += damage_per_turn
+    # Store heatmaps directly in map channels
+    map_view[:, :, 7] = my_dpt_map
+    map_view[:, :, 8] = opp_dpt_map
 
-    # --- Mercenaries and Demons ---
+    # --- Mercenaries ---
     merc_state_map = {"walking": 1, "attacking": 2}
     for m in game_state['Mercenaries']:
         y, x = int(m['y']), int(m['x'])
@@ -133,11 +147,12 @@ def convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
         map_view[y, x, 3] = 1 if my_team else -1
         map_view[y, x, 6] = merc_state_map.get(m['State'], 0)
 
+    # --- Demons ---
     demon_state_map = {"walking": 1, "attacking": 2}
     for d in game_state['Demons']:
         y, x = int(d['y']), int(d['x'])
         map_view[y, x, 1] = 3
-        map_view[y, x, 2] = d['Health'] / Constants.DEMON_INITIAL_HEALTH
+        map_view[y, x, 2] = d['Health'] / Constants.DEMON_INITIAL_HEALTH if Constants.DEMON_INITIAL_HEALTH > 0 else 0
         map_view[y, x, 3] = 0
         map_view[y, x, 6] = demon_state_map.get(d['State'], 0)
 
@@ -147,13 +162,13 @@ def convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
     my_base = base_r if is_red_agent else base_b
     opp_base = base_b if is_red_agent else base_r
     map_view[my_base['y'], my_base['x'], 1] = 4
-    map_view[my_base['y'], my_base['x'], 2] = my_base['Health'] / Constants.PLAYER_BASE_INITIAL_HEALTH
+    map_view[my_base['y'], my_base['x'], 2] = my_base['Health'] / Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 0
     map_view[my_base['y'], my_base['x'], 3] = 1
     map_view[opp_base['y'], opp_base['x'], 1] = 4
-    map_view[opp_base['y'], opp_base['x'], 2] = opp_base['Health'] / Constants.PLAYER_BASE_INITIAL_HEALTH
+    map_view[opp_base['y'], opp_base['x'], 2] = opp_base['Health'] / Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 0
     map_view[opp_base['y'], opp_base['x'], 3] = -1
 
-    # --- Vector features ---
+    # --- Vector Features (Global game state) ---
     my_money = game_state['RedTeamMoney'] if is_red_agent else game_state['BlueTeamMoney']
     my_base_health = my_base['Health']
     opp_money = game_state['BlueTeamMoney'] if is_red_agent else game_state['RedTeamMoney']
@@ -167,31 +182,22 @@ def convert_state_to_obs(game_state: dict, team_color: str) -> np.ndarray:
     Minigun_Cost = game_state['TowerPricesR']["Minigun"] if is_red_agent else game_state['TowerPricesB']["Minigun"]
     Church_Cost = game_state['TowerPricesR']["Church"] if is_red_agent else game_state['TowerPricesB']["Church"]
 
-    # Flatten heatmaps for vector features
-    my_dpt_flat = my_dpt_map.flatten()
-    opp_dpt_flat = opp_dpt_map.flatten()
-
     vector_features = np.array([
         my_money, my_base_health, opp_money, opp_base_health, turns_remaining,
-        House_Cost, Crossbow_Cost, Cannon_Cost, Minigun_Cost, Church_Cost,
-        *my_dpt_flat, *opp_dpt_flat
+        House_Cost, Crossbow_Cost, Cannon_Cost, Minigun_Cost, Church_Cost
     ], dtype=np.float32)
 
     # Normalize vector features
     vector_features[0] /= 1000
-    vector_features[1] /= Constants.PLAYER_BASE_INITIAL_HEALTH
+    vector_features[1] /= Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 1
     vector_features[2] /= 1000
-    vector_features[3] /= Constants.PLAYER_BASE_INITIAL_HEALTH
-    vector_features[4] /= Constants.MAX_TURNS
+    vector_features[3] /= Constants.PLAYER_BASE_INITIAL_HEALTH if Constants.PLAYER_BASE_INITIAL_HEALTH > 0 else 1
+    vector_features[4] /= Constants.MAX_TURNS if Constants.MAX_TURNS > 0 else 1
     vector_features[5:10] /= 1000  # tower costs
-    # Damage-per-tile values can stay raw or be scaled if desired
 
+    # --- Flatten and Concatenate ---
     flat_map = obs_map.flatten()
     return np.concatenate([flat_map, vector_features])
-
-
-
-
 
 class Agent:
     """
