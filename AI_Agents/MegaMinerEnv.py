@@ -350,7 +350,7 @@ class raw_env(AECEnv):
         
         # Apply penalties for invalid actions
         if is_out_of_bounds:
-            self.rewards[agent] -= 0.3  # Penalty for choosing out-of-bounds tile
+            self.rewards[agent] -= 0.5  # Penalty for choosing out-of-bounds tile
             act_type = 0  # Force "nothing" action
         elif act_type == 1 and not is_valid_build:
             self.rewards[agent] -= 0.5  # Stronger penalty for invalid build location
@@ -437,7 +437,7 @@ class raw_env(AECEnv):
             income_b = money_b - old_money_b
 
             # 3. Time Penalty: A small negative reward each turn to encourage faster wins and prevent passive behavior.
-            time_penalty = -0.01
+            time_penalty = 0#-0.01
 
             # 4. Tower Placement:
             BUILD_REWARDS = {
@@ -463,6 +463,9 @@ class raw_env(AECEnv):
                 crossbow_built_b * BUILD_REWARDS["crossbow"]
             )
 
+            tower_attempt_r = 1 if(self.action_r == "build") else 0
+            tower_attempt_b = 1 if(self.action_b == "build") else 0
+
             # Mercenary sending
             num_merc_r = sum(1 for m in self.game.game_state.mercs if m.team == 'r' and m.state != 'dead')
             merc_send_r = -0.5 if (self.game.game_state.turns_remaining > 280 and num_merc_r > 0) else 0
@@ -471,8 +474,8 @@ class raw_env(AECEnv):
             merc_send_b = -0.5 if (self.game.game_state.turns_remaining > 280 and num_merc_b > 0) else 0
 
             # Income
-            house_income_r = 20 if int(round(math.log(self.game.game_state.house_price_r / Constants.HOUSE_BASE_PRICE, 1.25))) != 0 else 0
-            house_income_b = 20 if int(round(math.log(self.game.game_state.house_price_b / Constants.HOUSE_BASE_PRICE, 1.25))) != 0 else 0
+            house_income_r = 5 if int(round(math.log(self.game.game_state.house_price_r / Constants.HOUSE_BASE_PRICE, 1.25))) != 0 else 0
+            house_income_b = 5 if int(round(math.log(self.game.game_state.house_price_b / Constants.HOUSE_BASE_PRICE, 1.25))) != 0 else 0
 
             # --- Total Reward ---
             # The final reward is a weighted sum of the components.
@@ -480,21 +483,23 @@ class raw_env(AECEnv):
             w_health = 1.0  # Health is the most important factor.
             w_econ = 1 if(self.game.game_state.turns_remaining > 290) else 0.2   # Economy is a secondary concern.
 
-            reward_r = (w_health * health_delta_r) + (w_econ * income_r) + time_penalty + tower_place_r + merc_send_r + house_income_r
-            reward_b = (w_health * health_delta_b) + (w_econ * income_b) + time_penalty + tower_place_b + merc_send_b + house_income_b
+            reward_r = (w_health * health_delta_r) + (w_econ * income_r) + time_penalty + tower_place_r + merc_send_r + house_income_r + tower_attempt_r
+            reward_b = (w_health * health_delta_b) + (w_econ * income_b) + time_penalty + tower_place_b + merc_send_b + house_income_b + tower_attempt_b
             
             self.rewards["player_r"] += reward_r
             self.rewards["player_b"] += reward_b
 
             # --- Check for Termination (Game Over) ---
             if self.game.game_state.is_game_over():
+                self.rewards["player_r"] += 50 if int(round(math.log(self.game.game_state.house_price_r / Constants.HOUSE_BASE_PRICE, 1.25))) != 0 else -50
+                self.rewards["player_b"] += 50 if int(round(math.log(self.game.game_state.house_price_b / Constants.HOUSE_BASE_PRICE, 1.25))) != 0 else -50
                 # A large, sparse reward for winning and a penalty for losing.
                 if self.game.game_state.victory == 'r':
-                    self.rewards["player_r"] += 10
-                    self.rewards["player_b"] -= 10
+                    self.rewards["player_r"] += 100
+                    self.rewards["player_b"] -= 100
                 elif self.game.game_state.victory == 'b':
-                    self.rewards["player_b"] += 10
-                    self.rewards["player_r"] -= 10
+                    self.rewards["player_b"] += 100
+                    self.rewards["player_r"] -= 100
                 
                 self.terminations = {a: True for a in self.agents}
 
