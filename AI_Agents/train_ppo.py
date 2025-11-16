@@ -12,12 +12,15 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback, EvalCallback, CallbackList
 from stable_baselines3.common.vec_env import VecMonitor
 from pettingzoo.utils.conversions import aec_to_parallel
+import importlib
 
 # Add the backend directory to the Python path if it's not already.
 # This is necessary to ensure that the MegaMinerEnv can be imported correctly.
 try:
     import MegaMinerEnv
+    importlib.reload(MegaMinerEnv)
 except ImportError:
+    print("error")
     import sys
     sys.path.append(str(Path(__file__).resolve().parent.parent))
     from AI_Agents import MegaMinerEnv
@@ -135,7 +138,7 @@ def main(args):
     # --- 5. Setup Callbacks ---
     # Set up callbacks to be used during training.
     # Time limit callback to stop training after a certain amount of time.
-    max_training_time_seconds = args.train_minutes * 60
+    max_training_time_seconds = args.train_minutes * 60 * 2
     time_callback = TimeLimitCallback(max_time=max_training_time_seconds, verbose=1)
 
     # Evaluation callback to evaluate the model periodically and save the best one.

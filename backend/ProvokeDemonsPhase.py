@@ -37,6 +37,7 @@ def provoke_demons_phase(game_state: GameState, ai_action_r: AIAction, ai_action
     
     if provoked_r:
         log_msg('Only red provoked the demons this turn. Spawning more demons!')
+        return True
     
 
 

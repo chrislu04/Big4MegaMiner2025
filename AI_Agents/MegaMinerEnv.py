@@ -9,6 +9,7 @@ from pettingzoo import AECEnv
 from pettingzoo.utils import agent_selector, wrappers
 import sys
 from pathlib import Path
+import math
 
 # Add the backend directory to the Python path to import game components.
 sys.path.append(str(Path(__file__).resolve().parent.parent / 'backend'))
@@ -187,6 +188,7 @@ class raw_env(AECEnv):
             "MINIGUN": Constants.MINIGUN_DAMAGE,
             "CROSSBOW": Constants.CROSSBOW_DAMAGE,
         }
+
         tower_range_map = {
             "CANNON": Constants.CANNON_RANGE,
             "MINIGUN": Constants.MINIGUN_RANGE,
