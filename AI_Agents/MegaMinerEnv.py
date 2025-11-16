@@ -117,7 +117,7 @@ class raw_env(AECEnv):
         The vector is structured as: [action_type, x, y, tower_type, merc_direction]
         """
         return gymnasium.spaces.MultiDiscrete([
-            3,  # action_type: 0=nothing, 1=build, 2=destroy
+            2,  # action_type: 0=nothing, 1=build, 2=destroy
             self.MAX_MAP_WIDTH,  # x-coordinate for the action (0 to MAX_MAP_WIDTH-1)
             self.MAX_MAP_HEIGHT, # y-coordinate for the action (0 to MAX_MAP_HEIGHT-1)
             5,  # tower_type: 0=crossbow, 1=cannon, 2=minigun, 3=house, 4=church
@@ -353,7 +353,7 @@ class raw_env(AECEnv):
         agent = self.agent_selection
 
         # --- Decode action from MultiDiscrete ---
-        action_type_map = {0: "nothing", 1: "build", 2: "destroy"}
+        action_type_map = {0: "nothing", 1: "build"}
         tower_type_map = {0: "crossbow", 1: "cannon", 2: "minigun", 3: "house", 4: "church"}
         merc_dir_map = {0: "", 1: "N", 2: "S", 3: "E", 4: "W"}
 
@@ -373,6 +373,12 @@ class raw_env(AECEnv):
         #     act_type = 0
         #     merc_dir = 0
 
+        if 300 - self.game.game_state.turns_remaining < 10:
+            if act_type == 0:
+                self.rewards[agent] -= 15
+            if act_type == 1:
+                self.rewards[agent] += 20
+
 
         team_color = 'r' if agent == "player_r" else 'b'
 
@@ -381,8 +387,8 @@ class raw_env(AECEnv):
 
         # If the chosen (x, y) is not a valid tile for this player, penalize and force "nothing"
         
-        if (x, y) not in valid_build_spaces and act_type in (1, 2):  # build/destroy only
-            self.rewards[agent] -= 0.1
+        if (x, y) not in valid_build_spaces and act_type == 1:  # build/destroy only
+            self.rewards[agent] -= 0.05
             act_type = 0          # do nothing
             merc_dir = 0          # no mercs this turn
 
@@ -497,46 +503,46 @@ class raw_env(AECEnv):
 
             # ---- RED: rewards for actually building towers ----
             if house_built_r:
-                build_reward_r += 0.6   # eco
+                build_reward_r += 5   # eco
             if crossbow_built_r:
-                build_reward_r += 0.8   # basic defense
+                build_reward_r += 0.8  # basic defense
             if cannon_built_r:
-                build_reward_r += 1.0   # strong splash
+                build_reward_r += 2.0   # strong splash
             if minigun_built_r:
-                build_reward_r += 1.2   # high DPS
+                build_reward_r += 2.2   # high DPS
             if church_built_r:
                 build_reward_r += 0.5   # support
 
             # ---- BLUE: same structure ----
             if house_built_b:
-                build_reward_b += 0.6
+                build_reward_b += 5
             if crossbow_built_b:
                 build_reward_b += 0.8
             if cannon_built_b:
-                build_reward_b += 1.0
+                build_reward_b += 2.0
             if minigun_built_b:
-                build_reward_b += 1.2
+                build_reward_b += 2.2
             if church_built_b:
                 build_reward_b += 0.5
 
             # ---- RED: penalties for destroy and merc usage ----
-            if old_action_r.action == "destroy":
-                action_penalty_r -= 0.5  # discourage destroy as a default move
+            # if old_action_r.action == "destroy":
+            #     action_penalty_r -= 0.5  # discourage destroy as a default move
 
             # Mercs only come from "nothing" + direction; penalize that usage
             if old_action_r.action == "nothing" and old_action_r.merc_direction != "":
                 action_penalty_r -= 0.3   # merc usage penalty
             elif old_action_r.action == "nothing" and old_action_r.merc_direction == "":
-                action_penalty_r += 0.05  # mild reward for truly doing nothing (saving money / patience)
+                action_penalty_r += 0.1  # mild reward for truly doing nothing (saving money / patience)
 
-            # ---- BLUE: same penalties ----
-            if old_action_b.action == "destroy":
-                action_penalty_b -= 0.5
+            # # ---- BLUE: same penalties ----
+            # if old_action_b.action == "destroy":
+            #     action_penalty_b -= 0.5
 
             if old_action_b.action == "nothing" and old_action_b.merc_direction != "":
                 action_penalty_b -= 0.3
             elif old_action_b.action == "nothing" and old_action_b.merc_direction == "":
-                action_penalty_b += 0.05
+                action_penalty_b += 0.1
 
             # ======================
             #   FINAL REWARD

@@ -243,19 +243,19 @@ class Agent:
         self.team_color = team_color
         from stable_baselines3 import PPO
         
-        model_path = Path(__file__).resolve().parent.parent / "training_copy" / "models" / "best_model" / "best_model.zip"
-        #debug_log(f"Loading model from: {model_path}")
+        model_path = Path(__file__).resolve().parent.parent / "training_copy" / "models"  / "best_model" / "best_model.zip"
+        debug_log(f"Loading model from: {model_path}")
         try:
             self.model = PPO.load(model_path)
-            #debug_log("Model loaded successfully.")
+            debug_log("Model loaded successfully.")
         except Exception as e:
-            #debug_log(f"ERROR: Failed to load PPO model: {e}")
+            debug_log(f"ERROR: Failed to load PPO model: {e}")
             raise
         
         return "Big Hero 4"
     
     def do_turn(self, game_state: dict) -> AIAction:
-        #debug_log("=== Turn Start ===")
+        debug_log("=== Turn Start ===")
         
         observation = _convert_state_to_obs(game_state, self.team_color)
         #debug_log(f"Observation shape: {observation.shape}")
@@ -265,17 +265,19 @@ class Agent:
         
         try:
             action_vector, _states = self.model.predict(observation, deterministic=True)
-            #debug_log(f"Action vector: {action_vector}")
+            debug_log(f"Action vector: {action_vector}")
         except Exception as e:
-            #debug_log(f"ERROR: Failed to predict: {e}")
+            debug_log(f"ERROR: Failed to predict: {e}")
             raise
         
-        action_type_map = {0: "nothing", 1: "build", 2: "destroy"}
+        action_type_map = {0: "nothing", 1: "build"}
         tower_type_map = {0: "crossbow", 1: "cannon", 2: "minigun", 3: "house", 4: "church"}
         merc_dir_map = {0: "", 1: "N", 2: "S", 3: "E", 4: "W"}
 
         act_type, x, y, tower_type, merc_dir = action_vector
 
+        if act_type == 1:
+            merc_dir = 0
         ai_action = AIAction(
             action=action_type_map[act_type],
             x=int(x),

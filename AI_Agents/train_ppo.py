@@ -11,19 +11,83 @@ import supersuit as ss
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback, EvalCallback, CallbackList
 from stable_baselines3.common.vec_env import VecMonitor
+from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+
 from pettingzoo.utils.conversions import aec_to_parallel
-import importlib
+import torch.nn as nn
+from gymnasium import spaces
 
 # Add the backend directory to the Python path if it's not already.
 # This is necessary to ensure that the MegaMinerEnv can be imported correctly.
 try:
     import MegaMinerEnv
-    importlib.reload(MegaMinerEnv)
 except ImportError:
-    print("error")
     import sys
     sys.path.append(str(Path(__file__).resolve().parent.parent))
     from AI_Agents import MegaMinerEnv
+
+
+class DictCNNFeatureExtractor(BaseFeaturesExtractor):
+    """
+    Custom feature extractor for Dict observation spaces containing:
+    - 'map': 3D CNN input (H, W, C)
+    - 'vector': 1D vector input
+    Processes both through separate paths and concatenates.
+    """
+    def __init__(self, observation_space: spaces.Dict):
+        super().__init__(observation_space, features_dim=256)
+        
+        # Extract map shape from observation space
+        map_space = observation_space['map']
+        vector_space = observation_space['vector']
+        
+        # CNN for map processing
+        self.cnn = nn.Sequential(
+            nn.Conv2d(map_space.shape[2], 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+        )
+        
+        # Calculate CNN output size
+        cnn_output_size = 128
+        
+        # Linear layers for vector processing
+        self.vector_processor = nn.Sequential(
+            nn.Linear(vector_space.shape[0], 64),
+            nn.ReLU(),
+            nn.Linear(64, 32),
+        )
+        
+        # Final combining layer
+        self.combine = nn.Sequential(
+            nn.Linear(cnn_output_size + 32, 256),
+            nn.ReLU(),
+        )
+    
+    def forward(self, observations):
+        # Extract map and vector from observations dict
+        map_obs = observations['map']
+        vector_obs = observations['vector']
+        
+        # Process map through CNN (expects shape: (batch, channels, height, width))
+        # Map is (batch, height, width, channels), need to transpose
+        map_obs = map_obs.permute(0, 3, 1, 2)  # (batch, channels, height, width)
+        cnn_features = self.cnn(map_obs)
+        
+        # Process vector
+        vector_features = self.vector_processor(vector_obs)
+        
+        # Concatenate and process through final layers
+        combined = torch.cat([cnn_features, vector_features], dim=1)
+        features = self.combine(combined)
+        
+        return features
 
 class TimeLimitCallback(BaseCallback):
     """
@@ -111,41 +175,37 @@ def main(args):
     else:
         print("--- No existing model found, starting new training ---")
         # Create a new PPO model with the specified hyperparameters.
+        policy_kwargs = {
+            'features_extractor_class': DictCNNFeatureExtractor,
+            'features_extractor_kwargs': {},
+            'net_arch': [dict(pi=[256, 256], vf=[256, 256])],
+        }
         model = PPO(
-            "MlpPolicy",
+            "MultiInputPolicy",  # Use MultiInputPolicy for Dict observation spaces
             env,
+            #policy_kwargs=policy_kwargs,
             verbose=1,
             tensorboard_log=log_dir,
-            # Learning rate: High for rapid validity learning
-            learning_rate=5e-4,
-            # Batch and epoch settings: Smaller for faster updates
-            n_steps=2048,
-            batch_size=32,
+            n_steps=512,
+            batch_size=64,
             n_epochs=10,
-            # Discount factors: Standard
             gamma=0.99,
             gae_lambda=0.95,
-            # Regularization: Encourage exploration
             ent_coef=0.01,
-            clip_range=0.2,
-            # Gradient clipping: Prevent instability
-            max_grad_norm=0.5,
-            # Value function: Standard
-            vf_coef=0.5,
-            device=device,
+            device=device,  # Use the selected device (cuda, mps, or cpu).
         )
 
     # --- 5. Setup Callbacks ---
     # Set up callbacks to be used during training.
     # Time limit callback to stop training after a certain amount of time.
-    max_training_time_seconds = args.train_minutes * 60 * 2
+    max_training_time_seconds = args.train_minutes * 60
     time_callback = TimeLimitCallback(max_time=max_training_time_seconds, verbose=1)
 
     # Evaluation callback to evaluate the model periodically and save the best one.
     eval_env = MegaMinerEnv.env(map_path=map_file)
     eval_env = aec_to_parallel(eval_env)
     eval_env = ss.pettingzoo_env_to_vec_env_v1(eval_env)
-    eval_env = ss.concat_vec_envs_v1(eval_env, num_vec_envs=1, num_cpus=1, base_class="stable_baselines3")
+    eval_env = ss.concat_vec_envs_v1(eval_env, num_vec_envs=1, num_cpus=4, base_class="stable_baselines3")
 
     eval_callback = EvalCallback(
         eval_env,
@@ -163,7 +223,7 @@ def main(args):
     # Start training the model. The total number of timesteps is set to a large number,
     # so the training will be stopped by the time limit callback.
     print(f"--- Starting PPO Training for {args.train_minutes} minutes ---")
-    model.learn(total_timesteps=10000, callback=callback_list)
+    model.learn(total_timesteps=500_000, callback=callback_list)
     print("--- Finished Training ---")
 
     # --- 7. Save the Final Model ---
