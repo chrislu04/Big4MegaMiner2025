@@ -211,7 +211,7 @@ class raw_env(AECEnv):
             map_view[t.y, t.x, 3] = 1 if my_team else -1
             map_view[t.y, t.x, 4] = tower_type_map.get(t.name.lower(), 0)
             max_cd = tower_cooldown_map.get(t.name.upper(), 1)
-            #map_view[t.y, t.x, 5] = t.current_cooldown / max_cd if max_cd > 0 else 0
+            #map_view[t.y, t.x, 7] = t.current_cooldown / max_cd if max_cd > 0 else 0
 
             # --- Apply Damage-Per-Tile heatmap for offensive towers (only on path tiles) ---
             t_type_upper = t.name.upper()
@@ -382,7 +382,7 @@ class raw_env(AECEnv):
         # If the chosen (x, y) is not a valid tile for this player, penalize and force "nothing"
         
         if (x, y) not in valid_build_spaces and act_type in (1, 2):  # build/destroy only
-            self.rewards[agent] -= 0.2
+            self.rewards[agent] -= 0.1
             act_type = 0          # do nothing
             merc_dir = 0          # no mercs this turn
 
@@ -390,7 +390,7 @@ class raw_env(AECEnv):
         # If the agent tries to build/destroy AND set a merc direction, we zero it and penalize.
         if act_type != 0 and merc_dir != 0:
             # can't send mercs while building/destroying
-            #self.rewards[agent] -= 0.2
+            self.rewards[agent] -= 0.1
             merc_dir = 0
 
         # Convert to AIAction used by the backend Game
@@ -479,8 +479,8 @@ class raw_env(AECEnv):
 
             # 1. HEALTH-BASED (primary objective)
             # How much more did I damage the opponent than they damaged me?
-            health_delta_r = (old_health_b - health_b) - (old_health_r - health_r)
-            health_delta_b = (old_health_r - health_r) - (old_health_b - health_b)
+            health_delta_r = health_r - old_health_r
+            health_delta_b = health_b - old_health_b
 
             # 2. ECONOMY (secondary)
             income_r = money_r - old_money_r
@@ -541,11 +541,13 @@ class raw_env(AECEnv):
             # ======================
             #   FINAL REWARD
             # ======================
-            w_health = 1.0
+            w_health = 0.5
+            o_health = -0.4
             w_econ   = 0.05
 
             reward_r = (
                 w_health * health_delta_r +
+                o_health * health_delta_b +
                 w_econ * income_r +
                 time_penalty +
                 build_reward_r +
@@ -554,6 +556,7 @@ class raw_env(AECEnv):
 
             reward_b = (
                 w_health * health_delta_b +
+                o_health * health_delta_r +
                 w_econ * income_b +
                 time_penalty +
                 build_reward_b +
@@ -567,11 +570,11 @@ class raw_env(AECEnv):
             # --- Terminal large win/loss reward ---
             if self.game.game_state.is_game_over():
                 if self.game.game_state.victory == 'r':
-                    self.rewards["player_r"] += 100.0
-                    self.rewards["player_b"] -= 100.0
+                    self.rewards["player_r"] += 200.0
+                    self.rewards["player_b"] -= 200.0
                 elif self.game.game_state.victory == 'b':
-                    self.rewards["player_b"] += 100.0
-                    self.rewards["player_r"] -= 100.0
+                    self.rewards["player_b"] += 200.0
+                    self.rewards["player_r"] -= 200.0
 
                 self.terminations = {a: True for a in self.agents}
 
@@ -582,319 +585,6 @@ class raw_env(AECEnv):
         # Handle rendering if enabled.
         if self.render_mode == "human":
             self.render()
-
-
-    # def step(self, action):
-    #     """
-    #     Takes a step in the environment for the current agent.
-    #     This involves storing the agent's action, and if all agents have acted,
-    #     running a game turn, calculating rewards, and checking for termination.
-    #     """
-    #     if self.terminations[self.agent_selection] or self.truncations[self.agent_selection]:
-    #         # If the agent is done, it shouldn't be able to act. Handle this gracefully.
-    #         self._was_dead_step(action)
-    #         return
-
-    #     agent = self.agent_selection
-
-    #     # --- Decode action from MultiDiscrete ---
-    #     action_type_map = {0: "nothing", 1: "build", 2: "destroy"}
-    #     tower_type_map = {0: "crossbow", 1: "cannon", 2: "minigun", 3: "house", 4: "church"}
-    #     merc_dir_map = {0: "", 1: "N", 2: "S", 3: "E", 4: "W"}
-
-    #     act_type, x, y, tower_type, merc_dir = action
-
-    #     map_w, map_h = self.map_size
-    #     original_x, original_y = x, y
-
-    #     # Determine which side this agent is on
-    #     is_red = (agent == "player_r")
-    #     my_tile_char = 'r' if is_red else 'b'
-    #     my_team_char = 'r' if is_red else 'b'
-    #     money = self.game.game_state.money_r if is_red else self.game.game_state.money_b
-
-    #     # ================================
-    #     #   INVALID MOVE DETECTION
-    #     # ================================
-    #     invalid_penalty = 0.0
-    #     is_invalid = False
-
-    #     # 1) Out-of-bounds coordinates
-    #     if original_x < 0 or original_x >= map_w or original_y < 0 or original_y >= map_h:
-    #         is_invalid = True
-    #         invalid_penalty -= 0.4  # always penalize OOB
-
-    #     # Clamp to be safe when we actually pass to Game
-    #     x = int(np.clip(original_x, 0, map_w - 1))
-    #     y = int(np.clip(original_y, 0, map_h - 1))
-
-    #     # Helper: get tower cost for this team & type
-    #     def get_tower_cost(is_red_team, tower_name: str):
-    #         gs = self.game.game_state
-    #         if tower_name == "crossbow":
-    #             return gs.crossbow_price_r if is_red_team else gs.crossbow_price_b
-    #         elif tower_name == "cannon":
-    #             return gs.cannon_price_r if is_red_team else gs.cannon_price_b
-    #         elif tower_name == "minigun":
-    #             return gs.minigun_price_r if is_red_team else gs.minigun_price_b
-    #         elif tower_name == "house":
-    #             return gs.house_price_r if is_red_team else gs.house_price_b
-    #         elif tower_name == "church":
-    #             return gs.church_price_r if is_red_team else gs.church_price_b
-    #         else:
-    #             return 999999  # clearly unaffordable
-
-    #     # Helper: valid merc queue directions for this team
-    #     def get_valid_merc_dirs():
-    #         dirs = []
-    #         gs = self.game.game_state
-    #         base = gs.player_base_r if is_red else gs.player_base_b
-    #         offsets = {"N": (0, -1), "S": (0, 1), "E": (1, 0), "W": (-1, 0)}
-    #         for d, (dx, dy) in offsets.items():
-    #             tx, ty = base.x + dx, base.y + dy
-    #             if 0 <= tx < map_w and 0 <= ty < map_h:
-    #                 # In the original game, merc queue tiles are 'O'
-    #                 if gs.floor_tiles[ty][tx] == 'O':
-    #                     dirs.append(d)
-    #         return dirs
-
-    #     # 2) Merc direction used with non-"nothing" action
-    #     if act_type != 0 and merc_dir != 0:
-    #         is_invalid = True
-    #         invalid_penalty -= 0.2  # cannot build/destroy and send merc at same time
-
-    #     # 3) Build validity checks
-    #     if act_type == 1 and not is_invalid:
-    #         gs = self.game.game_state
-    #         tile_char = gs.floor_tiles[y][x]
-    #         has_entity = (gs.entity_grid[y][x] is not None)
-
-    #         # Must be on own territory and empty
-    #         if tile_char != my_tile_char or has_entity:
-    #             is_invalid = True
-    #             invalid_penalty -= 0.4
-    #         else:
-    #             # Must be able to afford the tower
-    #             tower_name = tower_type_map[tower_type]
-    #             cost = get_tower_cost(is_red, tower_name)
-    #             if money < cost:
-    #                 is_invalid = True
-    #                 invalid_penalty -= 0.4
-
-    #     # 4) Destroy validity checks
-    #     if act_type == 2 and not is_invalid:
-    #         gs = self.game.game_state
-    #         target = gs.entity_grid[y][x]
-    #         # Valid destroy: there is an entity with matching team
-    #         if target is None or not hasattr(target, "team") or target.team != my_team_char:
-    #             is_invalid = True
-    #             invalid_penalty -= 0.4
-
-    #     # 5) Merc spawn validity (only when doing nothing)
-    #     if act_type == 0 and merc_dir != 0 and not is_invalid:
-    #         desired_dir = merc_dir_map[merc_dir]
-    #         valid_dirs = get_valid_merc_dirs()
-    #         if desired_dir not in valid_dirs:
-    #             is_invalid = True
-    #             invalid_penalty -= 0.3  # invalid merc queue selection
-
-    #     # If invalid for ANY reason, turn it into a pure "nothing" with no merc
-    #     if is_invalid:
-    #         self.rewards[agent] += invalid_penalty  # always penalize invalid actions
-    #         act_type = 0
-    #         merc_dir = 0
-    #         x, y = 0, 0  # coordinates irrelevant for "nothing"
-
-    #     # --- Enforce: merc only actually used with "nothing" (even if not invalid above) ---
-    #     # If after corrections act_type != 0, merc_dir should be 0.
-    #     if act_type != 0:
-    #         merc_dir = 0
-
-    #     # Convert to AIAction used by the backend Game
-    #     ai_action = AIAction(
-    #         action=action_type_map[act_type],
-    #         x=x,
-    #         y=y,
-    #         tower_type=tower_type_map[tower_type],
-    #         merc_direction=merc_dir_map[merc_dir]
-    #     )
-    #     print(agent,action_type_map[act_type], tower_type_map[tower_type],merc_dir_map[merc_dir])
-    #     # --- Store action and wait for the other agent ---
-    #     if agent == "player_r":
-    #         self.action_r = ai_action
-    #     else:
-    #         self.action_b = ai_action
-
-    #     # --- Cycle to the next agent ---
-    #     self.agent_selection = self._agent_selector.next()
-
-    #     # --- If both agents have acted, run a game turn and compute rewards ---
-    #     if self.action_r is not None and self.action_b is not None:
-    #         # Snapshot state BEFORE running the turn
-    #         old_health_r = self.game.game_state.player_base_r.health
-    #         old_health_b = self.game.game_state.player_base_b.health
-    #         old_money_r = self.game.game_state.money_r
-    #         old_money_b = self.game.game_state.money_b
-
-    #         # Tower prices (we'll use price changes to detect builds)
-    #         old_house_cost_r    = self.game.game_state.house_price_r
-    #         old_house_cost_b    = self.game.game_state.house_price_b
-    #         old_crossbow_cost_r = self.game.game_state.crossbow_price_r
-    #         old_crossbow_cost_b = self.game.game_state.crossbow_price_b
-    #         old_cannon_cost_r   = self.game.game_state.cannon_price_r
-    #         old_cannon_cost_b   = self.game.game_state.cannon_price_b
-    #         old_minigun_cost_r  = self.game.game_state.minigun_price_r
-    #         old_minigun_cost_b  = self.game.game_state.minigun_price_b
-    #         old_church_cost_r   = self.game.game_state.church_price_r
-    #         old_church_cost_b   = self.game.game_state.church_price_b
-
-    #         # Keep references to the actions *used* this turn
-    #         old_action_r = self.action_r
-    #         old_action_b = self.action_b
-
-    #         # Run the game logic for this simultaneous turn
-    #         self.game.run_turn(self.action_r, self.action_b)
-
-    #         # Clear stored actions
-    #         self.action_r = None
-    #         self.action_b = None
-
-    #         # --- State AFTER the turn ---
-    #         health_r = self.game.game_state.player_base_r.health
-    #         health_b = self.game.game_state.player_base_b.health
-    #         money_r  = self.game.game_state.money_r
-    #         money_b  = self.game.game_state.money_b
-
-    #         house_cost_r    = self.game.game_state.house_price_r
-    #         house_cost_b    = self.game.game_state.house_price_b
-    #         crossbow_cost_r = self.game.game_state.crossbow_price_r
-    #         crossbow_cost_b = self.game.game_state.crossbow_price_b
-    #         cannon_cost_r   = self.game.game_state.cannon_price_r
-    #         cannon_cost_b   = self.game.game_state.cannon_price_b
-    #         minigun_cost_r  = self.game.game_state.minigun_price_r
-    #         minigun_cost_b  = self.game.game_state.minigun_price_b
-    #         church_cost_r   = self.game.game_state.church_price_r
-    #         church_cost_b   = self.game.game_state.church_price_b
-
-    #         # --- Detect which towers actually got built (prices usually increase on purchase) ---
-    #         house_built_r    = (house_cost_r    != old_house_cost_r)
-    #         house_built_b    = (house_cost_b    != old_house_cost_b)
-    #         crossbow_built_r = (crossbow_cost_r != old_crossbow_cost_r)
-    #         crossbow_built_b = (crossbow_cost_b != old_crossbow_cost_b)
-    #         cannon_built_r   = (cannon_cost_r   != old_cannon_cost_r)
-    #         cannon_built_b   = (cannon_cost_b   != old_cannon_cost_b)
-    #         minigun_built_r  = (minigun_cost_r  != old_minigun_cost_r)
-    #         minigun_built_b  = (minigun_cost_b  != old_minigun_cost_b)
-    #         church_built_r   = (church_cost_r   != old_church_cost_r)
-    #         church_built_b   = (church_cost_b   != old_church_cost_b)
-
-    #         # ======================
-    #         #   REWARD COMPONENTS
-    #         # ======================
-
-    #         # 1. HEALTH-BASED (primary objective)
-    #         health_delta_r = (old_health_b - health_b) - (old_health_r - health_r)
-    #         health_delta_b = (old_health_r - health_r) - (old_health_b - health_b)
-
-    #         # 2. ECONOMY (secondary)
-    #         income_r = money_r - old_money_r
-    #         income_b = money_b - old_money_b
-
-    #         # 3. TIME PENALTY (encourage faster games)
-    #         time_penalty = -0.01
-
-    #         # 4. ACTION-SPECIFIC SHAPING
-    #         build_reward_r = 0.0
-    #         build_reward_b = 0.0
-    #         action_penalty_r = 0.0
-    #         action_penalty_b = 0.0
-
-    #         # ---- RED: rewards for actually building towers ----
-    #         if house_built_r:
-    #             build_reward_r += 0.6
-    #         if crossbow_built_r:
-    #             build_reward_r += 0.8
-    #         if cannon_built_r:
-    #             build_reward_r += 1.0
-    #         if minigun_built_r:
-    #             build_reward_r += 1.2
-    #         if church_built_r:
-    #             build_reward_r += 0.5
-
-    #         # ---- BLUE: same structure ----
-    #         if house_built_b:
-    #             build_reward_b += 0.6
-    #         if crossbow_built_b:
-    #             build_reward_b += 0.8
-    #         if cannon_built_b:
-    #             build_reward_b += 1.0
-    #         if minigun_built_b:
-    #             build_reward_b += 1.2
-    #         if church_built_b:
-    #             build_reward_b += 0.5
-
-    #         # ---- RED: penalties for destroy and merc usage ----
-    #         if old_action_r.action == "destroy":
-    #             action_penalty_r -= 0.5
-
-    #         if old_action_r.action == "nothing" and old_action_r.merc_direction != "":
-    #             action_penalty_r -= 0.5   # merc usage penalty
-    #         elif old_action_r.action == "nothing" and old_action_r.merc_direction == "":
-    #             action_penalty_r += 0.05  # mild reward for saving
-
-    #         # ---- BLUE: same penalties ----
-    #         if old_action_b.action == "destroy":
-    #             action_penalty_b -= 0.5
-
-    #         if old_action_b.action == "nothing" and old_action_b.merc_direction != "":
-    #             action_penalty_b -= 0.5
-    #         elif old_action_b.action == "nothing" and old_action_b.merc_direction == "":
-    #             action_penalty_b += 0.05
-
-    #         # ======================
-    #         #   FINAL REWARD
-    #         # ======================
-    #         w_health = 1.0
-    #         w_econ   = 0.05
-
-    #         reward_r = (
-    #             w_health * health_delta_r +
-    #             w_econ * income_r +
-    #             time_penalty +
-    #             build_reward_r +
-    #             action_penalty_r
-    #         )
-
-    #         reward_b = (
-    #             w_health * health_delta_b +
-    #             w_econ * income_b +
-    #             time_penalty +
-    #             build_reward_b +
-    #             action_penalty_b
-    #         )
-
-    #         # Accumulate rewards
-    #         self.rewards["player_r"] += reward_r
-    #         self.rewards["player_b"] += reward_b
-
-    #         # --- Terminal large win/loss reward ---
-    #         if self.game.game_state.is_game_over():
-    #             if self.game.game_state.victory == 'r':
-    #                 self.rewards["player_r"] += 100.0
-    #                 self.rewards["player_b"] -= 100.0
-    #             elif self.game.game_state.victory == 'b':
-    #                 self.rewards["player_b"] += 100.0
-    #                 self.rewards["player_r"] -= 100.0
-
-    #             self.terminations = {a: True for a in self.agents}
-
-    #         # PettingZoo cumulative rewards
-    #         for a in self.agents:
-    #             self._cumulative_rewards[a] = self.rewards[a]
-
-    #     # Handle rendering if enabled.
-    #     if self.render_mode == "human":
-    #         self.render()
 
     def render(self):
         """
