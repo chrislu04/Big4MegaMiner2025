@@ -109,17 +109,27 @@ def main(args):
         print("--- No existing model found, starting new training ---")
         # Create a new PPO model with the specified hyperparameters.
         model = PPO(
-            "MlpPolicy", # Use the Multi-Layer Perceptron policy.
+            "MlpPolicy",
             env,
             verbose=1,
             tensorboard_log=log_dir,
+            # Learning rate: High for rapid validity learning
+            learning_rate=5e-4,
+            # Batch and epoch settings: Smaller for faster updates
             n_steps=2048,
-            batch_size=64,
+            batch_size=32,
             n_epochs=10,
+            # Discount factors: Standard
             gamma=0.99,
             gae_lambda=0.95,
+            # Regularization: Encourage exploration
             ent_coef=0.01,
-            device=device,  # Use the selected device (cuda, mps, or cpu).
+            clip_range=0.2,
+            # Gradient clipping: Prevent instability
+            max_grad_norm=0.5,
+            # Value function: Standard
+            vf_coef=0.5,
+            device=device,
         )
 
     # --- 5. Setup Callbacks ---
@@ -150,7 +160,7 @@ def main(args):
     # Start training the model. The total number of timesteps is set to a large number,
     # so the training will be stopped by the time limit callback.
     print(f"--- Starting PPO Training for {args.train_minutes} minutes ---")
-    model.learn(total_timesteps=10_000_000, callback=callback_list)
+    model.learn(total_timesteps=10000, callback=callback_list)
     print("--- Finished Training ---")
 
     # --- 7. Save the Final Model ---

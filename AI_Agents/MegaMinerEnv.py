@@ -81,6 +81,18 @@ class raw_env(AECEnv):
         # while we wait for the action of the second agent.
         self.action_r = None
         self.action_b = None
+        
+        # --- Reward System State Tracking ---
+        # Track metrics needed for the structured reward system
+        self.tower_count_r = 0
+        self.tower_count_b = 0
+        self.tower_count_r_prev = 0
+        self.tower_count_b_prev = 0
+        self.enemies_killed_r = 0  # Enemies killed by red player's towers
+        self.enemies_killed_b = 0  # Enemies killed by blue player's towers
+        self.last_turn = 0
+        self.mercenary_count_r_prev = 0
+        self.mercenary_count_b_prev = 0
 
     def observation_space(self, agent):
         """Returns the observation space for a given agent."""
@@ -281,6 +293,187 @@ class raw_env(AECEnv):
         """
         return self._get_obs(agent)
 
+    def _count_towers(self, team):
+        """Count the number of towers built by a team."""
+        count = 0
+        for tower in self.game.game_state.towers:
+            if tower.team == team:
+                count += 1
+        return count
+
+    def _calculate_tower_placement_quality(self, team, is_red_agent):
+        """
+        Calculate a quality score for tower placement based on damage heatmap.
+        Higher values in friendly damage heatmap at tower locations indicate better placement.
+        """
+        map_h, map_w = self.map_size[1], self.map_size[0]
+        
+        # Build friendly damage heatmap
+        tower_damage_map = {
+            "CANNON": Constants.CANNON_DAMAGE,
+            "MINIGUN": Constants.MINIGUN_DAMAGE,
+            "CROSSBOW": Constants.CROSSBOW_DAMAGE,
+        }
+        tower_range_map = {
+            "CANNON": Constants.CANNON_RANGE,
+            "MINIGUN": Constants.MINIGUN_RANGE,
+            "CROSSBOW": Constants.CROSSBOW_RANGE,
+        }
+        tower_cooldown_map = {
+            "HOUSE": Constants.HOUSE_MAX_COOLDOWN,
+            "CANNON": Constants.CANNON_MAX_COOLDOWN,
+            "MINIGUN": Constants.MINIGUN_MAX_COOLDOWN,
+            "CROSSBOW": Constants.CROSSBOW_MAX_COOLDOWN,
+        }
+        
+        my_dpt_map = np.zeros((map_h, map_w), dtype=np.float32)
+        placement_score = 0.0
+        
+        for t in self.game.game_state.towers:
+            my_team = (is_red_agent and t.team == 'r') or (not is_red_agent and t.team == 'b')
+            if not my_team:
+                continue
+            
+            t_type_upper = t.name.upper()
+            if t_type_upper in tower_damage_map:
+                damage = tower_damage_map[t_type_upper]
+                rng = tower_range_map[t_type_upper]
+                max_cd = tower_cooldown_map.get(t_type_upper, 1)
+                damage_per_turn = damage / max_cd if max_cd > 0 else damage
+                
+                # Calculate coverage value at this tower's position
+                for dy in range(-rng, rng + 1):
+                    for dx in range(-rng, rng + 1):
+                        ny, nx = t.y + dy, t.x + dx
+                        if 0 <= ny < map_h and 0 <= nx < map_w:
+                            my_dpt_map[ny, nx] += damage_per_turn
+                
+                # Tower placement quality = sum of damage coverage in its range
+                placement_score += np.sum(my_dpt_map[
+                    max(0, t.y - rng):min(map_h, t.y + rng + 1),
+                    max(0, t.x - rng):min(map_w, t.x + rng + 1)
+                ])
+        
+        return placement_score
+
+    def _count_enemies_killed(self):
+        """
+        Detect enemies killed by counting changes in enemy counts.
+        Returns (red_kills, blue_kills) since last check.
+        """
+        merc_count_r = sum(1 for m in self.game.game_state.mercs if m.team == 'b')
+        merc_count_b = sum(1 for m in self.game.game_state.mercs if m.team == 'r')
+        demon_count = len(self.game.game_state.demons)
+        
+        # Estimate kills from mercenary count changes
+        # Red player kills blue mercenaries, blue player kills red mercenaries
+        prev_mercs = self.mercenary_count_r_prev + self.mercenary_count_b_prev
+        curr_mercs = merc_count_r + merc_count_b
+        
+        self.mercenary_count_r_prev = merc_count_r
+        self.mercenary_count_b_prev = merc_count_b
+        
+        return 0, 0  # Placeholder - would need more detailed tracking
+
+    def _check_invalid_action(self, action, agent, is_red_agent):
+        """
+        Check if an action is invalid and return penalty if so.
+        Invalid actions include:
+        - Building on occupied tiles
+        - Building on enemy/restricted tiles (CRITICALLY PENALIZED)
+        - Building without sufficient money (HEAVILY PENALIZED)
+        - Out of bounds actions (HEAVILY PENALIZED)
+        """
+        act_type, x, y, tower_type, merc_dir = action
+        action_type_map = {0: "nothing", 1: "build", 2: "destroy"}
+        tower_type_map = {0: "crossbow", 1: "cannon", 2: "minigun", 3: "house", 4: "church"}
+        
+        penalty = 0.0
+        map_w, map_h = self.map_size
+        
+        # Check if action is out of bounds (HEAVY PENALTY)
+        if x >= map_w or y >= map_h or x < 0 or y < 0:
+            penalty = -1.0  # HEAVILY PENALIZE out of bounds
+            return penalty
+        
+        # For build actions, check validity
+        if act_type == 1:  # build
+            # ========== CRITICAL CHECK: BUILDING IN OWN TERRITORY ==========
+            # This is the most important check - agent MUST learn to only build in own territory
+            my_territory_char = 'R' if is_red_agent else 'B'
+            actual_tile = self.game.game_state.floor_tiles[y][x]
+            
+            # CRITICAL PENALTY: Building outside own territory (enemy/neutral)
+            if actual_tile != my_territory_char:
+                penalty = -5.0  # EXTREMELY HEAVY PENALTY for building outside territory
+                return penalty
+            
+            current_money = self.game.game_state.money_r if is_red_agent else self.game.game_state.money_b
+            tower_type_str = tower_type_map.get(tower_type, "crossbow").lower()
+            
+            # Get tower price
+            if is_red_agent:
+                tower_prices = {
+                    "crossbow": self.game.game_state.crossbow_price_r,
+                    "cannon": self.game.game_state.cannon_price_r,
+                    "minigun": self.game.game_state.minigun_price_r,
+                    "house": self.game.game_state.house_price_r,
+                    "church": self.game.game_state.church_price_r,
+                }
+            else:
+                tower_prices = {
+                    "crossbow": self.game.game_state.crossbow_price_b,
+                    "cannon": self.game.game_state.cannon_price_b,
+                    "minigun": self.game.game_state.minigun_price_b,
+                    "house": self.game.game_state.house_price_b,
+                    "church": self.game.game_state.church_price_b,
+                }
+            
+            tower_cost = tower_prices.get(tower_type_str, 100)
+            
+            # HEAVY PENALTY: Trying to build without sufficient money
+            if current_money < tower_cost:
+                penalty = -2.0  # VERY HEAVY PENALTY for attempting purchase without money
+            
+            # HEAVY PENALTY: Building on occupied tiles
+            for entity in self.game.game_state.towers + self.game.game_state.mercs + self.game.game_state.demons:
+                if entity.x == x and entity.y == y:
+                    penalty = -1.5  # HEAVY PENALTY for occupied tile
+                    break
+        
+        return penalty
+
+    def _check_invalid_mercenary_purchase(self, action, is_red_agent):
+        """
+        Check if agent is trying to buy a mercenary without money.
+        Returns heavy penalty if attempting to buy without funds or buying too many.
+        Also penalizes mercenary spam.
+        """
+        act_type, x, y, tower_type, merc_dir = action
+        
+        # Check if action includes mercenary purchase (merc_dir is not empty)
+        if merc_dir != 0:  # 0 = "", 1+ = valid direction
+            current_money = self.game.game_state.money_r if is_red_agent else self.game.game_state.money_b
+            mercenary_cost = Constants.MERCENARY_PRICE  # $10
+            
+            # Count existing mercenaries for this player
+            merc_count = sum(1 for m in self.game.game_state.mercs if m.team == ('r' if is_red_agent else 'b'))
+            
+            # EXTREMELY HEAVY PENALTY: Trying to buy mercenary without sufficient money
+            if current_money < mercenary_cost:
+                return -3.0  # EXTREMELY HEAVY PENALTY for mercenary without funds
+            
+            # HEAVY PENALTY: Spamming mercenaries (more than 8 at once)
+            # Encourages strategic use, not spam
+            if merc_count >= 8:
+                return -1.5  # Penalty for having too many mercenaries
+        
+        return 0.0
+
+    def _is_early_game(self):
+        """Check if we're in the early game (first 30 turns)."""
+        return Constants.MAX_TURNS - self.game.game_state.turns_remaining < 30
+
     def reset(self, seed=None, options=None):
         """
         Resets the environment to its initial state for a new episode and returns the initial observation.
@@ -301,6 +494,17 @@ class raw_env(AECEnv):
         
         self.action_r = None
         self.action_b = None
+        
+        # Reset reward system state tracking
+        self.tower_count_r = 0
+        self.tower_count_b = 0
+        self.tower_count_r_prev = 0
+        self.tower_count_b_prev = 0
+        self.enemies_killed_r = 0
+        self.enemies_killed_b = 0
+        self.last_turn = 0
+        self.mercenary_count_r_prev = 0
+        self.mercenary_count_b_prev = 0
 
         # Get the initial observation for the first agent to act.
         observation = self._get_obs(self.agent_selection)
@@ -320,10 +524,11 @@ class raw_env(AECEnv):
             return
 
         agent = self.agent_selection
+        is_red_agent = agent == "player_r"
         
         # --- Decode and Validate Action ---
         action_type_map = {0: "nothing", 1: "build", 2: "destroy"}
-        tower_type_map = {0: "crossbow", 1: "cannon", 2: "minigun", 3: "house"}
+        tower_type_map = {0: "crossbow", 1: "cannon", 2: "minigun", 3: "house", 4: "church"}
         merc_dir_map = {0: "", 1: "N", 2: "S", 3: "E", 4: "W"}
 
         act_type, x, y, tower_type, merc_dir = action
@@ -335,11 +540,15 @@ class raw_env(AECEnv):
         x = np.clip(original_x, 0, map_w - 1)
         y = np.clip(original_y, 0, map_h - 1)
 
-        # If the agent chose an action outside the map, penalize it and force a "nothing" action.
-        # This encourages the agent to learn the map boundaries.
+        # --- 1. ACTION VALIDITY CHECK (HEAVY PENALTIES) ---
+        # Penalize invalid actions heavily to encourage proper behavior
+        invalid_penalty = self._check_invalid_action(action, agent, is_red_agent)
+        mercenary_purchase_penalty = self._check_invalid_mercenary_purchase(action, is_red_agent)
+        
+        # If the agent chose an action outside the map, penalize it HEAVILY and force a "nothing" action.
         if original_x >= map_w or original_y >= map_h:
-            self.rewards[agent] -= 0.1  # Small penalty for invalid action.
-            act_type = 0 # Force "nothing" action.
+            act_type = 0  # Force "nothing" action.
+            # Already penalized by invalid_penalty
 
         ai_action = AIAction(
             action=action_type_map[act_type], x=x, y=y,
@@ -362,6 +571,8 @@ class raw_env(AECEnv):
             old_health_b = self.game.game_state.player_base_b.health
             old_money_r = self.game.game_state.money_r
             old_money_b = self.game.game_state.money_b
+            old_tower_count_r = self.tower_count_r_prev
+            old_tower_count_b = self.tower_count_b_prev
 
             # Run the game turn with the actions from both agents.
             self.game.run_turn(self.action_r, self.action_b)
@@ -370,55 +581,161 @@ class raw_env(AECEnv):
             self.action_r = None
             self.action_b = None
 
-            # --- Calculate Rewards ---
-            # Reward shaping is crucial for training RL agents effectively.
-            # We use a sparse reward for winning/losing and a dense reward for in-game events.
+            # --- Calculate Rewards for both players ---
             health_r = self.game.game_state.player_base_r.health
             health_b = self.game.game_state.player_base_b.health
             money_r = self.game.game_state.money_r
             money_b = self.game.game_state.money_b
-
-            # --- Reward Components ---
-            # 1. Health Delta: A zero-sum reward for damaging the opponent's base vs. taking damage.
-            # This is a primary objective, so it has a high weight.
-            health_delta_r = (old_health_b - health_b) - (old_health_r - health_r)
-            health_delta_b = (old_health_r - health_r) - (old_health_b - health_b)
-
-            # 2. Economic Delta: A small reward for increasing one's money.
-            # This encourages building houses and managing the economy.
-            income_r = money_r - old_money_r
-            income_b = money_b - old_money_b
-
-            # 3. Time Penalty: A small negative reward each turn to encourage faster wins and prevent passive behavior.
-            time_penalty = -0.01
-
-            # --- Total Reward ---
-            # The final reward is a weighted sum of the components.
-            # Tuning these weights is a key part of training a successful agent.
-            w_health = 0.8  # Health is the most important factor.
-            w_econ = 1.0   # Economy is a secondary concern.
-
-            reward_r = (w_health * health_delta_r) + (w_econ * income_r) + time_penalty
-            reward_b = (w_health * health_delta_b) + (w_econ * income_b) + time_penalty
             
-            self.rewards["player_r"] += reward_r
-            self.rewards["player_b"] += reward_b
+            # Update tower counts
+            self.tower_count_r = self._count_towers('r')
+            self.tower_count_b = self._count_towers('b')
+
+            # === REWARD RED PLAYER ===
+            reward_r = 0.0
+            
+            # 1. EARLY DEFENSE CONSTRUCTION (First 30 turns)
+            # Reward building towers early (5-6 towers target)
+            if self._is_early_game():
+                early_defense_bonus_r = 0.0
+                if self.tower_count_r >= 5 and old_tower_count_r < 5:
+                    early_defense_bonus_r = 5.0  # Significant bonus for reaching 5 towers
+                elif self.tower_count_r >= 6 and old_tower_count_r < 6:
+                    early_defense_bonus_r = 5.0  # Bonus for reaching 6 towers
+                reward_r += early_defense_bonus_r
+            
+            # 2. ACTION VALIDITY (Red player's last action) - HEAVY PENALTIES
+            # Apply both invalid action penalty and mercenary purchase penalty
+            total_invalid_penalty_r = invalid_penalty if agent == "player_r" else 0
+            total_invalid_penalty_r += mercenary_purchase_penalty if agent == "player_r" else 0
+            reward_r += total_invalid_penalty_r
+            
+            # 3. TOWER CONSTRUCTION & STRATEGIC PLACEMENT
+            # Reward building new towers, penalize too many mercenaries
+            towers_built_r = max(0, self.tower_count_r - old_tower_count_r)
+            if towers_built_r > 0:
+                # Reward for building towers, especially early
+                tower_reward_r = towers_built_r * 0.2
+                reward_r += tower_reward_r
+                
+                # Bonus for strategic placement (towers in high-damage-per-tile areas)
+                placement_quality_r = self._calculate_tower_placement_quality('r', True)
+                if placement_quality_r > 0:
+                    reward_r += min(0.5, placement_quality_r * 0.01)  # Cap at 0.5
+            
+            # 4. MERCENARY CONTROL - Penalize overspending on mercenaries
+            # Count mercenaries built by red player
+            mercs_r = sum(1 for m in self.game.game_state.mercs if m.team == 'r')
+            if mercs_r > self.mercenary_count_r_prev:
+                # Mercenary was built
+                # Penalize if money is getting critically low (less than cost of basic tower)
+                if money_r < 15:  # Basic tower costs ~8-12, reserve should be > 15
+                    reward_r -= 0.2  # Penalty for overspending
+            self.mercenary_count_r_prev = mercs_r
+            
+            # 5. OFFENSIVE SUCCESS & BASE DAMAGE
+            # Reward damaging opponent's base
+            damage_dealt_r = old_health_b - health_b
+            if damage_dealt_r > 0:
+                reward_r += damage_dealt_r * 0.5  # High weight for base damage
+            
+            # 6. BASE PROTECTION - Penalize taking damage
+            # Heavy penalty for taking damage
+            damage_taken_r = old_health_r - health_r
+            if damage_taken_r > 0:
+                reward_r -= damage_taken_r * 1.0  # Scaling penalty for defense failures
+            
+            # 7. RESOURCE EFFICIENCY
+            # Penalize losing money without building (passive money loss)
+            money_delta_r = money_r - old_money_r
+            if money_delta_r < 0 and towers_built_r == 0:
+                # Lost money but didn't build anything
+                reward_r -= abs(money_delta_r) * 0.1
+            elif money_delta_r > 0:
+                # Earning money (houses working)
+                reward_r += money_delta_r * 0.05  # Smaller weight than base damage
+            
+            # 8. TIME PENALTY
+            # Small penalty each turn to encourage faster wins
+            reward_r -= 0.01
+
+            # === REWARD BLUE PLAYER (symmetrical) ===
+            reward_b = 0.0
+            
+            # 1. EARLY DEFENSE CONSTRUCTION
+            if self._is_early_game():
+                early_defense_bonus_b = 0.0
+                if self.tower_count_b >= 5 and old_tower_count_b < 5:
+                    early_defense_bonus_b = 5.0
+                elif self.tower_count_b >= 6 and old_tower_count_b < 6:
+                    early_defense_bonus_b = 5.0
+                reward_b += early_defense_bonus_b
+            
+            # 2. ACTION VALIDITY (Blue player's last action) - HEAVY PENALTIES
+            # Apply both invalid action penalty and mercenary purchase penalty
+            total_invalid_penalty_b = invalid_penalty if agent == "player_b" else 0
+            total_invalid_penalty_b += mercenary_purchase_penalty if agent == "player_b" else 0
+            reward_b += total_invalid_penalty_b
+            
+            # 3. TOWER CONSTRUCTION & STRATEGIC PLACEMENT
+            towers_built_b = max(0, self.tower_count_b - old_tower_count_b)
+            if towers_built_b > 0:
+                tower_reward_b = towers_built_b * 0.2
+                reward_b += tower_reward_b
+                
+                placement_quality_b = self._calculate_tower_placement_quality('b', False)
+                if placement_quality_b > 0:
+                    reward_b += min(0.5, placement_quality_b * 0.01)
+            
+            # 4. MERCENARY CONTROL
+            mercs_b = sum(1 for m in self.game.game_state.mercs if m.team == 'b')
+            if mercs_b > self.mercenary_count_b_prev:
+                if money_b < 15:
+                    reward_b -= 0.2
+            self.mercenary_count_b_prev = mercs_b
+            
+            # 5. OFFENSIVE SUCCESS & BASE DAMAGE
+            damage_dealt_b = old_health_r - health_r
+            if damage_dealt_b > 0:
+                reward_b += damage_dealt_b * 0.5
+            
+            # 6. BASE PROTECTION
+            damage_taken_b = old_health_b - health_b
+            if damage_taken_b > 0:
+                reward_b -= damage_taken_b * 1.0
+            
+            # 7. RESOURCE EFFICIENCY
+            money_delta_b = money_b - old_money_b
+            if money_delta_b < 0 and towers_built_b == 0:
+                reward_b -= abs(money_delta_b) * 0.1
+            elif money_delta_b > 0:
+                reward_b += money_delta_b * 0.05
+            
+            # 8. TIME PENALTY
+            reward_b -= 0.01
+            
+            # Update tower count tracking for next turn
+            self.tower_count_r_prev = self.tower_count_r
+            self.tower_count_b_prev = self.tower_count_b
+            
+            self.rewards["player_r"] = reward_r
+            self.rewards["player_b"] = reward_b
 
             # --- Check for Termination (Game Over) ---
             if self.game.game_state.is_game_over():
-                # A large, sparse reward for winning and a penalty for losing.
+                # Win/Loss conditions with large sparse rewards
                 if self.game.game_state.victory == 'r':
-                    self.rewards["player_r"] += 100
-                    self.rewards["player_b"] -= 100
+                    self.rewards["player_r"] += 100.0  # Large reward for winning
+                    self.rewards["player_b"] -= 100.0  # Large penalty for losing
                 elif self.game.game_state.victory == 'b':
-                    self.rewards["player_b"] += 100
-                    self.rewards["player_r"] -= 100
+                    self.rewards["player_b"] += 100.0
+                    self.rewards["player_r"] -= 100.0
                 
                 self.terminations = {a: True for a in self.agents}
 
             # Update cumulative rewards for logging and debugging.
             for a in self.agents:
-                self._cumulative_rewards[a] = self.rewards[a]
+                self._cumulative_rewards[a] += self.rewards[a]
 
         # Handle rendering if enabled.
         if self.render_mode == "human":

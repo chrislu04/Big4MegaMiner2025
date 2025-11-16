@@ -229,7 +229,7 @@ class Agent:
         print("DEBUG: do_turn called.", file=sys.stderr)
         
         # 1. Convert the game state dictionary into the numpy array observation format.
-        observation = _convert_state_to_obs(game_state, self.team_color)
+        observation = convert_state_to_obs(game_state, self.team_color)
         print(f"DEBUG: Observation created, shape: {observation.shape}", file=sys.stderr)
         
         # Reshape the observation to have a batch dimension of 1, as the model expects.
