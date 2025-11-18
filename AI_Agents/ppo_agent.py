@@ -243,7 +243,7 @@ class Agent:
         self.team_color = team_color
         from stable_baselines3 import PPO
         
-        model_path = Path(__file__).resolve().parent.parent / "training_copy" / "models"  / "best_model" / "best_model.zip"
+        model_path = Path(__file__).resolve().parent.parent / "training" / "models"  / "best_model" / "best_model.zip"
         debug_log(f"Loading model from: {model_path}")
         try:
             self.model = PPO.load(model_path)

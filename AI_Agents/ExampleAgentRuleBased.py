@@ -138,7 +138,7 @@ class Agent:
         self.num_cannons = 0
         self.num_crossbows = 0
         self.num_miniguns = 0
-
+        print("Check here")
         # Return a string representing your team's name
         return "Your Team Name"
         # -- YOUR CODE ENDS HERE --
@@ -147,6 +147,7 @@ class Agent:
     def do_turn(self, game_state: dict) -> AIAction:
         # -- YOUR CODE BEGINS HERE --
         # Competitors: For your convenience, it's recommended that you use the helper functions given earlier in this file
+        print("Check here2")
         q_directions = get_available_queue_directions(game_state, self.team_color)
         build_spaces = get_available_build_spaces(game_state, self.team_color)
         my_money = get_my_money_amount(game_state, self.team_color)

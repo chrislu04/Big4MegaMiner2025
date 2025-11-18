@@ -503,13 +503,13 @@ class raw_env(AECEnv):
 
             # ---- RED: rewards for actually building towers ----
             if house_built_r:
-                build_reward_r += 5   # eco
+                build_reward_r += 3   # eco
             if crossbow_built_r:
                 build_reward_r += 0.8  # basic defense
             if cannon_built_r:
-                build_reward_r += 2.0   # strong splash
+                build_reward_r += 3.0   # strong splash
             if minigun_built_r:
-                build_reward_r += 2.2   # high DPS
+                build_reward_r += 5.2   # high DPS
             if church_built_r:
                 build_reward_r += 0.5   # support
 
@@ -519,9 +519,9 @@ class raw_env(AECEnv):
             if crossbow_built_b:
                 build_reward_b += 0.8
             if cannon_built_b:
-                build_reward_b += 2.0
+                build_reward_b += 3.0
             if minigun_built_b:
-                build_reward_b += 2.2
+                build_reward_b += 5.2
             if church_built_b:
                 build_reward_b += 0.5
 
@@ -531,7 +531,7 @@ class raw_env(AECEnv):
 
             # Mercs only come from "nothing" + direction; penalize that usage
             if old_action_r.action == "nothing" and old_action_r.merc_direction != "":
-                action_penalty_r -= 0.3   # merc usage penalty
+                action_penalty_r += 0.1   # merc usage penalty
             elif old_action_r.action == "nothing" and old_action_r.merc_direction == "":
                 action_penalty_r += 0.1  # mild reward for truly doing nothing (saving money / patience)
 
@@ -540,7 +540,7 @@ class raw_env(AECEnv):
             #     action_penalty_b -= 0.5
 
             if old_action_b.action == "nothing" and old_action_b.merc_direction != "":
-                action_penalty_b -= 0.3
+                action_penalty_b += 0.1
             elif old_action_b.action == "nothing" and old_action_b.merc_direction == "":
                 action_penalty_b += 0.1
 
